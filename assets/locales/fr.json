@@ -1,0 +1,10 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "OSY",
+    "NSLocationWhenInUseUsageDescription": "OSY utilise votre position et votre vitesse lorsque l’application est ouverte pour vous avertir des risques sur la route.",
+    "NSMotionUsageDescription": "OSY utilise les données de mouvement pour aider à détecter un accident."
+  },
+  "android": {
+    "app_name": "OSY"
+  }
+}

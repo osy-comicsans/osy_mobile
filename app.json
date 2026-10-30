@@ -8,7 +8,10 @@
     "scheme": "osymobile",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -57,11 +60,32 @@
       "expo-font",
       "expo-image",
       "expo-status-bar",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": [
+              "en",
+              "fr",
+              "ar"
+            ],
+            "android": [
+              "en",
+              "fr",
+              "ar"
+            ]
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "locales": {
+      "fr": "./assets/locales/fr.json",
+      "ar": "./assets/locales/ar.json"
     }
   }
 }

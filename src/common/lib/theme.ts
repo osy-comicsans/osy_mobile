@@ -2,7 +2,21 @@ import '@/global.css';
 
 import { Platform } from 'react-native';
 
-export * from './tokens';
+import { getLanguage } from './i18n/i18n';
+import { isRtl } from './i18n/languages';
+import {
+  ArabicFontFamily,
+  createArabicTypography,
+  FontFamily as LatinFontFamily,
+  Typography as LatinTypography,
+} from './tokens';
+
+export { Colors, Palette, Priority, Radius, Shadow, Space, type ThemeColor } from './tokens';
+
+// Switching to or from Arabic reloads the app, so these are fixed for each run.
+const arabic = isRtl(getLanguage());
+export const FontFamily = arabic ? ArabicFontFamily : LatinFontFamily;
+export const Typography = arabic ? createArabicTypography() : LatinTypography;
 
 export const Fonts = Platform.select({
   ios: {
