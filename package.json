@@ -59,7 +59,8 @@
     "test:device-playground": "node --test tests/device-playground.test.cjs",
     "test:location": "node --test tests/location.test.cjs",
     "test:api": "node --test tests/api.test.cjs",
-    "test:i18n": "node --test tests/i18n.test.cjs"
+    "test:i18n": "node --test tests/i18n.test.cjs",
+    "test:startup": "node --test tests/startup.test.cjs"
   },
   "private": true
 }

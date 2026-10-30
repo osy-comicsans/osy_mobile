@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-  ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 
 import { Colors, Palette, Radius, Shadow, Typography } from '@/common/lib/theme';
+import { useFontFallback } from '@/common/providers/FontReadinessProvider';
+import { LoadingIndicator } from './loading';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'subtle' | 'text' | 'destructive';
 export type ButtonSize = 'large' | 'medium' | 'small';
@@ -80,6 +82,9 @@ export function Button({
   style,
   ...rest
 }: ButtonProps) {
+  const { t } = useTranslation();
+  const fontFallback = useFontFallback();
+  const accessibleLabel = rest.accessibilityLabel ?? label ?? (typeof children === 'string' ? children : t('loading.action'));
   const dims = sizes[size];
   const colors = palette(variant, tone);
   const isDisabled = disabled || loading;
@@ -94,10 +99,11 @@ export function Button({
 
   return (
     <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled: isDisabled, busy: loading }}
-      disabled={isDisabled}
       {...rest}
+      accessibilityRole="button"
+      accessibilityLabel={accessibleLabel}
+      accessibilityState={{ ...rest.accessibilityState, disabled: isDisabled, busy: loading }}
+      disabled={isDisabled}
       style={({ pressed }) => [
         styles.base,
         {
@@ -112,11 +118,11 @@ export function Button({
         style,
       ]}>
       {loading ? (
-        <ActivityIndicator size="small" color={colors.fg} />
+        <LoadingIndicator label={accessibleLabel} color={colors.fg} decorative />
       ) : (
         <>
           {leftIcon}
-          <Text style={[dims.type, { color: colors.fg }]} numberOfLines={1}>
+          <Text style={[dims.type, { color: colors.fg }, fontFallback]} numberOfLines={1}>
             {label}
             {children}
           </Text>

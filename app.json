@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "osymobile",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
       "infoPlist": {
@@ -32,8 +32,13 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#F5F5F5",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "image": "./assets/brand/osy-splash-light.png",
+          "imageWidth": 240,
+          "resizeMode": "contain",
+          "dark": {
+            "backgroundColor": "#171F25",
+            "image": "./assets/brand/osy-splash-dark.png"
+          }
         }
       ],
       "expo-sqlite",

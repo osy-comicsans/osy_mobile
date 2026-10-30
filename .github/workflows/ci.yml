@@ -41,6 +41,9 @@ jobs:
       - name: Test translations
         run: pnpm test:i18n
 
+      - name: Test startup readiness and emergency loading
+        run: pnpm test:startup
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks

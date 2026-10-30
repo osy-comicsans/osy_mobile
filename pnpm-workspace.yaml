@@ -1,0 +1,9 @@
+# Exact versions already locked on main and approved for installation.
+# Leave the release-age policy in place for all other package versions.
+minimumReleaseAgeExclude:
+  - i18next@26.5.12
+  - electron-to-chromium@1.5.468
+
+# Use the packaged native resolver binding without running its install script.
+allowBuilds:
+  unrs-resolver: false

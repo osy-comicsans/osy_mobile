@@ -89,5 +89,13 @@
       "request": "The request could not be completed.",
       "invalid_response": "The server sent an unexpected response."
     }
+  },
+  "loading": {
+    "app": "Loading OSY",
+    "screen": "Getting things ready",
+    "content": "Loading content",
+    "tasks": "Loading saved tasks",
+    "action": "Please wait",
+    "checkIn": "Open emergency check-in"
   }
 }

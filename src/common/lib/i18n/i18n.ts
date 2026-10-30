@@ -60,7 +60,7 @@ function applyDirection(): boolean {
   // Expo Go ignores forceRTL, so a second attempt would reload forever.
   if (languageStorage.getItem(RELOAD_ATTEMPT_KEY)) return true;
   languageStorage.setItem(RELOAD_ATTEMPT_KEY, '1');
-  void reloadAppAsync('Language direction changed');
+  void reloadAppAsync('Language direction changed').catch(() => undefined);
   return false;
 }
 

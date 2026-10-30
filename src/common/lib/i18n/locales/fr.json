@@ -89,5 +89,13 @@
       "request": "La demande n’a pas pu aboutir.",
       "invalid_response": "Le serveur a envoyé une réponse inattendue."
     }
+  },
+  "loading": {
+    "app": "Chargement d’OSY",
+    "screen": "Préparation en cours",
+    "content": "Chargement du contenu",
+    "tasks": "Chargement des tâches enregistrées",
+    "action": "Veuillez patienter",
+    "checkIn": "Ouvrir la vérification d’urgence"
   }
 }

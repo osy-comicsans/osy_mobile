@@ -1,17 +1,19 @@
-import { useFonts } from 'expo-font';
-import { DefaultTheme, LocaleProvider, Stack, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import '@/common/lib/startup/nativeSplash';
 
-import { AnimatedSplashOverlay } from '@/common/components/animated-icon';
-import { directionReady, getLanguage } from '@/common/lib/i18n/i18n';
+import { DefaultTheme, LocaleProvider, Stack, ThemeProvider } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useCallback, useState } from 'react';
+import { StyleSheet, View, useColorScheme } from 'react-native';
+
+import { StartupSplash } from '@/common/components/StartupSplash';
+import { useStartup } from '@/common/hooks/use-startup';
+import { getLanguage } from '@/common/lib/i18n/i18n';
 import { isRtl } from '@/common/lib/i18n/languages';
+import { isEmergencyPath } from '@/common/lib/startup/startupCoordinator';
 import { AppProviders } from '@/common/providers/AppProviders';
+import { FontReadinessProvider } from '@/common/providers/FontReadinessProvider';
 import { Colors, FontFamily } from '@/common/lib/theme';
 import { LocationProvider } from '@/features/location/providers/LocationProvider';
-
-SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 // Keeps the tabs beneath a modal that was opened directly from a deep link.
 export const unstable_settings = {
@@ -38,43 +40,41 @@ const OsyLightTheme = {
 };
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    Gabarito_400Regular: require('@/assets/fonts/Gabarito_400Regular.ttf'),
-    Gabarito_500Medium: require('@/assets/fonts/Gabarito_500Medium.ttf'),
-    Gabarito_600SemiBold: require('@/assets/fonts/Gabarito_600SemiBold.ttf'),
-    Gabarito_700Bold: require('@/assets/fonts/Gabarito_700Bold.ttf'),
-    IBMPlexSansArabic_400Regular: require('@/assets/fonts/IBMPlexSansArabic_400Regular.ttf'),
-    IBMPlexSansArabic_500Medium: require('@/assets/fonts/IBMPlexSansArabic_500Medium.ttf'),
-    IBMPlexSansArabic_600SemiBold: require('@/assets/fonts/IBMPlexSansArabic_600SemiBold.ttf'),
-    IBMPlexSansArabic_700Bold: require('@/assets/fonts/IBMPlexSansArabic_700Bold.ttf'),
-  });
-  const ready = (loaded || !!error) && directionReady;
-
-  useEffect(() => {
-    if (ready) SplashScreen.hideAsync();
-  }, [ready]);
-
-  if (!ready) return null;
+  const { startup, snapshot, path } = useStartup();
+  const tone = useColorScheme() === 'dark' ? 'dark' : 'light';
+  const [dismissed, setDismissed] = useState(false);
+  const handleDismiss = useCallback(() => setDismissed(true), []);
+  const emergency = snapshot.emergency || isEmergencyPath(path);
 
   return (
     <ThemeProvider value={OsyLightTheme}>
-      <AppProviders>
-        <LocationProvider>
-          <StatusBar style="dark" />
-          <AnimatedSplashOverlay />
-          <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen
-                name="check-in"
-                options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
-              />
-              <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
-              <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
-            </Stack>
-          </LocaleProvider>
-        </LocationProvider>
-      </AppProviders>
+      <FontReadinessProvider ready={snapshot.tasks.fonts === 'ready'}>
+        <AppProviders>
+          <LocationProvider>
+            <StatusBar style={!dismissed && !emergency && tone === 'dark' ? 'light' : 'dark'} />
+            <View style={styles.root} onLayout={startup.markContentReady}>
+              <View style={styles.root} accessibilityElementsHidden={!dismissed && !emergency}
+                importantForAccessibility={!dismissed && !emergency ? 'no-hide-descendants' : 'auto'}>
+                <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen
+                      name="check-in"
+                      options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+                    />
+                    <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
+                  </Stack>
+                </LocaleProvider>
+              </View>
+              <StartupSplash snapshot={snapshot} emergency={emergency} tone={tone}
+                onArtworkReady={startup.markArtworkReady} onDismiss={handleDismiss} />
+            </View>
+          </LocationProvider>
+        </AppProviders>
+      </FontReadinessProvider>
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({ root: { flex: 1, backgroundColor: Colors.background } });

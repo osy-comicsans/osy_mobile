@@ -1,17 +1,20 @@
-import { ActivityIndicator, FlatList, Platform, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { FlatList, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AmbientBackground } from '@/common/components/ui/ambient-background';
 import { Button } from '@/common/components/ui/button';
 import { Card } from '@/common/components/ui/card';
+import { ContentSkeleton } from '@/common/components/ui/loading';
 import { Input } from '@/common/components/ui/input';
 import { StatusPill, type StatusPillStatus } from '@/common/components/ui/status-pill';
 import { ThemedText } from '@/common/components/themed-text';
-import { BottomTabInset, Colors, MaxContentWidth, Spacing } from '@/common/lib/theme';
+import { BottomTabInset, MaxContentWidth, Spacing } from '@/common/lib/theme';
 import type { TodosController } from '../hooks/useTodosController';
 import { TodoItem } from './TodoItem';
 
 export function TodosView({ controller }: { controller: TodosController }) {
+  const { t } = useTranslation();
   const { status, todos, saving } = controller;
 
   const summary: { status: StatusPillStatus; label: string } = status.syncing
@@ -119,7 +122,7 @@ export function TodosView({ controller }: { controller: TodosController }) {
                 </Card>
               )}
               {controller.loading && (
-                <ActivityIndicator accessibilityLabel="Loading saved tasks" color={Colors.accent} />
+                <ContentSkeleton label={t('loading.tasks')} />
               )}
             </View>
           }

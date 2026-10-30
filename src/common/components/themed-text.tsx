@@ -2,6 +2,7 @@ import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
 
 import { Fonts, ThemeColor, Typography } from '@/common/lib/theme';
 import { useTheme } from '@/common/hooks/use-theme';
+import { useFontFallback } from '@/common/providers/FontReadinessProvider';
 
 export type ThemedTextProps = TextProps & {
   type?:
@@ -25,6 +26,7 @@ export type ThemedTextProps = TextProps & {
 
 export function ThemedText({ style, type = 'default', themeColor, ...rest }: ThemedTextProps) {
   const theme = useTheme();
+  const fontFallback = useFontFallback();
 
   return (
     <Text
@@ -46,6 +48,7 @@ export function ThemedText({ style, type = 'default', themeColor, ...rest }: The
         type === 'label' && styles.label,
         type === 'overline' && styles.overline,
         style,
+        fontFallback,
       ]}
       {...rest}
     />

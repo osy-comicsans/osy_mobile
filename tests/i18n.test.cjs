@@ -113,7 +113,7 @@ test('reachable screens have no hard-coded text or physical styles', () => {
   // Tasks and the device playground have no route, so users cannot reach them.
   const skipped = ['features/todos', 'features/device-playground'];
   const files = fs.readdirSync(src, { recursive: true })
-    .filter((file) => file.endsWith('.tsx') && !skipped.some((dir) => file.startsWith(dir)));
+    .filter((file) => file.endsWith('.tsx') && !skipped.some((dir) => file.split(path.sep).join('/').startsWith(dir)));
   for (const file of files) {
     const code = fs.readFileSync(path.join(src, file), 'utf8');
     assert.doesNotMatch(code, /\b(?:label|title|description|placeholder|accessibilityLabel)="[^"]*[A-Za-z]/, file);

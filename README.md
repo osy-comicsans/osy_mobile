@@ -1,21 +1,24 @@
 # OSYMobile
 
-Expo SDK 57 application using Expo Router, React Native, and strict TypeScript.
+Expo SDK 58 application using Expo Router, React Native, and strict TypeScript.
 
 ## Development
 
 ```powershell
-npm ci
+pnpm install --frozen-lockfile
 Copy-Item .env.example .env.local
-npm start
+pnpm start
 ```
+
+`pnpm-workspace.yaml` contains release-age exceptions for exactly `i18next@26.5.12` and `electron-to-chromium@1.5.468`, versions already in the lockfile. Other versions keep the configured release-age policy. The resolver's install script is explicitly disabled; its packaged native binding is used instead. These project settings let repeated installs use the same policy without temporary overrides. Use the project CLI through `pnpm start`, rather than the retired global `expo-cli`.
 
 Set `EXPO_PUBLIC_API_URL` in `.env.local` before making backend requests. Use an address reachable from your device. The app can launch without a backend URL; the shared client rejects requests until one is configured. `EXPO_PUBLIC_*` values are bundled into the app and must never contain secrets. Authentication values belong in SecureStore.
 
 ```powershell
-npm run lint
-npm run typecheck
-npm run test:offline
+pnpm lint
+pnpm typecheck
+pnpm test:offline
+pnpm test:startup
 npx expo-doctor
 npx expo export --platform all
 ```
@@ -146,3 +149,37 @@ The app runs in English, French, and Arabic, and follows the device language unt
 Arabic is right-to-left, so switching to or from it reloads the app. Expo Go ignores forced direction changes, so test this in a development build. Use `start`/`end` styles rather than `left`/`right` unless the direction is physical, such as a compass.
 
 French and Arabic strings are drafts until a fluent speaker has reviewed them. Do not release emergency text without that review.
+
+## Splash and shared loading
+
+Native startup uses the OSY wordmark in `assets/brand/`, with purple on the light canvas and lavender on charcoal in dark mode. Both platforms share the same image size and transparent safe-zone padding. SVG outlines are committed alongside the PNGs; `scripts/generate-splash-art.ps1` regenerates them from the bundled Gabarito font on Windows. Native appearance follows the device; the existing application screens retain the light OSY theme.
+
+`useStartup` waits for local fonts, the existing SecureStore auth-session restore, locale direction, artwork decoding, and the first content layout. It never waits for a network request, location access, or database synchronization. Startup errors settle the affected task; a four-second deadline releases a stalled startup. System fonts keep emergency text and buttons usable if the custom fonts fail. The navigator remains mounted throughout startup, preserving cold deep links and the check-in modal anchor.
+
+Native splash hiding happens after two animation frames of ready content. `StartupSplash` then fades matching JS artwork for 200 ms on iOS and Android, with interaction tracking disabled. Reduced Motion and emergency check-in bypass the fade. Entering `/check-in`, including through an initial or subsequent `osymobile://check-in` URL, releases the gate without waiting for fonts or auth. The old Expo-logo overlay has been removed.
+
+Reusable exports from `src/common/components/ui/loading.tsx`:
+
+| Component | Use |
+| --- | --- |
+| `LoadingIndicator` | Inline progress, including the shared Button's loading state; accepts a translated accessibility label and foreground color |
+| `FullScreenLoader` | Route/screen loading with the OSY mark, message, and an independently accessible emergency check-in link |
+| `ContentSkeleton` | Loading content inside an existing screen; accepts a label, line count, and container style |
+
+Full-screen loaders occupy their route's layout instead of mounting a global Modal. Keep check-in actions outside data-loading gates. Skeletons use the shared palette and respect Reduced Motion; loading announcements are polite and all progress indicators expose a busy state. Labels are available in English, French, and Arabic. Tasks now use `ContentSkeleton` rather than an isolated spinner.
+
+`pnpm test:startup` covers pending auth, font/session failures, stalled work and artwork, first layout, initial/late check-in links, StrictMode cleanup, and light/dark asset configuration. CI runs these checks alongside the existing suites.
+
+### Native verification still required
+
+This checkout has no EAS project/app identifiers or development build profile, and native device checks have not been performed here. Configure the existing app's identifiers and EAS project before building; do not invent a new application identity for this change. Once the existing development profile is available, build fresh binaries with `npx eas-cli@latest build --profile development --platform android` and the corresponding `--platform ios` command, then run `pnpm expo start --dev-client`.
+
+Verify these cases on both platforms:
+
+1. Force-quit and cold-launch in light and dark device appearance. Confirm OSY artwork, a continuous handoff, and no Expo logo or blank frame.
+2. Cold-launch a `osymobile://check-in` link and send the same link while startup is still pending. The emergency screen must be usable without waiting for auth or fonts.
+3. Enable Reduced Motion and repeat startup. Confirm there is no extra fade or pulsing skeleton animation.
+4. Check the full-screen loader's emergency action, Button loading labels, and inline skeleton announcements with VoiceOver/TalkBack. Check that a content skeleton leaves the surrounding screen usable.
+5. Exercise failed and stalled startup tasks through the startup test harness, and verify a degraded native build reveals usable system-font text rather than remaining on the splash.
+
+Expo Go does not verify the configured native splash. Expo also documents that development builds can differ from standalone splash rendering, so additionally inspect the final artwork in a preview/release build. See the [SDK 58 splash-screen reference](https://docs.expo.dev/versions/v58.0.0/sdk/splash-screen/).
