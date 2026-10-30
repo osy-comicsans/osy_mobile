@@ -1,6 +1,6 @@
 import { randomUUID } from 'expo-crypto';
 import { router } from 'expo-router';
-import { createContext, useEffect, useState, type PropsWithChildren } from 'react';
+import { useEffect, useState, type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api, authSession } from '@/common/lib/api/axios';
@@ -16,9 +16,8 @@ import { AlertBanner } from '../components/AlertBanner';
 import { alertDriver } from '../native/alertDriver';
 import type { AppAlert } from '../types/alert.types';
 import { ALERT_RULES, ALERT_TYPES, CHECK_IN_ACTIONS } from '../utils/alertRules';
-import { createAlertService, type AlertService } from '../utils/alertService';
-
-export const AlertContext = createContext<AlertService | null>(null);
+import { createAlertService } from '../utils/alertService';
+import { AlertContext } from './AlertContext';
 
 const profileApi = createProfileApi(api);
 

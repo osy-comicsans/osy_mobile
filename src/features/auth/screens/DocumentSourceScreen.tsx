@@ -37,7 +37,7 @@ export function DocumentSourceScreen() {
       return;
     }
 
-    const { uri, fileName, mimeType, sizeBytes } = result.file;
+    const { uri, fileName, mimeType, sizeBytes, width } = result.file;
     const errors = fieldErrors(documentFileSchema, { mimeType, sizeBytes });
     const problem = errors.mimeType ?? errors.sizeBytes;
     if (problem) {
@@ -47,14 +47,14 @@ export function DocumentSourceScreen() {
 
     setFileError(null);
     setCameraDenied(null);
-    const next = [...pages, { side, uri, fileName, mimeType } as CapturedPage];
+    const next = [...pages, { side, uri, fileName, mimeType, width } as CapturedPage];
     documentDraft.setState({ pages: next, source });
     if (next.length < 2) return;
 
     // OCR failure must never block manual entry on the review step.
     setBusy(true);
-    const fields = await extractDocumentFields(type, next).catch(() => ({}));
-    documentDraft.setState({ fields });
+    const { fields, lowConfidence, failed, failureReason } = await extractDocumentFields(type, next);
+    documentDraft.setState({ fields, lowConfidence, ocrFailed: failed, ocrFailureReason: failureReason });
     setBusy(false);
     router.replace('/document-review');
   };

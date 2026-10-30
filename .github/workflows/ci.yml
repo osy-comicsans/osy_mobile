@@ -53,6 +53,9 @@ jobs:
       - name: Test registration and onboarding
         run: pnpm test:auth
 
+      - name: Test OCR
+        run: pnpm test:ocr
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks

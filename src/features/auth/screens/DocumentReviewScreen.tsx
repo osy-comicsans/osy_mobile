@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { Redirect, router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { useStore } from 'zustand';
@@ -12,28 +12,39 @@ import { Input } from '@/common/components/ui/input';
 import { getLanguage } from '@/common/lib/i18n/i18n';
 import { Colors, Radius, Space } from '@/common/lib/theme';
 
-import { accountService, documentsApi } from '../authServices';
+import { accountService, documentsApi, profileApi } from '../authServices';
 import { AuthScreen, sheetCard } from '../components/AuthScreen';
 import { FormNotice } from '../components/FormNotice';
 import { useKeyText } from '../hooks/useKeyText';
 import { deleteCapturedFiles } from '../native/documentCapture';
-import { CONSENT_VERSION, DOCUMENT_FIELDS, type DocumentFieldKey } from '../types/auth.schemas';
-import { formErrorKey, missingFields } from '../utils/authForm';
+import { saveConfirmedFields } from '../native/documentVault';
+import { CONSENT_VERSION, DOCUMENT_FIELDS, type DocumentFieldKey, type User } from '../types/auth.schemas';
+import { formErrorKey, missingFields, nameMismatch } from '../utils/authForm';
 import { documentDraft, getConsentedAt, pageUris, resetDraftPages } from '../utils/documentDraft';
 
 export function DocumentReviewScreen() {
   const { t } = useTranslation();
   const text = useKeyText();
-  const { type, source, pages, fields } = useStore(documentDraft);
+  const { type, source, pages, fields, lowConfidence, ocrFailed, ocrFailureReason } = useStore(documentDraft);
+  const [account, setAccount] = useState<User | null>(null);
   const [showMissing, setShowMissing] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    profileApi.getProfile().then((user) => { if (active) setAccount(user); }).catch(() => undefined);
+    return () => { active = false; };
+  }, []);
 
   if (!type || !source || pages.length < 2) return <Redirect href="/documents" />;
   const missing = missingFields(type, fields);
 
   const change = (field: DocumentFieldKey, value: string) => {
-    documentDraft.setState({ fields: { ...fields, [field]: value } });
+    documentDraft.setState({
+      fields: { ...fields, [field]: value },
+      lowConfidence: lowConfidence.filter((key) => key !== field),
+    });
   };
 
   const retake = (rejectionReason: string | null = null) => {
@@ -49,12 +60,13 @@ export function DocumentReviewScreen() {
 
     setUploading(true);
     setUploadError(null);
+    const captureLanguage = getLanguage() === 'ar' ? 'ar' : 'fr';
     try {
       const response = await documentsApi.upload({
         type,
         source,
         pages,
-        captureLanguage: getLanguage() === 'ar' ? 'ar' : 'fr',
+        captureLanguage,
         fields,
         consentVersion: CONSENT_VERSION,
         consentedAt: getConsentedAt(),
@@ -65,6 +77,7 @@ export function DocumentReviewScreen() {
         retake(record.rejectionReason);
         return;
       }
+      await saveConfirmedFields(type, fields, captureLanguage).catch(() => undefined);
       deleteCapturedFiles(pageUris());
       resetDraftPages();
       accountService.apply(response);
@@ -110,6 +123,15 @@ export function DocumentReviewScreen() {
 
       <View style={sheetCard}>
         <ThemedText type="heading" accessibilityRole="header">{t('documents.detailsTitle')}</ThemedText>
+        {ocrFailed && (
+          <FormNotice
+            tone="warning"
+            message={__DEV__ && ocrFailureReason ? `${t('documents.ocrFailed')} (${ocrFailureReason})` : t('documents.ocrFailed')}
+          />
+        )}
+        {account && type === 'driver_license' && nameMismatch(fields, account) && (
+          <FormNotice tone="warning" message={t('documents.nameMismatch')} />
+        )}
         {DOCUMENT_FIELDS[type].map((field) => (
           <Input
             key={field}
@@ -117,6 +139,7 @@ export function DocumentReviewScreen() {
             value={fields[field] ?? ''}
             onChangeText={(value) => change(field, value)}
             error={showMissing && missing.includes(field) ? t('documents.errors.fieldRequired') : undefined}
+            hint={lowConfidence.includes(field) ? t('documents.checkField') : undefined}
             editable={!uploading}
           />
         ))}

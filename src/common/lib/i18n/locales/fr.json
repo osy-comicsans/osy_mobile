@@ -42,7 +42,8 @@
   "profile": {
     "title": "Profil",
     "description": "Vos informations, vos contacts d’urgence et vos statistiques de conduite s’afficheront ici.",
-    "settings": "Réglages"
+    "settings": "Réglages",
+    "logout": "Se déconnecter"
   },
   "settings": {
     "title": "Réglages",
@@ -231,7 +232,10 @@
     "photoHint": "Utilisez une photo existante",
     "fileHint": "Fichier JPG, PNG ou PDF, 10 Mo au maximum",
     "reading": "Lecture de votre document…",
-    "detailsTitle": "Informations du document"
+    "detailsTitle": "Informations du document",
+    "checkField": "Vérifiez ce champ. Il a peut-être été mal lu.",
+    "nameMismatch": "Le nom sur ce permis ne correspond pas à votre compte.",
+    "ocrFailed": "Nous n’avons pas pu lire ce document automatiquement. Veuillez saisir les informations vous-même."
   },
   "errors": {
     "api": {
