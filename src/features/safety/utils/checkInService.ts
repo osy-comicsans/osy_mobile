@@ -5,7 +5,7 @@ import type { CrashEvent } from '@/features/crash-detection/types/crash.types';
 // Waited one after another, so a driver has three minutes in total to answer.
 export const CHECK_IN_ROUNDS_SECONDS = [30, 60, 90];
 
-export type CheckInStatus = 'idle' | 'waiting' | 'escalated';
+export type CheckInStatus = 'idle' | 'waiting' | 'escalated' | 'confirmed';
 export type EscalationTrigger = 'user_requested' | 'check_in_timeout';
 
 export interface CheckInState {
@@ -67,7 +67,8 @@ export function createCheckInService({ escalate, remind, now = Date.now }: Check
 
     // A second crash during a check-in must not hand the driver more time.
     begin(event: CrashEvent | null = null) {
-      if (store.getState().status !== 'idle') return;
+      const { status } = store.getState();
+      if (status === 'waiting' || status === 'escalated') return;
       store.setState({
         status: 'waiting',
         round: 0,
@@ -79,7 +80,7 @@ export function createCheckInService({ escalate, remind, now = Date.now }: Check
 
     confirmOk() {
       clearTimeout(timer);
-      store.setState(idle);
+      store.setState({ ...idle, status: 'confirmed' });
     },
 
     needHelp() {

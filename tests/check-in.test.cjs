@@ -54,7 +54,16 @@ test('I am OK cancels, in any round', (t) => {
   f.service.confirmOk();
   f.advance(300);
   assert.deepEqual(f.escalations, []);
-  assert.equal(f.state().status, 'idle');
+  assert.equal(f.state().status, 'confirmed');
+});
+
+test('a new crash starts a check-in after an I am OK', (t) => {
+  const f = fixture(t);
+  f.service.begin(crash);
+  f.service.confirmOk();
+  f.service.begin(crash);
+  assert.equal(f.state().status, 'waiting');
+  assert.equal(f.state().round, 0);
 });
 
 test('I need help escalates at once, one time only', (t) => {

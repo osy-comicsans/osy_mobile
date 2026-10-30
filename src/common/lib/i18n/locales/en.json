@@ -112,8 +112,7 @@
   },
   "checkIn": {
     "title": "Are you OK?",
-    "waiting": "seconds to respond",
-    "stillWaiting": "We haven’t heard from you. Seconds left to respond",
+    "stillWaiting": "We haven’t heard from you yet.",
     "secondsLeft": "{{value}} seconds left to respond",
     "ok": "I’m OK",
     "help": "I need help",
@@ -124,7 +123,9 @@
       "speed": "Your speed before the crash"
     },
     "escalatedTitle": "We could not confirm you’re OK",
-    "escalatedBody": "OSY has not contacted anyone yet. If you need help, call emergency services yourself."
+    "escalatedBody": "OSY has not contacted anyone yet. If you need help, call emergency services yourself.",
+    "seconds": "seconds",
+    "confirmedTitle": "Glad you’re OK"
   },
   "errors": {
     "api": {

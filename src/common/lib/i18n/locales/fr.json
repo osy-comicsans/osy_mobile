@@ -112,8 +112,7 @@
   },
   "checkIn": {
     "title": "Tout va bien ?",
-    "waiting": "secondes pour répondre",
-    "stillWaiting": "Nous n’avons pas de réponse de votre part. Secondes restantes pour répondre",
+    "stillWaiting": "Nous n’avons pas encore de réponse de votre part.",
     "secondsLeft": "{{value}} secondes restantes pour répondre",
     "ok": "Je vais bien",
     "help": "J’ai besoin d’aide",
@@ -124,7 +123,9 @@
       "speed": "Votre vitesse avant l’accident"
     },
     "escalatedTitle": "Nous n’avons pas pu confirmer que tout va bien",
-    "escalatedBody": "OSY n’a encore contacté personne. Si vous avez besoin d’aide, appelez vous-même les secours."
+    "escalatedBody": "OSY n’a encore contacté personne. Si vous avez besoin d’aide, appelez vous-même les secours.",
+    "seconds": "secondes",
+    "confirmedTitle": "Tant mieux, tout va bien"
   },
   "errors": {
     "api": {
