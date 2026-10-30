@@ -1,7 +1,11 @@
 const apiUrl = process.env.EXPO_PUBLIC_API_URL?.trim() ?? '';
 
+// The public demo server is the default. It is rate limited and has no uptime guarantee.
+const osrmUrl = process.env.EXPO_PUBLIC_OSRM_URL?.trim() || 'https://router.project-osrm.org';
+
 export const config = {
   apiUrl,
+  osrmUrl,
   // Optional URL for the standalone weather service. This is public routing
   // configuration; the Open-Meteo credential stays on that service.
   weatherApiUrl: process.env.EXPO_PUBLIC_WEATHER_API_URL?.trim().replace(/\/+$/, '') ?? '',

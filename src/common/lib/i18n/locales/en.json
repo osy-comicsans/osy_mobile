@@ -37,7 +37,9 @@
   },
   "map": {
     "title": "Map",
-    "description": "Your position, road details, and risky roads will appear here."
+    "unknownRoad": "Unknown road",
+    "recenter": "Re-centre on my location",
+    "unavailable": "The map needs a development build. It is not available in Expo Go or on web."
   },
   "profile": {
     "title": "Profile",

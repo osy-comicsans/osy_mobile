@@ -19,6 +19,7 @@ const icons = {
   close: { ios: 'xmark', android: 'close', web: 'close' },
   warning: { ios: 'exclamationmark.triangle', android: 'warning', web: 'warning' },
   error: { ios: 'exclamationmark.circle', android: 'error', web: 'error' },
+  location: { ios: 'location.fill', android: 'my_location', web: 'my_location' },
   shield: { ios: 'lock.shield', android: 'shield_lock', web: 'shield_lock' },
 } satisfies Record<string, SymbolViewProps['name']>;
 
