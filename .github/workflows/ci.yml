@@ -38,6 +38,9 @@ jobs:
       - name: API tests
         run: pnpm test:api
 
+      - name: Test translations
+        run: pnpm test:i18n
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks
