@@ -75,7 +75,8 @@
     "test:alerts": "node --test tests/alerts.test.cjs",
     "test:check-in": "node --test tests/check-in.test.cjs",
     "test:auth": "node --test tests/auth.test.cjs",
-    "test:ocr": "node --test tests/ocr.test.cjs"
+    "test:ocr": "node --test tests/ocr.test.cjs",
+    "test:roads": "node --test tests/roads.test.cjs"
   },
   "private": true
 }
