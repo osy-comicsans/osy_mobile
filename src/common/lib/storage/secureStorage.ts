@@ -16,7 +16,10 @@ export const secureStorage = {
 
   async setItem(key: string, value: string): Promise<void> {
     await requireSecureStorage();
-    await SecureStore.setItemAsync(key, value);
+    // Crash escalation may need the access token while the phone is locked.
+    await SecureStore.setItemAsync(key, value, {
+      keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY,
+    });
   },
 
   async removeItem(key: string): Promise<void> {
