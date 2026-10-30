@@ -81,6 +81,8 @@ Installed foundations: TanStack Query, Axios, Expo SQLite, Zustand, Expo SecureS
 
 ## Navigation
 
+The Home weather card uses the standalone Open-Meteo service in `server/weather/`, a SQLite area cache, and normalized risk inputs. See [weather setup](docs/weather.md) for the two-terminal startup steps and server-only key configuration. No provider key belongs in the mobile environment. Run `pnpm weather:server` alongside Expo after configuring its public URL.
+
 ```text
 src/app/
   _layout.tsx             Root stack, anchored to (tabs)

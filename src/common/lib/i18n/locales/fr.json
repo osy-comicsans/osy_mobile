@@ -45,7 +45,8 @@
     "title": "Profil",
     "description": "Vos informations, vos contacts d’urgence et vos statistiques de conduite s’afficheront ici.",
     "settings": "Réglages",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "emergencyContacts": "Contacts d’urgence"
   },
   "settings": {
     "title": "Réglages",
@@ -133,7 +134,6 @@
       "speed": "Votre vitesse avant l’accident"
     },
     "escalatedTitle": "Nous n’avons pas pu confirmer que tout va bien",
-    "escalatedBody": "OSY n’a encore contacté personne. Si vous avez besoin d’aide, appelez vous-même les secours.",
     "seconds": "secondes",
     "confirmedTitle": "Tant mieux, tout va bien",
     "backHome": "Retour à l’accueil"
@@ -259,6 +259,43 @@
       "invalid_response": "Le serveur a envoyé une réponse inattendue."
     }
   },
+  "weather": {
+    "title": "Météo",
+    "refresh": "Actualiser",
+    "loading": "Chargement de la météo locale",
+    "unknown": "—",
+    "unconfigured": "La météo sera disponible lorsque le service météo sera connecté.",
+    "offline": "Aucune météo enregistrée pour cette zone. Reconnectez-vous pour actualiser.",
+    "locationRequired": "Autorisez la localisation et attendez une position récente pour charger la météo locale.",
+    "unavailable": "Météo indisponible. Réessayez dans un instant.",
+    "updated": "Météo valable à {{value}}",
+    "offlineUpdated": "Hors ligne · dernière météo connue à {{value}}",
+    "previousArea": "Météo de la dernière zone enregistrée ; votre zone actuelle n’est pas confirmée.",
+    "stale": "Ces conditions sont périmées et exclues des estimations actuelles du risque.",
+    "precipitation": "Précipitations",
+    "visibility": "Visibilité",
+    "wind": "Vent",
+    "gusts": "Rafales",
+    "sunrise": "Lever du soleil",
+    "sunset": "Coucher du soleil",
+    "celsius": "{{value}} °C",
+    "metres": "{{value}} m",
+    "millimetres": "{{value}} mm",
+    "windValue": "{{value}} m/s",
+    "precipitationValue": "{{value}} mm / {{minutes}} min",
+    "icingPossible": "Verglas possible",
+    "icingUnknown": "Verglas : inconnu",
+    "icingEstimate": "Estimation météo ; l’état de la chaussée n’est pas mesuré.",
+    "nextHours": "Les six prochaines heures",
+    "hourSummary": "{{time}} : {{condition}}, {{temperature}} degrés Celsius, {{rain}} millimètres de précipitations",
+    "refreshFailed": "Actualisation impossible. Les dernières valeurs enregistrées restent affichées.",
+    "attribution": "Météo par Open-Meteo · données adaptées par OSY",
+    "conditions": {
+      "clear": "Ciel dégagé", "partly_cloudy": "Partiellement nuageux", "cloudy": "Nuageux", "fog": "Brouillard",
+      "drizzle": "Bruine", "rain": "Pluie", "freezing_precipitation": "Précipitations verglaçantes",
+      "snow": "Neige", "thunderstorm": "Orage", "unknown": "Conditions indisponibles"
+    }
+  },
   "loading": {
     "app": "Chargement d’OSY",
     "screen": "Préparation en cours",
@@ -266,5 +303,26 @@
     "tasks": "Chargement des tâches enregistrées",
     "action": "Veuillez patienter",
     "checkIn": "Ouvrir la vérification d’urgence"
+  },
+  "escalation": {
+    "testMode": "Mode test : personne n’a été contacté.",
+    "call": "Appeler les secours ({{number}})",
+    "status": {
+      "idle": "Dites à OSY si vous avez besoin d’aide.",
+      "sending": "Envoi de votre demande d’aide…",
+      "sent": "Votre demande d’aide a été envoyée à OSY. Votre position est partagée.",
+      "waitingForSignal": "Pas de connexion. OSY continue d’essayer. Appelez si vous le pouvez.",
+      "noLocation": "OSY ne connaît pas votre position. Appelez les secours.",
+      "canceled": "Votre demande d’aide a été annulée."
+    }
+  },
+  "contacts": {
+    "description": "OSY prévient ces personnes si vous avez besoin d’aide après un accident.",
+    "add": "Ajouter un contact",
+    "name": "Nom",
+    "save": "Enregistrer le contact",
+    "remove": "Retirer",
+    "invalid": "Saisissez un nom et un numéro de mobile valide.",
+    "failed": "Cela n’a pas fonctionné. Vérifiez votre connexion et réessayez."
   }
 }

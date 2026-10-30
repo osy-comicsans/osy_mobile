@@ -1,7 +1,8 @@
 import type { DatabaseConnection } from '../databaseTypes';
 import { initialSchema } from './001_initial';
+import { weatherSchema } from './002_weather';
 
-const migrations = [{ version: 1, sql: initialSchema }];
+const migrations = [{ version: 1, sql: initialSchema }, { version: 2, sql: weatherSchema }];
 
 export async function migrateDatabase(database: DatabaseConnection): Promise<void> {
   await database.withTransactionAsync(async () => {

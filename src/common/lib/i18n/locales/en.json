@@ -45,7 +45,8 @@
     "title": "Profile",
     "description": "Your details, emergency contacts, and driving stats will appear here.",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "emergencyContacts": "Emergency contacts"
   },
   "settings": {
     "title": "Settings",
@@ -133,7 +134,6 @@
       "speed": "Your speed before the crash"
     },
     "escalatedTitle": "We could not confirm you’re OK",
-    "escalatedBody": "OSY has not contacted anyone yet. If you need help, call emergency services yourself.",
     "seconds": "seconds",
     "confirmedTitle": "Glad you’re OK",
     "backHome": "Back to home"
@@ -259,6 +259,43 @@
       "invalid_response": "The server sent an unexpected response."
     }
   },
+  "weather": {
+    "title": "Weather",
+    "refresh": "Refresh",
+    "loading": "Loading local weather",
+    "unknown": "—",
+    "unconfigured": "Weather will be available when the weather service is connected.",
+    "offline": "No saved weather is available for this area. Reconnect to update.",
+    "locationRequired": "Allow location access and wait for a recent position to load local weather.",
+    "unavailable": "Weather is unavailable. Try refreshing shortly.",
+    "updated": "Weather valid at {{value}}",
+    "offlineUpdated": "Offline · last known weather at {{value}}",
+    "previousArea": "Weather for the last saved area; your current area is not confirmed.",
+    "stale": "These conditions are out of date and are excluded from current risk estimates.",
+    "precipitation": "Precipitation",
+    "visibility": "Visibility",
+    "wind": "Wind",
+    "gusts": "Gusts",
+    "sunrise": "Sunrise",
+    "sunset": "Sunset",
+    "celsius": "{{value}} °C",
+    "metres": "{{value}} m",
+    "millimetres": "{{value}} mm",
+    "windValue": "{{value}} m/s",
+    "precipitationValue": "{{value}} mm / {{minutes}} min",
+    "icingPossible": "Possible road icing",
+    "icingUnknown": "Road icing: unknown",
+    "icingEstimate": "Weather-based estimate; road surface conditions are not measured.",
+    "nextHours": "Next six hours",
+    "hourSummary": "{{time}}: {{condition}}, {{temperature}} degrees Celsius, {{rain}} millimetres of precipitation",
+    "refreshFailed": "Could not refresh weather. The last saved values remain visible.",
+    "attribution": "Weather by Open-Meteo · data adapted by OSY",
+    "conditions": {
+      "clear": "Clear", "partly_cloudy": "Partly cloudy", "cloudy": "Cloudy", "fog": "Fog",
+      "drizzle": "Drizzle", "rain": "Rain", "freezing_precipitation": "Freezing precipitation",
+      "snow": "Snow", "thunderstorm": "Thunderstorm", "unknown": "Conditions unavailable"
+    }
+  },
   "loading": {
     "app": "Loading OSY",
     "screen": "Getting things ready",
@@ -266,5 +303,26 @@
     "tasks": "Loading saved tasks",
     "action": "Please wait",
     "checkIn": "Open emergency check-in"
+  },
+  "escalation": {
+    "testMode": "Test mode: nobody was contacted.",
+    "call": "Call emergency services ({{number}})",
+    "status": {
+      "idle": "Tell OSY if you need help.",
+      "sending": "Sending your request for help…",
+      "sent": "Your request for help was sent to OSY. Sharing your location.",
+      "waitingForSignal": "No connection. OSY keeps trying. Call if you can.",
+      "noLocation": "OSY does not know your location. Call emergency services.",
+      "canceled": "Your request for help was canceled."
+    }
+  },
+  "contacts": {
+    "description": "OSY alerts these people if you need help after a crash.",
+    "add": "Add a contact",
+    "name": "Name",
+    "save": "Save contact",
+    "remove": "Remove",
+    "invalid": "Enter a name and a valid mobile number.",
+    "failed": "That did not work. Check your connection and try again."
   }
 }

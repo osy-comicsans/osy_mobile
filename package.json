@@ -60,6 +60,8 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "weather:server": "node --env-file-if-exists=server/weather/.env.local server/weather/start.mjs",
+    "test:weather": "node --test tests/weather.test.cjs",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
@@ -79,7 +81,8 @@
     "test:auth": "node --test tests/auth.test.cjs",
     "test:ocr": "node --test tests/ocr.test.cjs",
     "test:roads": "node --test tests/roads.test.cjs",
-    "test:map": "node --test tests/map.test.cjs"
+    "test:map": "node --test tests/map.test.cjs",
+    "test:escalation": "node --test tests/escalation.test.cjs"
   },
   "private": true
 }

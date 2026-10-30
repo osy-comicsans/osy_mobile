@@ -59,11 +59,17 @@ jobs:
       - name: Test OCR
         run: pnpm test:ocr
 
+      - name: Test weather cache, provider, and risk inputs
+        run: pnpm test:weather
+
       - name: Test roads
         run: pnpm test:roads
 
       - name: Test map
         run: pnpm test:map
+
+      - name: Test escalation
+        run: pnpm test:escalation
 
   build:
     name: Build ${{ matrix.platform }}

@@ -73,6 +73,8 @@ Field keys are defined in #28. A document marked `rejected` must include a `reje
 | `POST` | `/incidents` | Incident | `201` incident |
 | `GET` | `/incidents/nearby` | `latitude`, `longitude`, `radiusKm` | `200` `incidents` |
 | `POST` | `/emergency/escalate` | Escalation | `201` escalation status |
+| `POST` | `/emergency/escalate/{id}/location` | `latitude`, `longitude` | `204` |
+| `POST` | `/emergency/escalate/{id}/cancel` | None | `200` escalation status |
 
 Incident: `id`, `source` (`user_report`, `crash_detected`), `location`, `occurredAt`, `type`, `severity` (`minor`, `serious`, `critical`), `injuriesVisible`, `note`.
 
@@ -113,6 +115,14 @@ Every error response uses this shape:
 `fields` is optional. The client maps `401` to `unauthorized`, `409` to `conflict`, `422` to `validation`, `429` to `rate_limited`, and `5xx` to `server`. A missing response is `network`.
 
 Error text may be shown to users, so it must never contain passwords, tokens, or document data.
+
+## Weather
+
+`GET /weather?latitude=<decimal>&longitude=<decimal>` returns current model conditions, up to six future hourly readings, local-day sunrise/sunset, area metadata and freshness timestamps. The standalone implementation is in `server/weather/`; the main backend can mount the same service later. Its read-only endpoint is unauthenticated and protected by limits/budgets, independently of account onboarding.
+
+The Zod contract is `src/features/weather/types/weather.types.ts`. Units are Celsius, metres, metres/second, millimetres and UTC ISO timestamps. Each precipitation amount includes its accumulation interval in seconds. `validAt` is provider-valid time, not retrieval time. Missing fields are null. Condition identifiers are translated by the app. `schemaVersion` is 1 and `dataKind` is `model`.
+
+Invalid coordinates return `422`; the standalone per-client rate limit returns `429`; provider failure without a usable cache returns `503`. Error bodies use the common `error` shape and never include a key or upstream request URL. A server-cache fallback preserves the original timestamps so the app can identify stale data. See [weather integration](docs/weather.md) for configuration, cache/risk rules and testing.
 
 ## Offline sync
 
