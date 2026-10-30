@@ -8,7 +8,23 @@ All paths are relative to `EXPO_PUBLIC_API_URL`, and requests use HTTPS. JSON is
 
 Every request sends `Accept-Language` with the app language: `en`, `fr`, or `ar`. The backend uses it for any text it generates.
 
-Alerts and push notifications send a stable key plus values such as road names and distances, never display text. The app holds the text in its translation files, so a safety alert still reads correctly offline. The keys are defined with the alerts work in #5.
+Alerts and push notifications send stable keys plus values such as road names and distances. The app holds the display text, so a safety alert still reads correctly offline.
+
+## Push notifications
+
+The backend sends through FCM and APNs directly, not the Expo push service, because Expo push has no field for translation keys. `POST /me/push-tokens` receives the device's native FCM or APNs token.
+
+| Alert | `alertType` | Channel and category | Title key | Body key |
+| --- | --- | --- | --- | --- |
+| Crash detected | `crash_detected` | `crash_detected` | `alert_crash_detected_title` | `alert_crash_detected_body` |
+| Potential accident | `potential_accident` | `potential_accident` | `alert_potential_accident_title` | `alert_potential_accident_body` |
+| Accident nearby | `accident_nearby` | `accident_nearby` | `alert_accident_nearby_title` | `alert_accident_nearby_body` |
+
+Rules for the backend:
+- FCM sets `title_loc_key`, `body_loc_key`, and `channel_id` under `android.notification`. It also sends English `title` and `body`, because Android has no base string file for languages the app does not support.
+- APNs sets `title-loc-key` and `loc-key` under `aps.alert`, and `category` under `aps`.
+- Every push includes these string values: `alertId` (required and unique per alert), `alertType` (required), `roadName`, and `distanceMeters`. FCM sends them in `data`. APNs sends them in a top-level `body` object.
+- Keep the same `alertId` when retrying, because the app ignores a repeat for 10 minutes.
 
 ## Authentication
 
