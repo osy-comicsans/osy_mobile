@@ -125,7 +125,8 @@
     "escalatedTitle": "We could not confirm you’re OK",
     "escalatedBody": "OSY has not contacted anyone yet. If you need help, call emergency services yourself.",
     "seconds": "seconds",
-    "confirmedTitle": "Glad you’re OK"
+    "confirmedTitle": "Glad you’re OK",
+    "backHome": "Back to home"
   },
   "errors": {
     "api": {
