@@ -13,7 +13,7 @@ import { Colors, Palette, Radius, Shadow, Typography } from '@/common/lib/theme'
 import { useFontFallback } from '@/common/providers/FontReadinessProvider';
 import { LoadingIndicator } from './loading';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'subtle' | 'text' | 'destructive';
+export type ButtonVariant = 'primary' | 'secondary' | 'subtle' | 'text' | 'destructive' | 'logout';
 export type ButtonSize = 'large' | 'medium' | 'small';
 export type ButtonTone = 'light' | 'dark';
 
@@ -40,6 +40,8 @@ function palette(variant: ButtonVariant, tone: ButtonTone) {
   switch (variant) {
     case 'primary':
       return { bg: Colors.accent, fg: Colors.onAccent, border: 'transparent', borderWidth: 0 };
+    case 'logout':
+      return { bg: Colors.logoutSoft, fg: Colors.logoutText, border: 'transparent', borderWidth: 0 };
     case 'destructive':
       return dark
         ? { bg: 'rgba(238,29,29,0.16)', fg: Colors.logoutText, border: 'transparent', borderWidth: 0 }

@@ -60,6 +60,21 @@ export function nextDocument(documents: DocumentRecord[]): DocumentType | null {
   return DOCUMENT_ORDER.find((type) => !isDone(type)) ?? null;
 }
 
+const normalizeName = (name: string) => name
+  .normalize('NFD')
+  .replace(/\p{M}/gu, '')
+  .replace(/[\s'-]+/g, '')
+  .toLowerCase();
+
+// Arabic names cannot be compared with a Latin account name without transliteration.
+export function nameMismatch(fields: DocumentFields, user: { firstName: string; lastName: string }): boolean {
+  const pairs = [[fields.firstName, user.firstName], [fields.lastName, user.lastName]];
+  return pairs.some(([document, account]) => (
+    !!document && /^[\p{Script=Latin}\s'-]+$/u.test(document) && /^[\p{Script=Latin}\s'-]+$/u.test(account as string)
+    && normalizeName(document) !== normalizeName(account as string)
+  ));
+}
+
 export function missingFields(type: DocumentType, fields: DocumentFields): string[] {
   return DOCUMENT_FIELDS[type].filter((field) => (
     !OPTIONAL_DOCUMENT_FIELDS.includes(field) && !fields[field]?.trim()

@@ -1,22 +1,27 @@
-import { config } from '@/common/lib/config';
+import type { CapturedPage, DocumentType } from '../types/auth.schemas';
+import { parseDocument, type OcrResult } from './documentParser';
+import { getOcrModels, loadPageImage } from './ocrEngine';
+import { readPage } from './paddle/pipeline';
 
-import type { CapturedPage, DocumentFields, DocumentType } from '../types/auth.schemas';
+export interface OcrOutcome extends OcrResult {
+  // True when OCR could not run, so the review step says so instead of looking empty.
+  failed: boolean;
+  failureReason?: string;
+}
 
-const SAMPLE_FIELDS: Record<DocumentType, DocumentFields> = {
-  driver_license: {
-    category: 'B', nin: '109870123456789012', licenseNumber: 'A123456', lastName: 'Driver',
-    firstName: 'Demo', dateOfBirth: '01.02.1990', placeOfBirth: 'Alger',
-  },
-  vehicle_registration: {
-    genre: 'VP', brand: 'Renault', type: 'SYMBOL', serialNumber: 'VF1LB000000000000', bodyType: 'CI',
-    energy: 'ES', power: '6', seats: '5', grossWeight: '1500', payload: '500',
-    registrationNumber: '12345 123 16', previousNumber: '', firstRegistrationYear: '2023',
-  },
-};
+const EMPTY: OcrResult = { fields: {}, lowConfidence: [] };
 
-// The on-device OCR from #28 replaces this. Until then, only the mock returns
-// values. Everywhere else the review step starts empty for manual entry.
-export async function extractDocumentFields(type: DocumentType, pages: CapturedPage[]): Promise<DocumentFields> {
-  const readable = pages.some((page) => page.mimeType !== 'application/pdf');
-  return config.useMockApi && readable ? SAMPLE_FIELDS[type] : {};
+// Any failure leaves the review step empty for manual entry, so OCR never blocks onboarding.
+export async function extractDocumentFields(type: DocumentType, pages: CapturedPage[]): Promise<OcrOutcome> {
+  const images = pages.filter((page) => page.mimeType !== 'application/pdf');
+  if (images.length === 0) return { ...EMPTY, failed: false };
+
+  try {
+    const models = await getOcrModels();
+    const read = [];
+    for (const page of images) read.push(await readPage(await loadPageImage(page.uri, page.width ?? Infinity), models));
+    return { ...parseDocument(type, read), failed: false };
+  } catch (error) {
+    return { ...EMPTY, failed: true, failureReason: error instanceof Error ? error.message : String(error) };
+  }
 }

@@ -252,6 +252,17 @@ test('signing in loads the account, and signing out ends it', async () => {
   assert.equal(f.phase(), 'signedOut');
 });
 
+test('logging out sends a finished user back to sign in', async () => {
+  const session = createAuthSession(asyncMemory(memory(signedIn)));
+  const service = createAccountService({ session, listDocuments: async () => complete, storage: memory() });
+  service.start();
+  await settle();
+  assert.equal(service.store.getState().phase, 'ready');
+  await createAuthApi(create(), session).signOut();
+  assert.equal(service.store.getState().phase, 'signedOut');
+  assert.equal(session.getTokens(), null);
+});
+
 test('offline, a finished user still gets into the app', async () => {
   const storage = memory({ 'osy.auth.onboardingComplete': '1' });
   const f = account({ tokens: signedIn, storage, listDocuments: async () => { throw new ApiError('network', 'Down'); } });

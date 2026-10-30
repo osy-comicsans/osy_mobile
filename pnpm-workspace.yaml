@@ -7,3 +7,6 @@ minimumReleaseAgeExclude:
 # Use the packaged native resolver binding without running its install script.
 allowBuilds:
   unrs-resolver: false
+
+patchedDependencies:
+  onnxruntime-react-native@1.24.3: patches/onnxruntime-react-native@1.24.3.patch

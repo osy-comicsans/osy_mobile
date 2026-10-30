@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { useStore } from 'zustand';
 
-import { AlertContext } from '../providers/AlertProvider';
+import { AlertContext } from '../providers/AlertContext';
 
 export function useAlertService() {
   const service = useContext(AlertContext);
