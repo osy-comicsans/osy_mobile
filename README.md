@@ -144,7 +144,7 @@ Device check: open the task screen, enable airplane mode, add/edit/complete/dele
 
 Crash, potential accident, and nearby accident alerts all go through `src/features/alerts/`. Add new alert behaviour to the rules in `utils/alertRules.ts`. In a development build, Settings has a test menu for each alert. Use its delayed button, then leave the app, to test a notification.
 
-Push needs a development build, not Expo Go. It also needs Firebase and Apple push credentials, an iOS bundle identifier, an Android package name, and `google-services.json`, none of which are set up yet. Alert text lives in `src/common/lib/i18n/locales/`, with a copy for closed-app pushes in `assets/locales/`, and `pnpm test:alerts` keeps them the same.
+Push needs a development build, not Expo Go. It uses the Expo push service, which also needs an EAS project, an iOS bundle identifier, an Android package name, `google-services.json`, and FCM and APNs credentials uploaded to EAS. None of these are set up yet. The server writes closed-app push text in the language the app registers, using the strings in `src/common/lib/i18n/locales/`.
 
 ## Languages
 

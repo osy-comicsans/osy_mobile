@@ -1,7 +1,9 @@
 import { createStore } from 'zustand/vanilla';
 
+import type { Language } from '@/common/lib/i18n/languages';
+
 import type {
-  AlertChannel, AlertDriver, AlertPermission, AlertPreferences, AlertText, AppAlert, DevicePushToken,
+  AlertChannel, AlertDriver, AlertPermission, AlertPreferences, AlertText, AppAlert, PushToken,
 } from '../types/alert.types';
 import { ALERT_RULES, createAlertGate, parseAlert, usesHaptics, usesSound } from './alertRules';
 
@@ -17,7 +19,7 @@ export interface AlertState {
 interface AlertServiceOptions {
   driver: AlertDriver;
   navigate: (alert: AppAlert) => void;
-  sendPushToken: (token: DevicePushToken) => Promise<void>;
+  sendPushToken: (token: PushToken & { language: Language }) => Promise<void>;
   now?: () => number;
 }
 
@@ -32,7 +34,7 @@ export function createAlertService({ driver, navigate, sendPushToken, now = Date
   const gate = createAlertGate();
   const alerts = new Map<string, AppAlert>();
   let bannerTimer: ReturnType<typeof setTimeout> | undefined;
-  let tokenSent = false;
+  let sentLanguage: Language | null = null;
 
   const dismissBanner = () => {
     clearTimeout(bannerTimer);
@@ -112,13 +114,14 @@ export function createAlertService({ driver, navigate, sendPushToken, now = Date
       }
     },
 
+    // The server writes push text in this language, so a change must reach it.
     // Runs again on the next launch or sign-in if the server could not be reached.
-    async registerPushToken() {
-      if (tokenSent || store.getState().permission !== 'granted') return;
+    async registerPushToken(language: Language) {
+      if (sentLanguage === language || store.getState().permission !== 'granted') return;
       const token = await driver.getPushToken();
       if (!token) return;
-      await sendPushToken(token);
-      tokenSent = true;
+      await sendPushToken({ ...token, language });
+      sentLanguage = language;
     },
 
     sendTest: (alert: AppAlert, text: AlertText, delaySeconds: number) => (

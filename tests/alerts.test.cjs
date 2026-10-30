@@ -10,7 +10,7 @@ require.extensions['.ts'] = (module, filename) => {
   module._compile(outputText, filename);
 };
 
-const { ALERT_RULES, ALERT_TYPES, parseAlert, toAlertData, usesHaptics, usesSound } = require('../src/features/alerts/utils/alertRules.ts');
+const { ALERT_RULES, parseAlert, toAlertData, usesHaptics, usesSound } = require('../src/features/alerts/utils/alertRules.ts');
 const { createAlertService } = require('../src/features/alerts/utils/alertService.ts');
 
 const crash = { alertId: 'c1', alertType: 'crash_detected' };
@@ -163,17 +163,33 @@ test('the push token is sent once, and retried after a failure', async () => {
   const f = fixture();
   await new Promise(setImmediate);
   f.pushFails = true;
-  await assert.rejects(f.service.registerPushToken());
+  await assert.rejects(f.service.registerPushToken('fr'));
   f.pushFails = false;
-  await f.service.registerPushToken();
-  await f.service.registerPushToken();
-  assert.deepEqual(f.tokens, [{ token: 't1', platform: 'android' }]);
+  await f.service.registerPushToken('fr');
+  await f.service.registerPushToken('fr');
+  assert.deepEqual(f.tokens, [{ token: 't1', platform: 'android', language: 'fr' }]);
+});
+
+test('a language change is sent to the server', async () => {
+  const f = fixture();
+  await new Promise(setImmediate);
+  await f.service.registerPushToken('fr');
+  await f.service.registerPushToken('ar');
+  assert.deepEqual(f.tokens.map((token) => token.language), ['fr', 'ar']);
+});
+
+test('nothing is sent until a token exists', async () => {
+  const f = fixture();
+  f.token = null;
+  await new Promise(setImmediate);
+  await f.service.registerPushToken('en');
+  assert.deepEqual(f.tokens, []);
 });
 
 test('no token is sent without permission', async () => {
   const f = fixture({ getPermission: async () => ({ permission: 'denied', canAskAgain: true }) });
   await new Promise(setImmediate);
-  await f.service.registerPushToken();
+  await f.service.registerPushToken('en');
   assert.deepEqual(f.tokens, []);
 });
 
@@ -190,19 +206,4 @@ test('stopping removes the listeners', () => {
   const f = fixture();
   f.stop();
   assert.equal(f.removed, 2);
-});
-
-test('closed-app push text matches the app text in every language', () => {
-  const { expo } = require('../app.json');
-  for (const [language, file] of Object.entries(expo.locales)) {
-    const app = require(`../src/common/lib/i18n/locales/${language}.json`).alerts;
-    const native = require(`../${file}`);
-    for (const type of ALERT_TYPES) {
-      for (const part of ['title', 'body']) {
-        const key = `alert_${type}_${part}`;
-        assert.equal(native.ios['Localizable.strings'][key], app[type][part], key);
-        assert.equal(native.android[key].replace(/\\'/g, "'"), app[type][part], key);
-      }
-    }
-  }
 });

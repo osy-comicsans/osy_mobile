@@ -31,7 +31,7 @@ export interface AlertChannel extends AlertText {
   severity: AlertSeverity;
 }
 
-export interface DevicePushToken {
+export interface PushToken {
   token: string;
   platform: 'ios' | 'android';
 }
@@ -45,7 +45,7 @@ export interface AlertDriver {
   ): Promise<void>;
   getPermission(): Promise<AlertPermissionSummary>;
   requestPermission(): Promise<AlertPermissionSummary>;
-  getPushToken(): Promise<DevicePushToken | null>;
+  getPushToken(): Promise<PushToken | null>;
   onReceived(listener: (data: unknown) => void): Removable;
   onOpened(listener: (data: unknown) => void): Removable;
   present(alert: AppAlert, text: AlertText, delaySeconds: number): Promise<void>;

@@ -2,23 +2,9 @@
   "ios": {
     "CFBundleDisplayName": "OSY",
     "NSLocationWhenInUseUsageDescription": "يستخدم OSY موقعك وسرعتك أثناء فتح التطبيق لتحذيرك من مخاطر الطريق.",
-    "NSMotionUsageDescription": "يستخدم OSY بيانات الحركة للمساعدة على رصد وقوع حادث.",
-    "Localizable.strings": {
-      "alert_crash_detected_title": "رُصد حادث محتمل",
-      "alert_crash_detected_body": "هل أنت بخير؟ افتح OSY للرد.",
-      "alert_potential_accident_title": "خطر وقوع حادث أمامك",
-      "alert_potential_accident_body": "خفّف السرعة وكن أكثر حذرًا.",
-      "alert_accident_nearby_title": "حادث بالقرب منك",
-      "alert_accident_nearby_body": "قد يحتاج شخص ما إلى المساعدة. افتح OSY لمعرفة التفاصيل."
-    }
+    "NSMotionUsageDescription": "يستخدم OSY بيانات الحركة للمساعدة على رصد وقوع حادث."
   },
   "android": {
-    "app_name": "OSY",
-    "alert_crash_detected_title": "رُصد حادث محتمل",
-    "alert_crash_detected_body": "هل أنت بخير؟ افتح OSY للرد.",
-    "alert_potential_accident_title": "خطر وقوع حادث أمامك",
-    "alert_potential_accident_body": "خفّف السرعة وكن أكثر حذرًا.",
-    "alert_accident_nearby_title": "حادث بالقرب منك",
-    "alert_accident_nearby_body": "قد يحتاج شخص ما إلى المساعدة. افتح OSY لمعرفة التفاصيل."
+    "app_name": "OSY"
   }
 }

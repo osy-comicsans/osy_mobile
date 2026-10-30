@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { api, authSession } from '@/common/lib/api/axios';
 import { config } from '@/common/lib/config';
+import { getLanguage } from '@/common/lib/i18n/i18n';
 import { createProfileApi } from '@/features/profile/api/profileApi';
 
 import { AlertBanner } from '../components/AlertBanner';
@@ -22,7 +23,7 @@ function navigate(alert: AppAlert) {
 }
 
 export function AlertProvider({ children }: PropsWithChildren) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [service] = useState(() => createAlertService({
     driver: alertDriver,
     navigate,
@@ -43,7 +44,7 @@ export function AlertProvider({ children }: PropsWithChildren) {
     if (!config.apiUrl) return undefined;
     const register = () => {
       if (authSession.status.getState().status !== 'signedIn') return;
-      service.registerPushToken().catch(() => undefined);
+      service.registerPushToken(getLanguage()).catch(() => undefined);
     };
     const unsubscribeAuth = authSession.status.subscribe(register);
     const unsubscribeAlerts = service.store.subscribe((state, previous) => {
@@ -54,7 +55,7 @@ export function AlertProvider({ children }: PropsWithChildren) {
       unsubscribeAuth();
       unsubscribeAlerts();
     };
-  }, [service]);
+  }, [service, i18n.language]);
 
   return (
     <AlertContext value={service}>

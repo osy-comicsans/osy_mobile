@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import * as Haptics from 'expo-haptics';
 import * as Notifications from 'expo-notifications';
 import { AndroidImportance } from 'expo-notifications';
@@ -59,11 +60,12 @@ export const alertDriver: AlertDriver = {
   getPermission: async () => toSummary(await Notifications.getPermissionsAsync()),
   requestPermission: async () => toSummary(await Notifications.requestPermissionsAsync()),
 
-  // The server sends through FCM and APNs directly, so it needs the device's own token.
+  // Skipped until the app is linked to an EAS project, which issues the Expo token.
   async getPushToken() {
-    if (Platform.OS !== 'ios' && Platform.OS !== 'android') return null;
-    const { data } = await Notifications.getDevicePushTokenAsync();
-    return typeof data === 'string' ? { token: data, platform: Platform.OS } : null;
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+    if (!projectId || (Platform.OS !== 'ios' && Platform.OS !== 'android')) return null;
+    const { data } = await Notifications.getExpoPushTokenAsync({ projectId });
+    return { token: data, platform: Platform.OS };
   },
 
   onReceived: (listener) => Notifications.addNotificationReceivedListener((notification) => {

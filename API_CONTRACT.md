@@ -8,23 +8,25 @@ All paths are relative to `EXPO_PUBLIC_API_URL`, and requests use HTTPS. JSON is
 
 Every request sends `Accept-Language` with the app language: `en`, `fr`, or `ar`. The backend uses it for any text it generates.
 
-Alerts and push notifications send stable keys plus values such as road names and distances. The app holds the display text, so a safety alert still reads correctly offline.
+In-app alerts use stable keys plus values such as road names and distances. The app holds their text, so a safety alert still reads correctly offline.
 
 ## Push notifications
 
-The backend sends through FCM and APNs directly, not the Expo push service, because Expo push has no field for translation keys. `POST /me/push-tokens` receives the device's native FCM or APNs token.
+The backend sends through the Expo push service. `POST /me/push-tokens` receives an Expo push token, the platform, and the app language, and is sent again when the language changes.
 
-| Alert | `alertType` | Channel and category | Title key | Body key |
-| --- | --- | --- | --- | --- |
-| Crash detected | `crash_detected` | `crash_detected` | `alert_crash_detected_title` | `alert_crash_detected_body` |
-| Potential accident | `potential_accident` | `potential_accident` | `alert_potential_accident_title` | `alert_potential_accident_body` |
-| Accident nearby | `accident_nearby` | `accident_nearby` | `alert_accident_nearby_title` | `alert_accident_nearby_body` |
+Expo push has no field for translation keys, and the phone shows a closed-app push as sent. The backend must write `title` and `body` in the token's language, using the reviewed text under `alerts` in `src/common/lib/i18n/locales/`.
+
+| Alert | `alertType` | `channelId` and `categoryId` | Text key |
+| --- | --- | --- | --- |
+| Crash detected | `crash_detected` | `crash_detected` | `alerts.crash_detected` |
+| Potential accident | `potential_accident` | `potential_accident` | `alerts.potential_accident` |
+| Accident nearby | `accident_nearby` | `accident_nearby` | `alerts.accident_nearby` |
 
 Rules for the backend:
-- FCM sets `title_loc_key`, `body_loc_key`, and `channel_id` under `android.notification`. It also sends English `title` and `body`, because Android has no base string file for languages the app does not support.
-- APNs sets `title-loc-key` and `loc-key` under `aps.alert`, and `category` under `aps`.
-- Every push includes these string values: `alertId` (required and unique per alert), `alertType` (required), `roadName`, and `distanceMeters`. FCM sends them in `data`. APNs sends them in a top-level `body` object.
+- `data` contains `alertId` (required and unique per alert), `alertType` (required), `roadName`, and `distanceMeters`, all as strings.
+- Send with `priority: high` and `sound: default`.
 - Keep the same `alertId` when retrying, because the app ignores a repeat for 10 minutes.
+- Remove tokens that Expo reports as `DeviceNotRegistered`.
 
 ## Authentication
 
@@ -86,7 +88,7 @@ Schemas: `src/features/safety/types/safety.schemas.ts`.
 | `PUT` | `/me` | `firstName`, `lastName`, `mobileNumber` | `200` user |
 | `GET` | `/me/emergency-contacts` | None | `200` `contacts` |
 | `PUT` | `/me/emergency-contacts` | `contacts` | `200` `contacts` |
-| `POST` | `/me/push-tokens` | `token`, `platform` (`ios`, `android`) | `204` |
+| `POST` | `/me/push-tokens` | `token`, `platform` (`ios`, `android`), `language` (`en`, `fr`, `ar`) | `204` |
 
 A contact contains `id`, `name`, `mobileNumber`, and `relationship`. `PUT` replaces the whole list.
 
