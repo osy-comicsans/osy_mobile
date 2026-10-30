@@ -48,8 +48,9 @@ test('the app config lists every language with permission text', () => {
   const { expo } = require('../app.json');
   const plugin = expo.plugins.find((entry) => entry[0] === 'expo-localization');
   assert.deepEqual(plugin[1].supportedLocales, { ios: ['en', 'fr', 'ar'], android: ['en', 'fr', 'ar'] });
-  for (const file of Object.values(expo.locales)) {
-    const locale = require(path.join(__dirname, '..', file));
+  // English permission text comes from the plugin settings in app.json.
+  for (const language of ['fr', 'ar']) {
+    const locale = require(path.join(__dirname, '..', expo.locales[language]));
     assert.ok(locale.ios.NSLocationWhenInUseUsageDescription);
     assert.ok(locale.ios.NSMotionUsageDescription);
     assert.ok(locale.android.app_name);

@@ -20,7 +20,9 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "permissions": ["android.permission.HIGH_SAMPLING_RATE_SENSORS"],
+      "permissions": [
+        "android.permission.HIGH_SAMPLING_RATE_SENSORS"
+      ],
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -77,6 +79,13 @@
               "ar"
             ]
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#6316DB"
         }
       ]
     ],

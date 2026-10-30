@@ -44,6 +44,9 @@ jobs:
       - name: Test crash detection
         run: pnpm test:crash-detection
 
+      - name: Test alerts
+        run: pnpm test:alerts
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks

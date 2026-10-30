@@ -288,13 +288,13 @@ test('safety and profile modules follow the contract', async () => {
   await profile.getProfile();
   await profile.updateProfile({ firstName: 'Amina', lastName: 'Test', mobileNumber: '+213555000000' });
   await profile.replaceEmergencyContacts([]);
-  await profile.registerPushToken({ token: 'push', platform: 'android' });
+  await profile.registerPushToken({ token: 'push', platform: 'android', language: 'fr' });
   assert.deepEqual(
     requests.map((request) => `${request.method} ${request.url}`),
     ['post /incidents', 'get /incidents/nearby', 'post /emergency/escalate', 'get /me', 'put /me',
       'put /me/emergency-contacts', 'post /me/push-tokens'],
   );
   assert.deepEqual(requests[1].params, { ...location, radiusKm: 5 });
-  assert.throws(() => profile.registerPushToken({ token: '', platform: 'android' }));
+  assert.throws(() => profile.registerPushToken({ token: '', platform: 'android', language: 'fr' }));
   assert.throws(() => safety.createIncident({ ...incident, id: 'not-a-uuid' }));
 });

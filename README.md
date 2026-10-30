@@ -140,6 +140,12 @@ Sync also requires a signed-in user. Once endpoints exist, implement transport, 
 
 Device check: open the task screen, enable airplane mode, add/edit/complete/delete tasks, close and reopen the app, and confirm local state survives. Cloud sync should remain unavailable with the default configuration, and changes should remain queued.
 
+## Alerts
+
+Crash, potential accident, and nearby accident alerts all go through `src/features/alerts/`. Add new alert behaviour to the rules in `utils/alertRules.ts`. In a development build, Settings has a test menu for each alert. Use its delayed button, then leave the app, to test a notification.
+
+Push needs a development build, not Expo Go. It uses the Expo push service, which also needs an EAS project, an iOS bundle identifier, an Android package name, `google-services.json`, and FCM and APNs credentials uploaded to EAS. None of these are set up yet. The server writes closed-app push text in the language the app registers, using the strings in `src/common/lib/i18n/locales/`.
+
 ## Languages
 
 The app runs in English, French, and Arabic, and follows the device language until the user picks one in Settings. Strings live in `src/common/lib/i18n/locales/`, and `pnpm test:i18n` checks that all three files stay in step. App name and permission text live in `assets/locales/`.

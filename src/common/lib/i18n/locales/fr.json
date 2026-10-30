@@ -1,5 +1,9 @@
 {
-  "tabs": { "home": "Accueil", "map": "Carte", "profile": "Profil" },
+  "tabs": {
+    "home": "Accueil",
+    "map": "Carte",
+    "profile": "Profil"
+  },
   "common": {
     "dismiss": "Fermer",
     "tryAgain": "Réessayer",
@@ -56,7 +60,11 @@
     "reportDescription": "Le formulaire de signalement d’accident s’affichera ici."
   },
   "location": {
-    "driving": { "stationary": "À l’arrêt", "walking": "À pied", "driving": "En voiture" },
+    "driving": {
+      "stationary": "À l’arrêt",
+      "walking": "À pied",
+      "driving": "En voiture"
+    },
     "errors": {
       "watch": "Impossible de lire votre position. Vérifiez les services de localisation et réessayez.",
       "permission": "Impossible de vérifier l’accès à la position. Réessayez."
@@ -75,6 +83,33 @@
       "motionRequestBody": "L’accès aux mouvements aide OSY à détecter un accident. La position fonctionne aussi sans cet accès.",
       "motionDeniedTitle": "L’accès aux mouvements est désactivé",
       "motionDeniedBody": "La position fonctionne toujours, mais OSY ne pourra pas utiliser les mouvements pour détecter un accident."
+    }
+  },
+  "alerts": {
+    "view": "Voir",
+    "distanceAway": "À {{distance}}",
+    "crash_detected": {
+      "title": "Accident possible détecté",
+      "body": "Tout va bien ? Ouvrez OSY pour répondre."
+    },
+    "potential_accident": {
+      "title": "Risque d’accident à l’approche",
+      "body": "Ralentissez et redoublez de prudence."
+    },
+    "accident_nearby": {
+      "title": "Accident à proximité",
+      "body": "Quelqu’un a peut-être besoin d’aide. Ouvrez OSY pour en savoir plus."
+    },
+    "permission": {
+      "requestTitle": "Activez les alertes de sécurité",
+      "requestBody": "OSY utilise les notifications pour vous avertir des risques sur la route et vous joindre après un accident.",
+      "deniedTitle": "Les alertes de sécurité sont désactivées",
+      "deniedBody": "OSY ne peut pas vous avertir lorsque l’application est fermée si les notifications sont désactivées."
+    },
+    "dev": {
+      "title": "Tester les alertes",
+      "now": "Maintenant",
+      "delayed": "Dans {{seconds}} s"
     }
   },
   "errors": {

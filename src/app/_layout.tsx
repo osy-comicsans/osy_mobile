@@ -9,6 +9,7 @@ import { directionReady, getLanguage } from '@/common/lib/i18n/i18n';
 import { isRtl } from '@/common/lib/i18n/languages';
 import { AppProviders } from '@/common/providers/AppProviders';
 import { Colors, FontFamily } from '@/common/lib/theme';
+import { AlertProvider } from '@/features/alerts/providers/AlertProvider';
 import { CrashDetectionProvider } from '@/features/crash-detection/providers/CrashDetectionProvider';
 import { LocationProvider } from '@/features/location/providers/LocationProvider';
 
@@ -64,17 +65,19 @@ export default function RootLayout() {
           <CrashDetectionProvider>
             <StatusBar style="dark" />
             <AnimatedSplashOverlay />
-            <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen
-                  name="check-in"
-                  options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
-                />
-                <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
-              </Stack>
-            </LocaleProvider>
+            <AlertProvider>
+              <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen
+                    name="check-in"
+                    options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+                  />
+                  <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
+                  <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
+                </Stack>
+              </LocaleProvider>
+            </AlertProvider>
           </CrashDetectionProvider>
         </LocationProvider>
       </AppProviders>
