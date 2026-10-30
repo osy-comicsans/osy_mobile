@@ -38,10 +38,10 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Allow OSYMobile to show your foreground location in the temporary Device Lab.",
+          "locationWhenInUsePermission": "OSY uses your location and speed while the app is open to warn you about road risks.",
           "locationAlwaysAndWhenInUsePermission": false,
           "locationAlwaysPermission": false,
-          "motionUsagePermission": "Allow OSYMobile to test motion sensors and count steps in the temporary Device Lab.",
+          "motionUsagePermission": "OSY uses motion data to help notice a crash.",
           "isIosBackgroundLocationEnabled": false,
           "isAndroidBackgroundLocationEnabled": false,
           "isAndroidForegroundServiceEnabled": false,
@@ -51,7 +51,7 @@
       [
         "expo-sensors",
         {
-          "motionPermission": "Allow OSYMobile to test motion sensors and count steps in the temporary Device Lab."
+          "motionPermission": "OSY uses motion data to help notice a crash."
         }
       ],
       "expo-font",
