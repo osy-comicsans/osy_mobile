@@ -32,7 +32,7 @@ src/
     screens/                    Shared screens
     hooks/                      Shared React hooks
     lib/
-      api/axios.ts              Shared HTTP transport client
+      api/                      Shared HTTP clients, auth session, and API errors
       config.ts                 Public environment configuration
       database/
         sqlite.ts               Lazy native database connection and migrations
@@ -48,6 +48,7 @@ src/
     types/
     utils/
   features/
+    auth/                       Sign up, sign in, and document API contract
     home/
     location/                   Shared live position, speed, and permissions
     map/
@@ -72,7 +73,7 @@ SQLite opens on first use, shares one initialization across callers, enables WAL
 
 Secure storage exposes asynchronous `getItem`, `setItem`, and `removeItem` operations and an `isAvailable` check. Unsupported platforms reject operations; no browser storage fallback is used for authentication values.
 
-Installed foundations: TanStack Query, Axios, Expo SQLite, Zustand, Expo SecureStore, Expo Network, NetInfo, Zod, and Expo Crypto. Query providers, connectivity listeners, local repositories, and the offline synchronization infrastructure are wired. Real HTTP endpoints, authentication, and account integration remain deferred.
+Installed foundations: TanStack Query, Axios, Expo SQLite, Zustand, Expo SecureStore, Expo Network, NetInfo, Zod, and Expo Crypto. Query providers, connectivity listeners, local repositories, and the offline synchronization infrastructure are wired. The API contract is documented in `API_CONTRACT.md`, and typed client modules follow it. Screens that use them, and sync endpoints, are not built yet.
 
 ## Navigation
 
@@ -122,15 +123,17 @@ EXPO_PUBLIC_SYNC_ENABLED=false
 | HTTP route paths and response mapping | Implement `TodosTransport` in `src/features/todos/api/todosApi.ts` using the shared Axios client | Later, when endpoints exist |
 | Transport registration | Register `createTodoSyncAdapter(runtime.todos, transport)` with `runtime.registerSyncAdapter('todo', adapter)` in `src/common/providers/AppProviders.tsx` | Later |
 | App username and password | The future sign-in screen; there is no login form or credential configuration yet | No |
-| Access and refresh tokens | Saved at runtime through `src/common/lib/storage/secureStorage.ts` | Authentication integration will manage this |
+| Access and refresh tokens | Saved at runtime by `authSession` in `src/common/lib/api/axios.ts` through `secureStorage` | Managed by the app; never configure by hand |
 | Local SQLite username/password | None; `osy.db` is created automatically in the app's private storage | No |
 | Backend database/service passwords and private API keys | Your backend's secret environment settings, outside this mobile project | Never put these in `EXPO_PUBLIC_*` |
 
 Central public configuration lives in `src/common/lib/config.ts`; retry/timer defaults live in `src/common/lib/database/sync/syncPolicy.ts`. Do not put login passwords or tokens in `.env.local`: `EXPO_PUBLIC_*` values are visible in the app bundle. Keep `EXPO_PUBLIC_SYNC_ENABLED=false` for local-only use. A URL or flag alone cannot start sync because there are no registered transports.
 
-Once endpoints exist, implement transport and authentication, register the adapter, and define how existing device-local data belongs to a signed-in account before enabling sync. The backend must preserve local entity IDs, deduplicate stable `clientOperationId` values, provide real acknowledgements, and map conflict responses to `SyncConflictError`. The optional pull transport returns normalized task changes and a cursor; `createTodoSyncAdapter` applies them through the repository. No endpoint paths or credentials are guessed in this implementation.
+Sync also requires a signed-in user. Once endpoints exist, implement transport, register the adapter, and define how existing device-local data belongs to a signed-in account before enabling sync. The backend must preserve local entity IDs, deduplicate stable `clientOperationId` values, provide real acknowledgements, and map conflict responses to `SyncConflictError`. The optional pull transport returns normalized task changes and a cursor; `createTodoSyncAdapter` applies them through the repository. No endpoint paths or credentials are guessed in this implementation.
 
 ## Offline verification
+
+`pnpm test:api` covers the auth session, token refresh, error mapping, and contract modules against a fake server.
 
 `npm run test:offline` uses Node's built-in SQLite engine (Node 22.13+ or newer) to exercise the production repositories, migrations, and sync manager without an emulator or backend. Tests cover atomic rollback, persistence across reopen, queue ordering, interrupted delivery, idempotency contracts, concurrent edits, conflict retention, cursor rollback, and React Query reads/writes while offline. This does not replace testing Expo's native SQLite bridge on a phone.
 
