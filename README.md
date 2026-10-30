@@ -162,6 +162,8 @@ Users must sign in and add both documents before they can reach the tabs. With n
 
 OCR is a stand-in until #28, and fills in sample values only under the mock. PDFs skip OCR, so their details are typed by hand.
 
+The full flow, design notes, and release checklist are in [docs/accounts-and-onboarding.md](docs/accounts-and-onboarding.md).
+
 ## Languages
 
 The app runs in English, French, and Arabic, and follows the device language until the user picks one in Settings. Strings live in `src/common/lib/i18n/locales/`, and `pnpm test:i18n` checks that all three files stay in step. App name and permission text live in `assets/locales/`.
