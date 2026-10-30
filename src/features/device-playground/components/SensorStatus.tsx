@@ -18,5 +18,5 @@ export function SensorStatus({ phase }: { phase: SensorPhase }) {
 const styles = StyleSheet.create({
   status: { flexDirection: 'row', alignItems: 'center', gap: 7, flexShrink: 1 },
   dot: { width: 6, height: 6, borderRadius: 3 },
-  label: { fontSize: 11, fontWeight: '600' },
+  label: { fontFamily: lab.fontMedium, fontSize: 11 },
 });

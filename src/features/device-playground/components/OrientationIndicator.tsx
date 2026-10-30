@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { Radius } from '@/common/lib/theme';
 import { clamp, finite, formatNumber } from '../utils/sensor.utils';
 import { lab } from './playgroundTheme';
 
@@ -54,10 +55,10 @@ const styles = StyleSheet.create({
   needle: { width: 3, height: 30, backgroundColor: lab.accent, borderRadius: 2 },
   center: { width: 7, height: 7, borderRadius: 4, backgroundColor: lab.accent },
   unknown: { color: lab.muted, position: 'absolute', bottom: 15 },
-  caption: { flex: 1, gap: 7 }, label: { color: lab.muted, fontSize: 11 },
-  value: { color: lab.text, fontFamily: lab.mono, fontSize: 17 }, hint: { color: lab.muted, fontSize: 10, lineHeight: 16 },
-  orientation: { height: 160, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 12, backgroundColor: lab.inset },
-  phone: { width: 70, height: 120, borderRadius: 14, borderWidth: 2, borderColor: lab.accent, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1B2C49' },
+  caption: { flex: 1, gap: 7 }, label: { color: lab.muted, fontFamily: lab.font, fontSize: 12 },
+  value: { color: lab.text, fontFamily: lab.mono, fontSize: 17 }, hint: { color: lab.muted, fontFamily: lab.font, fontSize: 11, lineHeight: 16 },
+  orientation: { height: 160, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: Radius.md, backgroundColor: lab.inset },
+  phone: { width: 70, height: 120, borderRadius: 14, borderWidth: 2, borderColor: lab.accent, alignItems: 'center', justifyContent: 'center', backgroundColor: lab.inset },
   notch: { position: 'absolute', top: 5, width: 24, height: 4, borderRadius: 2, backgroundColor: lab.accent },
   phoneText: { color: lab.accent, fontFamily: lab.mono, fontSize: 14, textAlign: 'center', lineHeight: 23 },
 });

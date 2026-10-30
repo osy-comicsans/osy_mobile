@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnimatedIcon } from '@/common/components/animated-icon';
 import { HintRow } from '@/common/components/hint-row';
+import { Card } from '@/common/components/ui/card';
 import { ThemedText } from '@/common/components/themed-text';
 import { ThemedView } from '@/common/components/themed-view';
 import { WebBadge } from '@/common/components/web-badge';
@@ -15,16 +16,16 @@ export function HomeScreen() {
       <SafeAreaView style={styles.safeArea}>
         <ThemedView style={styles.heroSection}>
           <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
+          <ThemedText type="display" style={styles.title}>
+            Welcome to&nbsp;OSY
           </ThemedText>
         </ThemedView>
 
-        <ThemedText type="code" style={styles.code}>
+        <ThemedText type="overline" themeColor="textTertiary">
           get started
         </ThemedText>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
+        <Card tone="muted" style={styles.stepContainer}>
           <HintRow
             title="Try editing"
             hint={<ThemedText type="code">HomeScreen.tsx</ThemedText>}
@@ -37,7 +38,7 @@ export function HomeScreen() {
             title="Fresh start"
             hint={<ThemedText type="code">npm run reset-project</ThemedText>}
           />
-        </ThemedView>
+        </Card>
 
         {Platform.OS === 'web' && <WebBadge />}
       </SafeAreaView>
@@ -69,14 +70,10 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
   },
-  code: {
-    textTransform: 'uppercase',
-  },
   stepContainer: {
     gap: Spacing.three,
     alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
+    paddingHorizontal: Spacing.four,
     paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
   },
 });

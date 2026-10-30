@@ -8,8 +8,7 @@ import { ThemedText } from '@/common/components/themed-text';
 import { ThemedView } from '@/common/components/themed-view';
 import { Collapsible } from '@/common/components/ui/collapsible';
 import { WebBadge } from '@/common/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/common/lib/theme';
-import { useTheme } from '@/common/hooks/use-theme';
+import { BottomTabInset, Colors, MaxContentWidth, Radius, Spacing } from '@/common/lib/theme';
 
 export function ExploreScreen() {
   const safeAreaInsets = useSafeAreaInsets();
@@ -17,7 +16,6 @@ export function ExploreScreen() {
     ...safeAreaInsets,
     bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
   };
-  const theme = useTheme();
 
   const contentPlatformStyle = Platform.select({
     android: {
@@ -34,7 +32,7 @@ export function ExploreScreen() {
 
   return (
     <ScrollView
-      style={[styles.scrollView, { backgroundColor: theme.background }]}
+      style={styles.scrollView}
       contentInset={insets}
       contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}>
       <ThemedView style={styles.container}>
@@ -46,10 +44,10 @@ export function ExploreScreen() {
 
           <ExternalLink href="https://docs.expo.dev" asChild>
             <Pressable style={({ pressed }) => pressed && styles.pressed}>
-              <ThemedView type="backgroundElement" style={styles.linkButton}>
+              <ThemedView type="accentSoft" style={styles.linkButton}>
                 <ThemedText type="link">Expo documentation</ThemedText>
                 <SymbolView
-                  tintColor={theme.text}
+                  tintColor={Colors.accent}
                   name={{ ios: 'arrow.up.right.square', android: 'link', web: 'link' }}
                   size={12}
                 />
@@ -60,15 +58,15 @@ export function ExploreScreen() {
 
         <ThemedView style={styles.sectionsWrapper}>
           <Collapsible title="File-based routing">
-            <ThemedText type="small">
+            <ThemedText type="label">
               This app has two routes: <ThemedText type="code">src/app/index.tsx</ThemedText> and{' '}
               <ThemedText type="code">src/app/explore.tsx</ThemedText>
             </ThemedText>
-            <ThemedText type="small">
+            <ThemedText type="label">
               Screen implementations live in <ThemedText type="code">src/features/</ThemedText>.
               Routes only select which screen to render.
             </ThemedText>
-            <ThemedText type="small">
+            <ThemedText type="label">
               The layout file in <ThemedText type="code">src/app/_layout.tsx</ThemedText> sets up
               the tab navigator.
             </ThemedText>
@@ -78,21 +76,19 @@ export function ExploreScreen() {
           </Collapsible>
 
           <Collapsible title="Android, iOS, and web support">
-            <ThemedView type="backgroundElement" style={styles.collapsibleContent}>
-              <ThemedText type="small">
-                You can open this project on Android, iOS, and the web. To open the web version,
-                press <ThemedText type="smallBold">w</ThemedText> in the terminal running this
-                project.
-              </ThemedText>
-              <Image
-                source={require('@/assets/images/tutorial-web.png')}
-                style={styles.imageTutorial}
-              />
-            </ThemedView>
+            <ThemedText type="label">
+              You can open this project on Android, iOS, and the web. To open the web version,
+              press <ThemedText type="smallBold">w</ThemedText> in the terminal running this
+              project.
+            </ThemedText>
+            <Image
+              source={require('@/assets/images/tutorial-web.png')}
+              style={styles.imageTutorial}
+            />
           </Collapsible>
 
           <Collapsible title="Images">
-            <ThemedText type="small">
+            <ThemedText type="label">
               For static images, you can use the <ThemedText type="code">@2x</ThemedText> and{' '}
               <ThemedText type="code">@3x</ThemedText> suffixes to provide files for different
               screen densities.
@@ -103,23 +99,21 @@ export function ExploreScreen() {
             </ExternalLink>
           </Collapsible>
 
-          <Collapsible title="Light and dark mode components">
-            <ThemedText type="small">
-              This template has light and dark mode support. The{' '}
-              <ThemedText type="code">useColorScheme()</ThemedText> hook lets you inspect what the
-              user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
+          <Collapsible title="OSY design system">
+            <ThemedText type="label">
+              Colors, spacing, radii, shadows, and type come from the shared tokens in{' '}
+              <ThemedText type="code">src/common/lib/tokens.ts</ThemedText>. Components use the
+              purple accent, pill buttons, 16px cards, and Gabarito typography.
             </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
           </Collapsible>
 
           <Collapsible title="Animations">
-            <ThemedText type="small">
+            <ThemedText type="label">
               This template includes an example of an animated component. The{' '}
-              <ThemedText type="code">src/common/components/ui/collapsible.tsx</ThemedText> component uses
-              the powerful <ThemedText type="code">react-native-reanimated</ThemedText> library to
-              animate opening this hint.
+              <ThemedText type="code">src/common/components/ui/collapsible.tsx</ThemedText>{' '}
+              component uses the powerful{' '}
+              <ThemedText type="code">react-native-reanimated</ThemedText> library to animate
+              opening this hint.
             </ThemedText>
           </Collapsible>
         </ThemedView>
@@ -132,6 +126,7 @@ export function ExploreScreen() {
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
+    backgroundColor: Colors.background,
   },
   contentContainer: {
     flexDirection: 'row',
@@ -157,7 +152,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: Spacing.four,
     paddingVertical: Spacing.two,
-    borderRadius: Spacing.five,
+    borderRadius: Radius.full,
+    borderWidth: 1.5,
+    borderColor: Colors.accent,
     justifyContent: 'center',
     gap: Spacing.one,
     alignItems: 'center',
@@ -167,13 +164,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.three,
   },
-  collapsibleContent: {
-    alignItems: 'center',
-  },
   imageTutorial: {
     width: '100%',
     aspectRatio: 296 / 171,
-    borderRadius: Spacing.three,
+    borderRadius: Radius.lg,
     marginTop: Spacing.two,
   },
   imageReact: {

@@ -48,12 +48,12 @@ export function MagnitudeBar({ value, max = 4, threshold, unit = 'g', label = 'M
 }
 const styles = StyleSheet.create({
   axes: { gap: 12 }, row: { flexDirection: 'row', alignItems: 'center', gap: 8, justifyContent: 'space-between' },
-  axis: { fontFamily: lab.mono, fontSize: 12, width: 14 },
+  axis: { fontFamily: lab.fontSemiBold, fontSize: 12, width: 14 },
   track: { flex: 1, height: 7, borderRadius: 4, backgroundColor: lab.inset, overflow: 'hidden' },
   center: { position: 'absolute', left: '50%', width: 1, height: '100%', backgroundColor: lab.border },
   fill: { position: 'absolute', height: '100%', borderRadius: 4 },
   number: { color: lab.text, fontFamily: lab.mono, fontSize: 10, width: 90, textAlign: 'right', fontVariant: ['tabular-nums'] },
-  scale: { color: lab.muted, fontSize: 10, lineHeight: 16 },
+  scale: { color: lab.muted, fontFamily: lab.font, fontSize: 11, lineHeight: 16 },
   magnitude: { color: lab.text, fontFamily: lab.mono, fontSize: 17 },
   meter: { height: 9, backgroundColor: lab.inset, borderRadius: 5 },
   threshold: { position: 'absolute', width: 2, height: 15, top: -3, backgroundColor: lab.z },

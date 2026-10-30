@@ -4,7 +4,7 @@ import { View, StyleSheet } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
-import { Spacing } from '@/common/lib/theme';
+import { Radius, Spacing } from '@/common/lib/theme';
 
 type HintRowProps = {
   title?: string;
@@ -25,11 +25,13 @@ export function HintRow({ title = 'Try editing', hint = 'app/index.tsx' }: HintR
 const styles = StyleSheet.create({
   stepRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
+    gap: Spacing.two,
   },
   codeSnippet: {
-    borderRadius: Spacing.two,
-    paddingVertical: Spacing.half,
+    borderRadius: Radius.sm,
+    paddingVertical: 4,
     paddingHorizontal: Spacing.two,
   },
 });

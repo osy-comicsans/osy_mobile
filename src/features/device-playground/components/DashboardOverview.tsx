@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { Radius } from '@/common/lib/theme';
 import { usePlaygroundRegistry } from '../hooks/PlaygroundProvider';
 import type { SensorId } from '../types/sensor.types';
 import { LabButton } from './SensorCard';
@@ -39,9 +40,9 @@ export function DashboardOverview() {
 }
 const styles = StyleSheet.create({
   container: { gap: 14 }, summary: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  tile: { flexGrow: 1, flexBasis: 130, padding: 15, backgroundColor: lab.card, borderWidth: 1, borderColor: lab.border, borderRadius: 12, gap: 11 },
-  code: { color: lab.accent, fontSize: 9, fontFamily: lab.mono, letterSpacing: 1.2 },
-  name: { color: lab.text, fontSize: 12, fontWeight: '600' },
+  tile: { flexGrow: 1, flexBasis: 130, padding: 15, backgroundColor: lab.card, borderWidth: 1, borderColor: lab.border, borderRadius: Radius.md, gap: 11 },
+  code: { color: lab.accent, fontFamily: lab.fontMedium, fontSize: 10, letterSpacing: 1.2 },
+  name: { color: lab.text, fontFamily: lab.fontSemiBold, fontSize: 13 },
   toolbar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 },
-  hint: { color: lab.muted, fontSize: 11, lineHeight: 18, flexShrink: 1 },
+  hint: { color: lab.muted, fontFamily: lab.font, fontSize: 13, lineHeight: 18, flexShrink: 1 },
 });

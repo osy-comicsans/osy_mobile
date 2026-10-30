@@ -1,6 +1,8 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { Button } from '@/common/components/ui/button';
+import { Radius, Shadow } from '@/common/lib/theme';
 import type { SensorSnapshot } from '../types/sensor.types';
 import { formatTimestamp } from '../utils/sensor.utils';
 import { lab } from './playgroundTheme';
@@ -10,12 +12,16 @@ export function LabButton({ label, onPress, disabled, danger, secondary, testID 
   label: string; onPress: () => void; disabled?: boolean; danger?: boolean; secondary?: boolean; testID?: string;
 }) {
   return (
-    <Pressable
-      accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled: !!disabled }}
-      disabled={disabled} onPress={onPress} testID={testID}
-      style={({ pressed }) => [styles.button, secondary && styles.secondary, danger && styles.danger, (disabled || pressed) && styles.dim]}>
-      <Text style={[styles.buttonLabel, secondary && styles.secondaryLabel, danger && styles.dangerLabel]}>{label}</Text>
-    </Pressable>
+    <Button
+      label={label}
+      onPress={onPress}
+      disabled={disabled}
+      tone="dark"
+      size="medium"
+      variant={danger ? 'destructive' : secondary ? 'subtle' : 'primary'}
+      testID={testID}
+      accessibilityLabel={label}
+    />
   );
 }
 
@@ -56,23 +62,25 @@ export function SensorCard({ title, description, tag, state, onStart, onStop, co
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: lab.card, borderColor: lab.border, borderWidth: 1, borderRadius: 18, padding: 18, gap: 16, flex: 1 },
+  card: {
+    backgroundColor: lab.card,
+    borderColor: lab.border,
+    borderWidth: 1,
+    borderRadius: Radius.lg,
+    padding: 20,
+    gap: 16,
+    flex: 1,
+    boxShadow: Shadow.sm,
+  },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  tag: { color: lab.accent, fontFamily: lab.mono, fontSize: 11, letterSpacing: 1.2 },
+  tag: { color: lab.accent, fontFamily: lab.fontMedium, fontSize: 11, letterSpacing: 1.2 },
   heading: { gap: 6 },
-  title: { color: lab.text, fontSize: 21, fontWeight: '600', letterSpacing: -0.3 },
-  description: { color: lab.muted, fontSize: 12, lineHeight: 19 },
+  title: { color: lab.text, fontFamily: lab.fontSemiBold, fontSize: 20, lineHeight: 28 },
+  description: { color: lab.muted, fontFamily: lab.font, fontSize: 13, lineHeight: 19 },
   permissions: { gap: 4 },
-  meta: { color: lab.muted, fontFamily: lab.mono, fontSize: 10 },
+  meta: { color: lab.muted, fontFamily: lab.fontMedium, fontSize: 11 },
   controls: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  button: { backgroundColor: lab.accent, minHeight: 44, paddingHorizontal: 15, paddingVertical: 12, borderRadius: 9, justifyContent: 'center' },
-  secondary: { backgroundColor: lab.inset, borderColor: lab.border, borderWidth: 1 },
-  danger: { backgroundColor: '#36212C' },
-  dim: { opacity: 0.5 },
-  buttonLabel: { fontSize: 12, fontWeight: '700', color: lab.background },
-  secondaryLabel: { color: lab.text },
-  dangerLabel: { color: lab.red },
-  error: { color: lab.red, backgroundColor: '#2B1D27', padding: 12, borderRadius: 8, fontSize: 12, lineHeight: 19 },
-  notice: { color: lab.green, backgroundColor: '#14352D', padding: 14, borderRadius: 8, fontFamily: lab.mono, fontWeight: '700', letterSpacing: 1 },
-  footer: { color: lab.muted, fontFamily: lab.mono, fontSize: 9, lineHeight: 15 },
+  error: { color: lab.red, backgroundColor: lab.errorBg, padding: 12, borderRadius: Radius.sm, fontFamily: lab.font, fontSize: 13, lineHeight: 19 },
+  notice: { color: lab.green, backgroundColor: lab.noticeBg, padding: 14, borderRadius: Radius.sm, fontFamily: lab.fontSemiBold, letterSpacing: 0.4 },
+  footer: { color: lab.muted, fontFamily: lab.fontMedium, fontSize: 10, lineHeight: 15 },
 });
