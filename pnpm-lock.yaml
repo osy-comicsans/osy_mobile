@@ -5,7 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  onnxruntime-react-native@1.24.3: 746143fcc1f5d2b83b196fcff3e8e820d8c76726fbe9a8f87f112c0347594fce
+  onnxruntime-react-native@1.24.3:
+    hash: 746143fcc1f5d2b83b196fcff3e8e820d8c76726fbe9a8f87f112c0347594fce
+    path: patches/onnxruntime-react-native@1.24.3.patch
 
 importers:
 
