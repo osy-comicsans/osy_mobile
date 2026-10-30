@@ -34,7 +34,26 @@
         }
       ],
       "expo-sqlite",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow OSYMobile to show your foreground location in the temporary Device Lab.",
+          "locationAlwaysAndWhenInUsePermission": false,
+          "locationAlwaysPermission": false,
+          "motionUsagePermission": "Allow OSYMobile to test motion sensors and count steps in the temporary Device Lab.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false,
+          "isAndroidMotionActivityEnabled": false
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Allow OSYMobile to test motion sensors and count steps in the temporary Device Lab."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

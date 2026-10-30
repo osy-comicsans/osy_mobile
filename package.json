@@ -15,9 +15,11 @@
     "expo-glass-effect": "~57.0.4",
     "expo-image": "~57.0.5",
     "expo-linking": "~57.0.13",
+    "expo-location": "~57.0.22",
     "expo-network": "~57.0.3",
     "expo-router": "~57.0.29",
     "expo-secure-store": "~57.0.4",
+    "expo-sensors": "~57.0.3",
     "expo-splash-screen": "~57.0.10",
     "expo-sqlite": "~57.0.4",
     "expo-status-bar": "~57.0.1",
@@ -50,7 +52,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "test:offline": "node --test tests/offline.test.cjs"
+    "test:offline": "node --test tests/offline.test.cjs",
+    "test:device-playground": "node --test tests/device-playground.test.cjs"
   },
   "private": true
 }
