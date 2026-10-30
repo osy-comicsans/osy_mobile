@@ -1,5 +1,7 @@
 import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
 
+import { migrateDatabase } from './migrations';
+
 let databasePromise: Promise<SQLiteDatabase> | undefined;
 
 async function openDatabase(): Promise<SQLiteDatabase> {
@@ -7,6 +9,7 @@ async function openDatabase(): Promise<SQLiteDatabase> {
 
   try {
     await database.execAsync('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
+    await migrateDatabase(database);
     return database;
   } catch (error) {
     await database.closeAsync().catch(() => undefined);
