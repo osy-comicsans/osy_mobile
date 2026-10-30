@@ -41,6 +41,9 @@ jobs:
       - name: Test translations
         run: pnpm test:i18n
 
+      - name: Test crash detection
+        run: pnpm test:crash-detection
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks
