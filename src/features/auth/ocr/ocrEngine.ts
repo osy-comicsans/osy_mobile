@@ -56,10 +56,14 @@ async function loadModels(): Promise<OcrModels> {
   };
 }
 
-let models: Promise<OcrModels | null> | undefined;
+let models: Promise<OcrModels> | undefined;
 
-export function getOcrModels(): Promise<OcrModels | null> {
-  models ??= loadModels().catch(() => null);
+// A failed load is not kept, so the next document tries again.
+export function getOcrModels(): Promise<OcrModels> {
+  models ??= loadModels().catch((error: unknown) => {
+    models = undefined;
+    throw error;
+  });
   return models;
 }
 

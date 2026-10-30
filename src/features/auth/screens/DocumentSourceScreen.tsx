@@ -53,9 +53,8 @@ export function DocumentSourceScreen() {
 
     // OCR failure must never block manual entry on the review step.
     setBusy(true);
-    const { fields, lowConfidence } = await extractDocumentFields(type, next)
-      .catch(() => ({ fields: {}, lowConfidence: [] }));
-    documentDraft.setState({ fields, lowConfidence });
+    const { fields, lowConfidence, failed, failureReason } = await extractDocumentFields(type, next);
+    documentDraft.setState({ fields, lowConfidence, ocrFailed: failed, ocrFailureReason: failureReason });
     setBusy(false);
     router.replace('/document-review');
   };

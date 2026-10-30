@@ -25,7 +25,7 @@ import { documentDraft, getConsentedAt, pageUris, resetDraftPages } from '../uti
 export function DocumentReviewScreen() {
   const { t } = useTranslation();
   const text = useKeyText();
-  const { type, source, pages, fields, lowConfidence } = useStore(documentDraft);
+  const { type, source, pages, fields, lowConfidence, ocrFailed, ocrFailureReason } = useStore(documentDraft);
   const [account, setAccount] = useState<User | null>(null);
   const [showMissing, setShowMissing] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -123,6 +123,12 @@ export function DocumentReviewScreen() {
 
       <View style={sheetCard}>
         <ThemedText type="heading" accessibilityRole="header">{t('documents.detailsTitle')}</ThemedText>
+        {ocrFailed && (
+          <FormNotice
+            tone="warning"
+            message={__DEV__ && ocrFailureReason ? `${t('documents.ocrFailed')} (${ocrFailureReason})` : t('documents.ocrFailed')}
+          />
+        )}
         {account && type === 'driver_license' && nameMismatch(fields, account) && (
           <FormNotice tone="warning" message={t('documents.nameMismatch')} />
         )}

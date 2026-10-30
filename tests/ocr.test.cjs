@@ -202,6 +202,11 @@ test('names are compared without case or accents', () => {
   assert.equal(nameMismatch({ firstName: 'أمينة' }, user), false);
 });
 
+test('the runtime is only loaded once its native module exists', () => {
+  const engine = fs.readFileSync(path.join(__dirname, '../src/features/auth/ocr/ocrEngine.ts'), 'utf8');
+  assert.ok(engine.indexOf('NativeModules.Onnxruntime') < engine.indexOf("require('onnxruntime-react-native')"));
+});
+
 test('auth OCR code never logs', () => {
   const directory = path.join(__dirname, '../src/features/auth/ocr');
   for (const file of fs.readdirSync(directory, { recursive: true })) {

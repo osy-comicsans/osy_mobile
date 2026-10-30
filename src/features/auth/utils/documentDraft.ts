@@ -8,10 +8,12 @@ export interface DocumentDraft {
   pages: CapturedPage[];
   fields: DocumentFields;
   lowConfidence: DocumentFieldKey[];
+  ocrFailed: boolean;
+  ocrFailureReason?: string;
   rejectionReason: string | null;
 }
 
-const empty: DocumentDraft = { type: null, source: null, pages: [], fields: {}, lowConfidence: [], rejectionReason: null };
+const empty: DocumentDraft = { type: null, source: null, pages: [], fields: {}, lowConfidence: [], ocrFailed: false, rejectionReason: null };
 
 // Kept in memory only: passwords and document data are never written to storage.
 export const documentDraft = createStore<DocumentDraft>(() => empty);
@@ -21,7 +23,7 @@ export function startDraft(type: DocumentType, rejectionReason: string | null) {
 }
 
 export function resetDraftPages(rejectionReason: string | null = null) {
-  documentDraft.setState({ source: null, pages: [], fields: {}, lowConfidence: [], rejectionReason });
+  documentDraft.setState({ source: null, pages: [], fields: {}, lowConfidence: [], ocrFailed: false, ocrFailureReason: undefined, rejectionReason });
 }
 
 // Set when the user accepts the notice, and sent with each document.

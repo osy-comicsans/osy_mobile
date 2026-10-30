@@ -234,7 +234,8 @@
     "reading": "Lecture de votre document…",
     "detailsTitle": "Informations du document",
     "checkField": "Vérifiez ce champ. Il a peut-être été mal lu.",
-    "nameMismatch": "Le nom sur ce permis ne correspond pas à votre compte."
+    "nameMismatch": "Le nom sur ce permis ne correspond pas à votre compte.",
+    "ocrFailed": "Nous n’avons pas pu lire ce document automatiquement. Veuillez saisir les informations vous-même."
   },
   "errors": {
     "api": {
