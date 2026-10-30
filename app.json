@@ -39,7 +39,12 @@
           "imageWidth": 76
         }
       ],
-      "expo-sqlite",
+      [
+        "expo-sqlite",
+        {
+          "useSQLCipher": true
+        }
+      ],
       "expo-secure-store",
       [
         "expo-location",
@@ -95,7 +100,8 @@
           "photosPermission": "OSY lets you choose a photo of your driver’s licence and car registration.",
           "microphonePermission": false
         }
-      ]
+      ],
+      "onnxruntime-react-native"
     ],
     "experiments": {
       "typedRoutes": true,
