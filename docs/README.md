@@ -5,3 +5,4 @@
 The project overview is in the [README](../README.md), the API in [API_CONTRACT.md](../API_CONTRACT.md), and the design system in [DESIGN.md](../DESIGN.md).
 - [Road matching](road-matching.md): how the current road is found with OSRM, and what is left to build.
 - [Map](map.md): the Map tab, its library choice, and overlays.
+- [Background monitoring](background-monitoring.md): how crash detection keeps running with the screen locked.
