@@ -56,12 +56,12 @@
         "expo-location",
         {
           "locationWhenInUsePermission": "OSY uses your location and speed while the app is open to warn you about road risks.",
-          "locationAlwaysAndWhenInUsePermission": false,
-          "locationAlwaysPermission": false,
+          "locationAlwaysAndWhenInUsePermission": "OSY uses your location in the background while you drive, so it can notice a crash when your phone is locked.",
+          "locationAlwaysPermission": "OSY uses your location in the background while you drive, so it can notice a crash when your phone is locked.",
           "motionUsagePermission": "OSY uses motion data to help notice a crash.",
-          "isIosBackgroundLocationEnabled": false,
-          "isAndroidBackgroundLocationEnabled": false,
-          "isAndroidForegroundServiceEnabled": false,
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true,
           "isAndroidMotionActivityEnabled": false
         }
       ],
