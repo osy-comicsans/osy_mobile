@@ -10,6 +10,8 @@ import { isRtl } from '@/common/lib/i18n/languages';
 import { AppProviders } from '@/common/providers/AppProviders';
 import { Colors, FontFamily } from '@/common/lib/theme';
 import { AlertProvider } from '@/features/alerts/providers/AlertProvider';
+import { accountService } from '@/features/auth/authServices';
+import { useAccount } from '@/features/auth/hooks/useAccount';
 import { CrashDetectionProvider } from '@/features/crash-detection/providers/CrashDetectionProvider';
 import { LocationProvider } from '@/features/location/providers/LocationProvider';
 import { CheckInProvider } from '@/features/safety/providers/CheckInProvider';
@@ -51,7 +53,10 @@ export default function RootLayout() {
     IBMPlexSansArabic_600SemiBold: require('@/assets/fonts/IBMPlexSansArabic_600SemiBold.ttf'),
     IBMPlexSansArabic_700Bold: require('@/assets/fonts/IBMPlexSansArabic_700Bold.ttf'),
   });
-  const ready = (loaded || !!error) && directionReady;
+  const { phase } = useAccount();
+  const ready = (loaded || !!error) && directionReady && phase !== 'loading';
+
+  useEffect(() => accountService.start(), []);
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();
@@ -70,12 +75,17 @@ export default function RootLayout() {
               <AlertProvider>
                 <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
                   <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="(tabs)" />
+                    <Stack.Protected guard={phase === 'ready'} redirectTo="/login">
+                      <Stack.Screen name="(tabs)" />
+                      <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
+                    </Stack.Protected>
+                    <Stack.Protected guard={phase !== 'ready'}>
+                      <Stack.Screen name="(auth)" />
+                    </Stack.Protected>
                     <Stack.Screen
                       name="check-in"
                       options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
                     />
-                    <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
                     <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
                   </Stack>
                 </LocaleProvider>
