@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Lint, typecheck, and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test offline storage
+        run: pnpm test:offline
+
+      - name: Test device playground
+        run: pnpm test:device-playground
+
+  build:
+    name: Build ${{ matrix.platform }}
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [android, ios, web]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+
+      - name: Export bundle
+        run: pnpm expo export --platform ${{ matrix.platform }} --output-dir dist
+
+      - name: Check bundle output
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          if [ "$PLATFORM" = "web" ]; then
+            test -s dist/index.html
+          else
+            test -n "$(find "dist/_expo/static/js/$PLATFORM" -name '*.hbc' -size +0)"
+          fi
+
+  health:
+    name: Project health
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+
+      - name: Run expo-doctor
+        run: pnpm dlx expo-doctor
+
+      - name: Check for other package manager lockfiles
+        run: |
+          for lockfile in package-lock.json yarn.lock bun.lock bun.lockb; do
+            if [ -e "$lockfile" ]; then
+              echo "::error file=$lockfile::This project uses pnpm. Remove $lockfile."
+              exit 1
+            fi
+          done
+
+      - name: Check for unsafe public environment variables
+        run: |
+          if grep -rnE 'EXPO_PUBLIC_[A-Z0-9_]*(SECRET|PASSWORD|TOKEN|PRIVATE)' src .env.example; then
+            echo "::error::EXPO_PUBLIC_ values ship in the app bundle and must never contain secrets."
+            exit 1
+          fi
