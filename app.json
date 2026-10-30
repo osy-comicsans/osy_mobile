@@ -78,6 +78,13 @@
             ]
           }
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#6316DB"
+        }
       ]
     ],
     "experiments": {
@@ -85,6 +92,7 @@
       "reactCompiler": true
     },
     "locales": {
+      "en": "./assets/locales/en.json",
       "fr": "./assets/locales/fr.json",
       "ar": "./assets/locales/ar.json"
     }

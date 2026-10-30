@@ -2,9 +2,23 @@
   "ios": {
     "CFBundleDisplayName": "OSY",
     "NSLocationWhenInUseUsageDescription": "OSY utilise votre position et votre vitesse lorsque l’application est ouverte pour vous avertir des risques sur la route.",
-    "NSMotionUsageDescription": "OSY utilise les données de mouvement pour aider à détecter un accident."
+    "NSMotionUsageDescription": "OSY utilise les données de mouvement pour aider à détecter un accident.",
+    "Localizable.strings": {
+      "alert_crash_detected_title": "Accident possible détecté",
+      "alert_crash_detected_body": "Tout va bien ? Ouvrez OSY pour répondre.",
+      "alert_potential_accident_title": "Risque d’accident à l’approche",
+      "alert_potential_accident_body": "Ralentissez et redoublez de prudence.",
+      "alert_accident_nearby_title": "Accident à proximité",
+      "alert_accident_nearby_body": "Quelqu’un a peut-être besoin d’aide. Ouvrez OSY pour en savoir plus."
+    }
   },
   "android": {
-    "app_name": "OSY"
+    "app_name": "OSY",
+    "alert_crash_detected_title": "Accident possible détecté",
+    "alert_crash_detected_body": "Tout va bien ? Ouvrez OSY pour répondre.",
+    "alert_potential_accident_title": "Risque d’accident à l’approche",
+    "alert_potential_accident_body": "Ralentissez et redoublez de prudence.",
+    "alert_accident_nearby_title": "Accident à proximité",
+    "alert_accident_nearby_body": "Quelqu’un a peut-être besoin d’aide. Ouvrez OSY pour en savoir plus."
   }
 }

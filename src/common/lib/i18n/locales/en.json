@@ -1,5 +1,9 @@
 {
-  "tabs": { "home": "Home", "map": "Map", "profile": "Profile" },
+  "tabs": {
+    "home": "Home",
+    "map": "Map",
+    "profile": "Profile"
+  },
   "common": {
     "dismiss": "Dismiss",
     "tryAgain": "Try again",
@@ -56,7 +60,11 @@
     "reportDescription": "The accident report form will appear here."
   },
   "location": {
-    "driving": { "stationary": "Stationary", "walking": "Walking", "driving": "Driving" },
+    "driving": {
+      "stationary": "Stationary",
+      "walking": "Walking",
+      "driving": "Driving"
+    },
     "errors": {
       "watch": "Could not read your location. Check location services and try again.",
       "permission": "Could not check location access. Try again."
@@ -75,6 +83,33 @@
       "motionRequestBody": "Motion access helps OSY notice a crash. Location still works without it.",
       "motionDeniedTitle": "Motion access is off",
       "motionDeniedBody": "Location still works, but OSY will not be able to use motion to notice a crash."
+    }
+  },
+  "alerts": {
+    "view": "View",
+    "distanceAway": "{{distance}} away",
+    "crash_detected": {
+      "title": "Possible crash detected",
+      "body": "Are you OK? Open OSY to respond."
+    },
+    "potential_accident": {
+      "title": "Accident risk ahead",
+      "body": "Slow down and take extra care."
+    },
+    "accident_nearby": {
+      "title": "Accident nearby",
+      "body": "Someone may need help. Open OSY for details."
+    },
+    "permission": {
+      "requestTitle": "Turn on safety alerts",
+      "requestBody": "OSY uses notifications to warn you about road risks and reach you after a crash.",
+      "deniedTitle": "Safety alerts are off",
+      "deniedBody": "OSY cannot warn you when the app is closed unless notifications are on."
+    },
+    "dev": {
+      "title": "Test alerts",
+      "now": "Now",
+      "delayed": "In {{seconds}} s"
     }
   },
   "errors": {
