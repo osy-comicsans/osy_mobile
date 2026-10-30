@@ -37,7 +37,9 @@
   },
   "map": {
     "title": "Carte",
-    "description": "Votre position, les informations sur la route et les routes à risque s’afficheront ici."
+    "unknownRoad": "Route inconnue",
+    "recenter": "Recentrer sur ma position",
+    "unavailable": "La carte nécessite une version de développement. Elle n’est pas disponible dans Expo Go ni sur le web."
   },
   "profile": {
     "title": "Profil",
