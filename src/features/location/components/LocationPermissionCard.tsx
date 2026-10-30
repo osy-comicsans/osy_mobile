@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Linking, Platform, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/common/components/themed-text';
@@ -10,48 +11,55 @@ import { useLocationService, useLocationState } from '../hooks/useLocation';
 const openSettings = () => { void Linking.openSettings(); };
 
 function useMessage() {
+  const { t } = useTranslation();
   const { status, location, canAskAgain, motion, error } = useLocationState();
 
-  if (status === 'error') return { title: 'Location unavailable', body: error, action: 'retry' } as const;
+  if (status === 'error') {
+    return {
+      title: t('location.permission.unavailableTitle'),
+      body: error ? t(`location.errors.${error}`) : null,
+      action: 'retry',
+    } as const;
+  }
   if (status === 'servicesDisabled') {
     return {
-      title: 'Location services are off',
-      body: 'Turn on location services for your device so OSY can follow your position and speed.',
+      title: t('location.permission.servicesOffTitle'),
+      body: t('location.permission.servicesOffBody'),
       action: 'retry',
     } as const;
   }
   if (location === 'undetermined') {
     return {
-      title: 'Share your location with OSY',
-      body: 'OSY uses your location and speed while the app is open to warn you about road risks. Motion access helps it notice a crash.',
+      title: t('location.permission.requestTitle'),
+      body: t('location.permission.requestBody'),
       action: 'request',
     } as const;
   }
   if (location === 'denied') {
     return {
-      title: 'Location access is off',
-      body: 'OSY cannot show your position or speed without location access.',
+      title: t('location.permission.deniedTitle'),
+      body: t('location.permission.deniedBody'),
       action: canAskAgain ? 'request' : 'settings',
     } as const;
   }
   if (location === 'limited') {
     return {
-      title: 'Precise location is off',
-      body: 'OSY is using your approximate location, so speed and road details may be wrong.',
+      title: t('location.permission.limitedTitle'),
+      body: t('location.permission.limitedBody'),
       action: 'settings',
     } as const;
   }
   if (motion === 'undetermined') {
     return {
-      title: 'Allow motion access',
-      body: 'Motion access helps OSY notice a crash. Location still works without it.',
+      title: t('location.permission.motionRequestTitle'),
+      body: t('location.permission.motionRequestBody'),
       action: 'request',
     } as const;
   }
   if (motion === 'denied') {
     return {
-      title: 'Motion access is off',
-      body: 'Location still works, but OSY will not be able to use motion to notice a crash.',
+      title: t('location.permission.motionDeniedTitle'),
+      body: t('location.permission.motionDeniedBody'),
       action: 'settings',
     } as const;
   }
@@ -59,6 +67,7 @@ function useMessage() {
 }
 
 export function LocationPermissionCard() {
+  const { t } = useTranslation();
   const service = useLocationService();
   const { requesting } = useLocationState();
   const message = useMessage();
@@ -71,12 +80,12 @@ export function LocationPermissionCard() {
       <ThemedText type="headingS">{message.title}</ThemedText>
       <ThemedText type="body" themeColor="textSecondary">{message.body}</ThemedText>
       {message.action === 'request' && (
-        <Button label="Allow access" loading={requesting} onPress={() => void service.requestPermission()} />
+        <Button label={t('common.allowAccess')} loading={requesting} onPress={() => void service.requestPermission()} />
       )}
       {message.action === 'retry' && (
-        <Button label="Try again" variant="secondary" onPress={() => void service.start()} />
+        <Button label={t('common.tryAgain')} variant="secondary" onPress={() => void service.start()} />
       )}
-      {canOpenSettings && <Button label="Open settings" variant="secondary" onPress={openSettings} />}
+      {canOpenSettings && <Button label={t('common.openSettings')} variant="secondary" onPress={openSettings} />}
     </Card>
   );
 }

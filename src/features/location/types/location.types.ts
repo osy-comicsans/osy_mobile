@@ -1,3 +1,6 @@
+// Translated where it is shown, under `location.errors`.
+export type LocationError = 'watch' | 'permission';
+
 export type DrivingState = 'stationary' | 'walking' | 'driving';
 
 export type LocationPermission = 'undetermined' | 'granted' | 'limited' | 'denied';
@@ -45,7 +48,7 @@ export interface LocationState {
   requesting: boolean;
   fix: LocationFix | null;
   drivingState: DrivingState;
-  error: string | null;
+  error: LocationError | null;
 }
 
 export interface SamplingProfile {

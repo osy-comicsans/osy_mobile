@@ -6,6 +6,7 @@ import {
   TabTriggerSlotProps,
   TabListProps,
 } from 'expo-router/ui';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View, StyleSheet } from 'react-native';
 
 import { ThemedText } from './themed-text';
@@ -13,18 +14,20 @@ import { ThemedText } from './themed-text';
 import { Colors, MaxContentWidth, Radius, Shadow, Spacing } from '@/common/lib/theme';
 
 export default function AppTabs() {
+  const { t } = useTranslation();
+
   return (
     <Tabs>
       <TabList asChild>
         <CustomTabList>
           <TabTrigger name="home" href="/" asChild>
-            <TabButton>Home</TabButton>
+            <TabButton>{t('tabs.home')}</TabButton>
           </TabTrigger>
           <TabTrigger name="map" href="/map" asChild>
-            <TabButton>Map</TabButton>
+            <TabButton>{t('tabs.map')}</TabButton>
           </TabTrigger>
           <TabTrigger name="profile" href="/profile" asChild>
-            <TabButton>Profile</TabButton>
+            <TabButton>{t('tabs.profile')}</TabButton>
           </TabTrigger>
         </CustomTabList>
       </TabList>
@@ -89,7 +92,7 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
   },
   brandText: {
-    marginRight: 'auto',
+    marginEnd: 'auto',
     color: Colors.textPrimary,
   },
   pressed: {
