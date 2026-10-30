@@ -136,12 +136,12 @@
     "firstName": "الاسم",
     "lastName": "اللقب",
     "email": "البريد الإلكتروني",
-    "mobileNumber": "رقم الهاتف مع رمز البلد",
+    "mobileNumber": "رقم الهاتف",
     "password": "كلمة المرور",
     "confirmPassword": "تأكيد كلمة المرور",
     "signIn": "تسجيل الدخول",
     "createAccount": "إنشاء حساب",
-    "haveAccount": "لدي حساب بالفعل",
+    "haveAccount": "لديك حساب بالفعل؟",
     "offline": "أنت غير متصل. تتطلب هذه الخطوة اتصالًا بالإنترنت.",
     "errors": {
       "nameShort": "يجب ألا يقل عن حرفين.",
@@ -158,7 +158,16 @@
       "emailTaken": "هذا البريد الإلكتروني مسجل بالفعل.",
       "mobileTaken": "رقم الهاتف هذا مسجل بالفعل.",
       "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة."
-    }
+    },
+    "mobileHint": "أدخل رمز البلد، مثل ‎+213.",
+    "passwordHint": "8 أحرف على الأقل، مع حرف كبير وحرف صغير ورقم.",
+    "noAccount": "جديد على OSY؟",
+    "back": "رجوع",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "stepOne": "الخطوة 1 من 3",
+    "stepTwo": "الخطوة 2 من 3",
+    "stepThree": "الخطوة 3 من 3"
   },
   "documents": {
     "title": "وثائقك",
@@ -214,7 +223,15 @@
       "registrationNumber": "رقم التسجيل",
       "previousNumber": "الرقم السابق",
       "firstRegistrationYear": "سنة أول تسجيل"
-    }
+    },
+    "bothSides": "الوجهان الأمامي والخلفي",
+    "front": "الوجه الأمامي",
+    "back": "الوجه الخلفي",
+    "scanHint": "التقط صورة للوثيقة الآن",
+    "photoHint": "استخدم صورة موجودة لديك",
+    "fileHint": "ملف JPG أو PNG أو PDF حتى 10 ميغابايت",
+    "reading": "جارٍ قراءة وثيقتك…",
+    "detailsTitle": "تفاصيل الوثيقة"
   },
   "errors": {
     "api": {

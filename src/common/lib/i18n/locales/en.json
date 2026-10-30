@@ -136,12 +136,12 @@
     "firstName": "First name",
     "lastName": "Last name",
     "email": "Email",
-    "mobileNumber": "Mobile number, with country code",
+    "mobileNumber": "Mobile number",
     "password": "Password",
     "confirmPassword": "Confirm password",
     "signIn": "Sign in",
     "createAccount": "Create account",
-    "haveAccount": "I already have an account",
+    "haveAccount": "Already have an account?",
     "offline": "You are offline. This step needs a connection.",
     "errors": {
       "nameShort": "Must be at least 2 characters.",
@@ -158,7 +158,16 @@
       "emailTaken": "This email is already registered.",
       "mobileTaken": "This mobile number is already registered.",
       "invalidCredentials": "The email or password is wrong."
-    }
+    },
+    "mobileHint": "Include your country code, such as +213.",
+    "passwordHint": "At least 8 characters, with upper and lower case letters and a number.",
+    "noAccount": "New to OSY?",
+    "back": "Go back",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "stepOne": "Step 1 of 3",
+    "stepTwo": "Step 2 of 3",
+    "stepThree": "Step 3 of 3"
   },
   "documents": {
     "title": "Your documents",
@@ -214,7 +223,15 @@
       "registrationNumber": "Registration number",
       "previousNumber": "Previous number",
       "firstRegistrationYear": "Year of first registration"
-    }
+    },
+    "bothSides": "Front and back",
+    "front": "Front",
+    "back": "Back",
+    "scanHint": "Take a photo of the document now",
+    "photoHint": "Use a photo you already have",
+    "fileHint": "Use a JPG, PNG, or PDF, up to 10 MB",
+    "reading": "Reading your document…",
+    "detailsTitle": "Document details"
   },
   "errors": {
     "api": {

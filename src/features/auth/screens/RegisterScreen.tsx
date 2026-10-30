@@ -1,15 +1,18 @@
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, type TextInputProps } from 'react-native';
+import { StyleSheet, View, type TextInputProps } from 'react-native';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
+import { Icon, type IconName } from '@/common/components/ui/icon';
 import { Input, type InputHandle } from '@/common/components/ui/input';
 import { Space } from '@/common/lib/theme';
 
 import { authApi } from '../authServices';
-import { AuthScreen } from '../components/AuthScreen';
+import { AuthScreen, sheetCard } from '../components/AuthScreen';
+import { FormNotice } from '../components/FormNotice';
+import { PasswordInput } from '../components/PasswordInput';
 import { useFormErrors } from '../hooks/useFormErrors';
 import { useKeyText } from '../hooks/useKeyText';
 import { registerFormSchema } from '../types/auth.schemas';
@@ -23,9 +26,12 @@ const inputProps: Record<Field, TextInputProps> = {
   lastName: { autoComplete: 'family-name', textContentType: 'familyName' },
   email: { autoCapitalize: 'none', autoComplete: 'email', keyboardType: 'email-address', textContentType: 'emailAddress' },
   mobileNumber: { autoComplete: 'tel', keyboardType: 'phone-pad', textContentType: 'telephoneNumber' },
-  password: { secureTextEntry: true, autoComplete: 'new-password', textContentType: 'newPassword' },
-  confirmPassword: { secureTextEntry: true, autoComplete: 'new-password', textContentType: 'newPassword' },
+  password: { autoComplete: 'new-password', textContentType: 'newPassword' },
+  confirmPassword: { autoComplete: 'new-password', textContentType: 'newPassword' },
 };
+
+const hints = { mobileNumber: 'auth.mobileHint', password: 'auth.passwordHint' } as const satisfies Partial<Record<Field, string>>;
+const icons: Partial<Record<Field, IconName>> = { email: 'mail', mobileNumber: 'phone' };
 
 export function RegisterScreen() {
   const { t } = useTranslation();
@@ -73,39 +79,54 @@ export function RegisterScreen() {
   };
 
   return (
-    <AuthScreen title={t('auth.registerTitle')} description={t('auth.registerDescription')}>
-      {FIELDS.map((field, index) => (
-        <Input
-          key={field}
-          ref={(input) => { inputs.current[field] = input; }}
-          label={t(`auth.${field}`)}
-          value={values[field]}
-          onChangeText={(value) => change(field, value)}
-          onBlur={() => form.touch(field)}
-          error={error(field)}
-          returnKeyType={index === FIELDS.length - 1 ? 'done' : 'next'}
-          onSubmitEditing={() => {
-            if (index === FIELDS.length - 1) void submit();
-            else inputs.current[FIELDS[index + 1]]?.focus();
-          }}
-          {...inputProps[field]}
-        />
-      ))}
-      {formError && (
-        <ThemedText type="label" themeColor="errorText" accessibilityRole="alert">{text(formError)}</ThemedText>
-      )}
-      <Button
-        label={t('auth.createAccount')}
-        size="large"
-        loading={submitting}
-        onPress={() => void submit()}
-        style={styles.action}
-      />
-      <Button label={t('auth.haveAccount')} variant="text" onPress={() => router.back()} style={styles.action} />
+    <AuthScreen
+      title={t('auth.registerTitle')}
+      description={t('auth.registerDescription')}
+      overline={t('auth.stepOne')}
+      showBack
+      footer={(
+        <>
+          <ThemedText type="body" themeColor="textSecondary">{t('auth.haveAccount')}</ThemedText>
+          <Button label={t('auth.signIn')} variant="text" size="small" onPress={() => router.back()} />
+        </>
+      )}>
+      <View style={sheetCard}>
+        {formError && <FormNotice message={text(formError)} />}
+        <View style={styles.fields}>
+          {FIELDS.map((name, index) => {
+            const Field = name === 'password' || name === 'confirmPassword' ? PasswordInput : Input;
+            const last = index === FIELDS.length - 1;
+            const iconName = icons[name];
+            return (
+              <Field
+                key={name}
+                ref={(input: InputHandle | null) => { inputs.current[name] = input; }}
+                label={t(`auth.${name}`)}
+                hint={name in hints ? t(hints[name as keyof typeof hints]) : undefined}
+                value={values[name]}
+                onChangeText={(value) => change(name, value)}
+                onBlur={() => form.touch(name)}
+                error={error(name)}
+                returnKeyType={last ? 'done' : 'next'}
+                onSubmitEditing={() => {
+                  if (last) void submit();
+                  else inputs.current[FIELDS[index + 1]]?.focus();
+                }}
+                containerStyle={name === 'firstName' || name === 'lastName' ? styles.name : styles.wide}
+                leadingIcon={iconName && <Icon name={iconName} size={18} />}
+                {...inputProps[name]}
+              />
+            );
+          })}
+        </View>
+        <Button label={t('auth.createAccount')} size="large" loading={submitting} onPress={() => void submit()} />
+      </View>
     </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  action: { alignSelf: 'stretch', marginTop: Space[1] },
+  fields: { flexDirection: 'row', flexWrap: 'wrap', gap: Space[5] },
+  name: { flex: 1, minWidth: 130 },
+  wide: { width: '100%' },
 });

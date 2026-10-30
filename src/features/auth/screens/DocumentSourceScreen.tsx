@@ -1,15 +1,17 @@
 import { Redirect, router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Linking, StyleSheet } from 'react-native';
+import { ActivityIndicator, Linking, StyleSheet, View } from 'react-native';
 import { useStore } from 'zustand';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
-import { Card } from '@/common/components/ui/card';
-import { Space } from '@/common/lib/theme';
+import { Colors, Space } from '@/common/lib/theme';
 
-import { AuthScreen } from '../components/AuthScreen';
+import { AuthScreen, sheetCard } from '../components/AuthScreen';
+import { FormNotice } from '../components/FormNotice';
+import { SideProgress } from '../components/SideProgress';
+import { SourceOption } from '../components/SourceOption';
 import { useKeyText } from '../hooks/useKeyText';
 import { pickFile, pickPhoto, scanPage, type CaptureResult } from '../native/documentCapture';
 import { extractDocumentFields } from '../ocr/documentOcr';
@@ -68,33 +70,39 @@ export function DocumentSourceScreen() {
   return (
     <AuthScreen
       title={t(`documents.types.${type}`)}
-      description={t(side === 'front' ? 'documents.sideFront' : 'documents.sideBack')}>
-      {rejectionReason && (
-        <ThemedText type="label" themeColor="errorText" accessibilityRole="alert">{rejectionReason}</ThemedText>
-      )}
-      {cameraDenied && (
-        <Card tone="muted" style={styles.card}>
-          <ThemedText accessibilityRole="alert">{t('documents.cameraDenied')}</ThemedText>
-          {!cameraDenied.canAskAgain && (
-            <Button
-              label={t('common.openSettings')}
-              variant="secondary"
-              onPress={() => void Linking.openSettings()}
-            />
-          )}
-        </Card>
-      )}
-      {fileError && (
-        <ThemedText type="label" themeColor="errorText" accessibilityRole="alert">{text(fileError)}</ThemedText>
-      )}
-      <Button label={t('documents.scan')} size="large" loading={busy} onPress={() => void run(scanPage, 'scan')} style={styles.action} />
-      <Button label={t('documents.choosePhoto')} variant="secondary" size="large" disabled={busy} onPress={() => void run(pickPhoto, 'upload')} style={styles.action} />
-      <Button label={t('documents.chooseFile')} variant="secondary" size="large" disabled={busy} onPress={() => void run(pickFile, 'upload')} style={styles.action} />
+      description={t(side === 'front' ? 'documents.sideFront' : 'documents.sideBack')}
+      overline={t('auth.stepTwo')}
+      showBack>
+      <View style={sheetCard}>
+        <SideProgress side={side} />
+        {rejectionReason && <FormNotice message={rejectionReason} />}
+        {fileError && <FormNotice message={text(fileError)} />}
+        {cameraDenied && (
+          <>
+            <FormNotice tone="warning" message={t('documents.cameraDenied')} />
+            {!cameraDenied.canAskAgain && (
+              <Button label={t('common.openSettings')} variant="secondary" onPress={() => void Linking.openSettings()} />
+            )}
+          </>
+        )}
+        {busy ? (
+          <View style={styles.reading}>
+            <ActivityIndicator color={Colors.accent} />
+            <ThemedText type="body" themeColor="textSecondary">{t('documents.reading')}</ThemedText>
+          </View>
+        ) : (
+          <View style={styles.options}>
+            <SourceOption icon="camera" title={t('documents.scan')} description={t('documents.scanHint')} onPress={() => void run(scanPage, 'scan')} />
+            <SourceOption icon="photo" title={t('documents.choosePhoto')} description={t('documents.photoHint')} onPress={() => void run(pickPhoto, 'upload')} />
+            <SourceOption icon="file" title={t('documents.chooseFile')} description={t('documents.fileHint')} onPress={() => void run(pickFile, 'upload')} />
+          </View>
+        )}
+      </View>
     </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { gap: Space[3], padding: Space[4] },
-  action: { alignSelf: 'stretch' },
+  options: { gap: Space[3] },
+  reading: { alignItems: 'center', gap: Space[3], paddingVertical: Space[8] },
 });

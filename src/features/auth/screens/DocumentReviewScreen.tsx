@@ -7,13 +7,14 @@ import { useStore } from 'zustand';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
-import { Card } from '@/common/components/ui/card';
+import { Icon } from '@/common/components/ui/icon';
 import { Input } from '@/common/components/ui/input';
 import { getLanguage } from '@/common/lib/i18n/i18n';
-import { Radius, Space } from '@/common/lib/theme';
+import { Colors, Radius, Space } from '@/common/lib/theme';
 
 import { accountService, documentsApi } from '../authServices';
-import { AuthScreen } from '../components/AuthScreen';
+import { AuthScreen, sheetCard } from '../components/AuthScreen';
+import { FormNotice } from '../components/FormNotice';
 import { useKeyText } from '../hooks/useKeyText';
 import { deleteCapturedFiles } from '../native/documentCapture';
 import { CONSENT_VERSION, DOCUMENT_FIELDS, type DocumentFieldKey } from '../types/auth.schemas';
@@ -76,60 +77,65 @@ export function DocumentReviewScreen() {
   };
 
   return (
-    <AuthScreen title={t(`documents.types.${type}`)} description={t('documents.reviewDescription')}>
-      <View style={styles.pages}>
-        {pages.map((page) => (
-          page.mimeType === 'application/pdf' ? (
-            <Card key={page.side} tone="muted" style={styles.page}>
-              <ThemedText type="label" themeColor="textSecondary">{page.fileName}</ThemedText>
-            </Card>
-          ) : (
-            <Image
-              key={page.side}
-              source={{ uri: page.uri }}
-              contentFit="contain"
-              accessibilityLabel={t(page.side === 'front' ? 'documents.sideFront' : 'documents.sideBack')}
-              style={styles.page}
-            />
-          )
-        ))}
+    <AuthScreen
+      title={t(`documents.types.${type}`)}
+      description={t('documents.reviewDescription')}
+      overline={t('auth.stepThree')}
+      showBack
+      onBack={() => retake()}>
+      <View style={sheetCard}>
+        <View style={styles.pages}>
+          {pages.map((page) => (
+            <View key={page.side} style={styles.pageColumn}>
+              <ThemedText type="overline" themeColor="textTertiary">
+                {t(page.side === 'front' ? 'documents.front' : 'documents.back')}
+              </ThemedText>
+              {page.mimeType === 'application/pdf' ? (
+                <View style={[styles.page, styles.pdf]}>
+                  <Icon name="file" size={24} color={Colors.accent} />
+                  <ThemedText type="label" themeColor="textSecondary" numberOfLines={2}>{page.fileName}</ThemedText>
+                </View>
+              ) : (
+                <Image
+                  source={{ uri: page.uri }}
+                  contentFit="cover"
+                  accessibilityLabel={t(page.side === 'front' ? 'documents.front' : 'documents.back')}
+                  style={styles.page}
+                />
+              )}
+            </View>
+          ))}
+        </View>
       </View>
 
-      {DOCUMENT_FIELDS[type].map((field) => (
-        <Input
-          key={field}
-          label={t(`documents.fields.${field}`)}
-          value={fields[field] ?? ''}
-          onChangeText={(value) => change(field, value)}
-          error={showMissing && missing.includes(field) ? t('documents.errors.fieldRequired') : undefined}
-          editable={!uploading}
+      <View style={sheetCard}>
+        <ThemedText type="heading" accessibilityRole="header">{t('documents.detailsTitle')}</ThemedText>
+        {DOCUMENT_FIELDS[type].map((field) => (
+          <Input
+            key={field}
+            label={t(`documents.fields.${field}`)}
+            value={fields[field] ?? ''}
+            onChangeText={(value) => change(field, value)}
+            error={showMissing && missing.includes(field) ? t('documents.errors.fieldRequired') : undefined}
+            editable={!uploading}
+          />
+        ))}
+        {uploadError && <FormNotice message={text(uploadError)} />}
+        <Button
+          label={t(uploadError ? 'common.tryAgain' : 'documents.confirm')}
+          size="large"
+          loading={uploading}
+          onPress={() => void confirm()}
         />
-      ))}
-
-      {uploadError && (
-        <ThemedText type="label" themeColor="errorText" accessibilityRole="alert">{text(uploadError)}</ThemedText>
-      )}
-      <Button
-        label={t(uploadError ? 'common.tryAgain' : 'documents.confirm')}
-        size="large"
-        loading={uploading}
-        onPress={() => void confirm()}
-        style={styles.action}
-      />
-      <Button
-        label={t('documents.retake')}
-        variant="secondary"
-        size="large"
-        disabled={uploading}
-        onPress={() => retake()}
-        style={styles.action}
-      />
+        <Button label={t('documents.retake')} variant="text" disabled={uploading} onPress={() => retake()} />
+      </View>
     </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  pages: { flexDirection: 'row', gap: Space[2] },
-  page: { flex: 1, height: 120, borderRadius: Radius.md, justifyContent: 'center', padding: Space[2] },
-  action: { alignSelf: 'stretch' },
+  pages: { flexDirection: 'row', gap: Space[3] },
+  pageColumn: { flex: 1, gap: Space[2] },
+  page: { height: 112, borderRadius: Radius.md, backgroundColor: Colors.backgroundElement },
+  pdf: { alignItems: 'center', justifyContent: 'center', gap: Space[1], padding: Space[2] },
 });

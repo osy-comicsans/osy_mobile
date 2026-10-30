@@ -7,22 +7,16 @@ import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
 import { Card } from '@/common/components/ui/card';
 import { Checkbox } from '@/common/components/ui/checkbox';
-import { StatusPill, type StatusPillStatus } from '@/common/components/ui/status-pill';
-import { Space } from '@/common/lib/theme';
+import { Icon } from '@/common/components/ui/icon';
+import { Colors, Space } from '@/common/lib/theme';
 
 import { accountService } from '../authServices';
-import { AuthScreen } from '../components/AuthScreen';
+import { AuthScreen, sheetCard } from '../components/AuthScreen';
+import { DocumentTracker } from '../components/DocumentTracker';
+import { FormNotice } from '../components/FormNotice';
 import { useAccount } from '../hooks/useAccount';
-import { DOCUMENT_ORDER, type DocumentRecord } from '../types/auth.schemas';
 import { nextDocument } from '../utils/authForm';
 import { recordConsent, startDraft } from '../utils/documentDraft';
-
-const statusPills: Record<DocumentRecord['status'], StatusPillStatus> = {
-  missing: 'waiting',
-  pending: 'pending',
-  verified: 'approved',
-  rejected: 'rejected',
-};
 
 export function DocumentsScreen() {
   const { t } = useTranslation();
@@ -44,33 +38,26 @@ export function DocumentsScreen() {
     router.push('/document-source');
   };
 
-  return (
-    <AuthScreen title={t('documents.title')} description={t('documents.description')}>
-      {loadFailed ? (
-        <Card tone="muted" style={styles.card}>
-          <ThemedText accessibilityRole="alert">{t('documents.loadFailed')}</ThemedText>
-          <Button label={t('common.tryAgain')} variant="secondary" loading={retrying} onPress={() => void retry()} />
-        </Card>
-      ) : (
-        DOCUMENT_ORDER.map((type) => {
-          const record = documents.find((document) => document.type === type);
-          const status = record?.status ?? 'missing';
-          return (
-            <Card key={type} style={styles.card}>
-              <View style={styles.row}>
-                <ThemedText type="headingS" style={styles.name}>{t(`documents.types.${type}`)}</ThemedText>
-                <StatusPill status={statusPills[status]} label={t(`documents.status.${status}`)} />
-              </View>
-              {record?.rejectionReason && (
-                <ThemedText type="label" themeColor="errorText">{record.rejectionReason}</ThemedText>
-              )}
-            </Card>
-          );
-        })
-      )}
+  const current = nextDocument(documents);
 
-      <Card tone="muted" style={styles.card}>
-        <ThemedText type="bodyMedium">{t('documents.consentTitle')}</ThemedText>
+  return (
+    <AuthScreen title={t('documents.title')} description={t('documents.description')} overline={t('auth.stepTwo')}>
+      <View style={sheetCard}>
+        {loadFailed ? (
+          <>
+            <FormNotice message={t('documents.loadFailed')} />
+            <Button label={t('common.tryAgain')} variant="secondary" loading={retrying} onPress={() => void retry()} />
+          </>
+        ) : (
+          <DocumentTracker documents={documents} current={current} />
+        )}
+      </View>
+
+      <Card tone="accentSoft" style={styles.consent}>
+        <View style={styles.consentTitle}>
+          <Icon name="shield" size={20} color={Colors.accent} />
+          <ThemedText type="headingS">{t('documents.consentTitle')}</ThemedText>
+        </View>
         <ThemedText type="body" themeColor="textSecondary">{t('documents.consentBody')}</ThemedText>
         <Checkbox checked={consented} onPress={() => setConsented(!consented)} label={t('documents.consentAccept')} />
       </Card>
@@ -78,17 +65,15 @@ export function DocumentsScreen() {
       <Button
         label={t('documents.continue')}
         size="large"
-        disabled={!consented || loadFailed || !nextDocument(documents)}
+        disabled={!consented || loadFailed || !current}
+        rightIcon={<Icon name="forward" size={16} color={Colors.onAccent} />}
         onPress={start}
-        style={styles.action}
       />
     </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { gap: Space[3], padding: Space[4] },
-  row: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: Space[2] },
-  name: { flex: 1, minWidth: 140 },
-  action: { alignSelf: 'stretch' },
+  consent: { gap: Space[3], padding: Space[5], borderColor: Colors.accentSoft },
+  consentTitle: { flexDirection: 'row', alignItems: 'center', gap: Space[2] },
 });

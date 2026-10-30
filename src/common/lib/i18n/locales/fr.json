@@ -136,12 +136,12 @@
     "firstName": "Prénom",
     "lastName": "Nom",
     "email": "E-mail",
-    "mobileNumber": "Numéro de mobile, avec l’indicatif du pays",
+    "mobileNumber": "Numéro de mobile",
     "password": "Mot de passe",
     "confirmPassword": "Confirmez le mot de passe",
     "signIn": "Se connecter",
     "createAccount": "Créer un compte",
-    "haveAccount": "J’ai déjà un compte",
+    "haveAccount": "Vous avez déjà un compte ?",
     "offline": "Vous êtes hors ligne. Cette étape nécessite une connexion.",
     "errors": {
       "nameShort": "Au moins 2 caractères.",
@@ -158,7 +158,16 @@
       "emailTaken": "Cet e-mail est déjà enregistré.",
       "mobileTaken": "Ce numéro de mobile est déjà enregistré.",
       "invalidCredentials": "L’e-mail ou le mot de passe est incorrect."
-    }
+    },
+    "mobileHint": "Indiquez l’indicatif du pays, par exemple +213.",
+    "passwordHint": "Au moins 8 caractères, avec une majuscule, une minuscule et un chiffre.",
+    "noAccount": "Nouveau sur OSY ?",
+    "back": "Retour",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "stepOne": "Étape 1 sur 3",
+    "stepTwo": "Étape 2 sur 3",
+    "stepThree": "Étape 3 sur 3"
   },
   "documents": {
     "title": "Vos documents",
@@ -214,7 +223,15 @@
       "registrationNumber": "N° d’immatriculation",
       "previousNumber": "Précédent numéro",
       "firstRegistrationYear": "Année de première mise en circulation"
-    }
+    },
+    "bothSides": "Recto et verso",
+    "front": "Recto",
+    "back": "Verso",
+    "scanHint": "Photographiez le document maintenant",
+    "photoHint": "Utilisez une photo existante",
+    "fileHint": "Fichier JPG, PNG ou PDF, 10 Mo au maximum",
+    "reading": "Lecture de votre document…",
+    "detailsTitle": "Informations du document"
   },
   "errors": {
     "api": {
