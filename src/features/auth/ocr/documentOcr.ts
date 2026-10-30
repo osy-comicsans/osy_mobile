@@ -1,6 +1,9 @@
 import { config } from '@/common/lib/config';
 
 import type { CapturedPage, DocumentFields, DocumentType } from '../types/auth.schemas';
+import { parseDocument, type OcrResult } from './documentParser';
+import { getOcrModels, loadPageImage } from './ocrEngine';
+import { readPage } from './paddle/pipeline';
 
 const SAMPLE_FIELDS: Record<DocumentType, DocumentFields> = {
   driver_license: {
@@ -14,9 +17,18 @@ const SAMPLE_FIELDS: Record<DocumentType, DocumentFields> = {
   },
 };
 
-// The on-device OCR from #28 replaces this. Until then, only the mock returns
-// values. Everywhere else the review step starts empty for manual entry.
-export async function extractDocumentFields(type: DocumentType, pages: CapturedPage[]): Promise<DocumentFields> {
-  const readable = pages.some((page) => page.mimeType !== 'application/pdf');
-  return config.useMockApi && readable ? SAMPLE_FIELDS[type] : {};
+const EMPTY: OcrResult = { fields: {}, lowConfidence: [] };
+
+// Any failure leaves the review step empty for manual entry, so OCR never blocks onboarding.
+export async function extractDocumentFields(type: DocumentType, pages: CapturedPage[]): Promise<OcrResult> {
+  const images = pages.filter((page) => page.mimeType !== 'application/pdf');
+  if (images.length === 0) return EMPTY;
+
+  const models = await getOcrModels();
+  // Expo Go and web have no runtime, so the mock keeps development moving there.
+  if (!models) return config.useMockApi ? { fields: SAMPLE_FIELDS[type], lowConfidence: [] } : EMPTY;
+
+  const read = [];
+  for (const page of images) read.push(await readPage(await loadPageImage(page.uri, page.width ?? Infinity), models));
+  return parseDocument(type, read);
 }
