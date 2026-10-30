@@ -54,8 +54,6 @@
   "safety": {
     "alertTitle": "تنبيه",
     "alertDescription": "ستظهر هنا تفاصيل التنبيه.",
-    "checkInTitle": "هل أنت بخير؟",
-    "checkInDescription": "سيظهر هنا فحص الطوارئ.",
     "reportTitle": "الإبلاغ عن حادث",
     "reportDescription": "سيظهر هنا نموذج الإبلاغ عن حادث."
   },
@@ -111,6 +109,22 @@
       "now": "الآن",
       "delayed": "بعد {{seconds}} ث"
     }
+  },
+  "checkIn": {
+    "title": "هل أنت بخير؟",
+    "waiting": "ثانية للرد",
+    "stillWaiting": "لم نتلقَّ ردًا منك. الثواني المتبقية للرد",
+    "secondsLeft": "{{value}} ثانية متبقية للرد",
+    "ok": "أنا بخير",
+    "help": "أحتاج إلى مساعدة",
+    "sharedTitle": "إذا احتجت إلى مساعدة، سيشارك OSY:",
+    "shared": {
+      "location": "موقعك",
+      "road": "الطريق الذي أنت عليه",
+      "speed": "سرعتك قبل الحادث"
+    },
+    "escalatedTitle": "تعذّر التأكد من أنك بخير",
+    "escalatedBody": "لم يتصل OSY بأي جهة بعد. إذا احتجت إلى مساعدة، فاتصل بخدمات الطوارئ بنفسك."
   },
   "errors": {
     "api": {
