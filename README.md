@@ -138,3 +138,11 @@ Sync also requires a signed-in user. Once endpoints exist, implement transport, 
 `npm run test:offline` uses Node's built-in SQLite engine (Node 22.13+ or newer) to exercise the production repositories, migrations, and sync manager without an emulator or backend. Tests cover atomic rollback, persistence across reopen, queue ordering, interrupted delivery, idempotency contracts, concurrent edits, conflict retention, cursor rollback, and React Query reads/writes while offline. This does not replace testing Expo's native SQLite bridge on a phone.
 
 Device check: open the task screen, enable airplane mode, add/edit/complete/delete tasks, close and reopen the app, and confirm local state survives. Cloud sync should remain unavailable with the default configuration, and changes should remain queued.
+
+## Languages
+
+The app runs in English, French, and Arabic, and follows the device language until the user picks one in Settings. Strings live in `src/common/lib/i18n/locales/`, and `pnpm test:i18n` checks that all three files stay in step. App name and permission text live in `assets/locales/`.
+
+Arabic is right-to-left, so switching to or from it reloads the app. Expo Go ignores forced direction changes, so test this in a development build. Use `start`/`end` styles rather than `left`/`right` unless the direction is physical, such as a compass.
+
+French and Arabic strings are drafts until a fluent speaker has reviewed them. Do not release emergency text without that review.

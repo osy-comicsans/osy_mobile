@@ -1,10 +1,12 @@
 import { useFonts } from 'expo-font';
-import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { DefaultTheme, LocaleProvider, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { AnimatedSplashOverlay } from '@/common/components/animated-icon';
+import { directionReady, getLanguage } from '@/common/lib/i18n/i18n';
+import { isRtl } from '@/common/lib/i18n/languages';
 import { AppProviders } from '@/common/providers/AppProviders';
 import { Colors, FontFamily } from '@/common/lib/theme';
 import { LocationProvider } from '@/features/location/providers/LocationProvider';
@@ -41,14 +43,18 @@ export default function RootLayout() {
     Gabarito_500Medium: require('@/assets/fonts/Gabarito_500Medium.ttf'),
     Gabarito_600SemiBold: require('@/assets/fonts/Gabarito_600SemiBold.ttf'),
     Gabarito_700Bold: require('@/assets/fonts/Gabarito_700Bold.ttf'),
+    IBMPlexSansArabic_400Regular: require('@/assets/fonts/IBMPlexSansArabic_400Regular.ttf'),
+    IBMPlexSansArabic_500Medium: require('@/assets/fonts/IBMPlexSansArabic_500Medium.ttf'),
+    IBMPlexSansArabic_600SemiBold: require('@/assets/fonts/IBMPlexSansArabic_600SemiBold.ttf'),
+    IBMPlexSansArabic_700Bold: require('@/assets/fonts/IBMPlexSansArabic_700Bold.ttf'),
   });
-  const fontsReady = loaded || !!error;
+  const ready = (loaded || !!error) && directionReady;
 
   useEffect(() => {
-    if (fontsReady) SplashScreen.hideAsync();
-  }, [fontsReady]);
+    if (ready) SplashScreen.hideAsync();
+  }, [ready]);
 
-  if (!fontsReady) return null;
+  if (!ready) return null;
 
   return (
     <ThemeProvider value={OsyLightTheme}>
@@ -56,15 +62,17 @@ export default function RootLayout() {
         <LocationProvider>
           <StatusBar style="dark" />
           <AnimatedSplashOverlay />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen
-              name="check-in"
-              options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
-            />
-            <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
-          </Stack>
+          <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen
+                name="check-in"
+                options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+              />
+              <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
+            </Stack>
+          </LocaleProvider>
         </LocationProvider>
       </AppProviders>
     </ThemeProvider>

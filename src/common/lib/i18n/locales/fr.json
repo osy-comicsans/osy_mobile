@@ -1,0 +1,93 @@
+{
+  "tabs": { "home": "Accueil", "map": "Carte", "profile": "Profil" },
+  "common": {
+    "dismiss": "Fermer",
+    "tryAgain": "Réessayer",
+    "openSettings": "Ouvrir les réglages",
+    "allowAccess": "Autoriser l’accès",
+    "slider": "Curseur",
+    "increase": "Augmenter",
+    "decrease": "Diminuer"
+  },
+  "status": {
+    "inProgress": "En cours",
+    "approved": "Approuvé",
+    "synced": "Synchronisé",
+    "rejected": "Refusé",
+    "escalated": "Transmis",
+    "pending": "En attente",
+    "waiting": "En file d’attente",
+    "stopped": "Arrêté"
+  },
+  "units": {
+    "kmh": "km/h",
+    "speed": "{{value}} km/h",
+    "speedSpoken": "Vitesse {{value}} kilomètres par heure",
+    "speedUnknown": "Vitesse inconnue",
+    "distanceMeters": "{{value}} m",
+    "distanceKilometers": "{{value}} km"
+  },
+  "home": {
+    "title": "Accueil",
+    "description": "Votre position, votre vitesse, le risque d’accident et la météo s’afficheront ici."
+  },
+  "map": {
+    "title": "Carte",
+    "description": "Votre position, les informations sur la route et les routes à risque s’afficheront ici."
+  },
+  "profile": {
+    "title": "Profil",
+    "description": "Vos informations, vos contacts d’urgence et vos statistiques de conduite s’afficheront ici.",
+    "settings": "Réglages"
+  },
+  "settings": {
+    "title": "Réglages",
+    "description": "Les préférences d’alerte, de voix, d’unités et de confidentialité s’afficheront ici.",
+    "language": "Langue",
+    "systemLanguage": "Utiliser la langue de l’appareil",
+    "restartHint": "L’application redémarre lorsque vous passez à l’arabe ou que vous le quittez."
+  },
+  "safety": {
+    "alertTitle": "Alerte",
+    "alertDescription": "Les détails de l’alerte s’afficheront ici.",
+    "checkInTitle": "Tout va bien ?",
+    "checkInDescription": "La vérification d’urgence s’affichera ici.",
+    "reportTitle": "Signaler un accident",
+    "reportDescription": "Le formulaire de signalement d’accident s’affichera ici."
+  },
+  "location": {
+    "driving": { "stationary": "À l’arrêt", "walking": "À pied", "driving": "En voiture" },
+    "errors": {
+      "watch": "Impossible de lire votre position. Vérifiez les services de localisation et réessayez.",
+      "permission": "Impossible de vérifier l’accès à la position. Réessayez."
+    },
+    "permission": {
+      "unavailableTitle": "Position indisponible",
+      "servicesOffTitle": "Les services de localisation sont désactivés",
+      "servicesOffBody": "Activez les services de localisation de votre appareil pour qu’OSY puisse suivre votre position et votre vitesse.",
+      "requestTitle": "Partagez votre position avec OSY",
+      "requestBody": "OSY utilise votre position et votre vitesse lorsque l’application est ouverte pour vous avertir des risques sur la route. L’accès aux mouvements l’aide à détecter un accident.",
+      "deniedTitle": "L’accès à la position est désactivé",
+      "deniedBody": "OSY ne peut pas afficher votre position ni votre vitesse sans accès à la position.",
+      "limitedTitle": "La position exacte est désactivée",
+      "limitedBody": "OSY utilise votre position approximative : la vitesse et les informations sur la route peuvent être inexactes.",
+      "motionRequestTitle": "Autoriser l’accès aux mouvements",
+      "motionRequestBody": "L’accès aux mouvements aide OSY à détecter un accident. La position fonctionne aussi sans cet accès.",
+      "motionDeniedTitle": "L’accès aux mouvements est désactivé",
+      "motionDeniedBody": "La position fonctionne toujours, mais OSY ne pourra pas utiliser les mouvements pour détecter un accident."
+    }
+  },
+  "errors": {
+    "api": {
+      "canceled": "La demande a été annulée.",
+      "network": "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
+      "unauthorized": "Votre session a expiré. Reconnectez-vous.",
+      "conflict": "Cette information est déjà utilisée.",
+      "validation": "Vérifiez les informations indiquées et réessayez.",
+      "rate_limited": "Trop de tentatives. Patientez un instant et réessayez.",
+      "server": "Un problème est survenu de notre côté. Réessayez.",
+      "request": "La demande n’a pas pu aboutir.",
+      "invalid_response": "Le serveur a envoyé une réponse inattendue."
+    }
+  }
+}

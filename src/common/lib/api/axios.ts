@@ -1,6 +1,7 @@
 import { create, type AxiosInstance } from 'axios';
 
 import { config } from '@/common/lib/config';
+import { getLanguage } from '@/common/lib/i18n/i18n';
 import { secureStorage } from '@/common/lib/storage/secureStorage';
 
 import { parseResponse } from './apiError';
@@ -21,6 +22,7 @@ function createClient(): AxiosInstance {
       throw new Error('Set EXPO_PUBLIC_API_URL in .env.local before making API requests.');
     }
 
+    request.headers.set('Accept-Language', getLanguage());
     return request;
   });
 

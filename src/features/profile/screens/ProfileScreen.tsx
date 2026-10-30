@@ -1,14 +1,16 @@
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/common/components/ui/button';
 import { PlaceholderScreen } from '@/common/screens/PlaceholderScreen';
 
 export function ProfileScreen() {
+  const { t } = useTranslation();
   return (
     <PlaceholderScreen
-      title="Profile"
-      description="Your details, emergency contacts, and driving stats will appear here.">
-      <Button label="Settings" variant="secondary" onPress={() => router.push('/profile/settings')} />
+      title={t('profile.title')}
+      description={t('profile.description')}>
+      <Button label={t('profile.settings')} variant="secondary" onPress={() => router.push('/profile/settings')} />
     </PlaceholderScreen>
   );
 }

@@ -3,6 +3,7 @@ import { createContext, useEffect, useState, type PropsWithChildren } from 'reac
 
 import { authSession } from '@/common/lib/api/axios';
 import { createOfflineRuntime, type OfflineRuntime } from '@/common/lib/database/offlineRuntime';
+import { refreshDeviceLanguage } from '@/common/lib/i18n/i18n';
 import { subscribeToForeground } from '@/common/lib/native/appLifecycle';
 import { subscribeToConnectivity } from '@/common/lib/network/connectivity';
 
@@ -26,6 +27,7 @@ export function AppProviders({ children }: PropsWithChildren) {
     const unsubscribeForeground = subscribeToForeground((active) => {
       focusManager.setFocused(active);
       runtime.setForeground(active);
+      if (active) refreshDeviceLanguage();
     });
 
     return () => {

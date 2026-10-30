@@ -119,6 +119,14 @@ export const FontFamily = {
   bold: 'Gabarito_700Bold',
 } as const;
 
+/** Gabarito has no Arabic glyphs. Weights map one-to-one onto FontFamily. */
+export const ArabicFontFamily = {
+  regular: 'IBMPlexSansArabic_400Regular',
+  medium: 'IBMPlexSansArabic_500Medium',
+  semiBold: 'IBMPlexSansArabic_600SemiBold',
+  bold: 'IBMPlexSansArabic_700Bold',
+} as const;
+
 /** DESIGN §3 type scale. letterSpacing is px (-2% / +8% of font size). */
 export const Typography = {
   displayXL: { fontFamily: FontFamily.bold, fontSize: 64, lineHeight: 72, letterSpacing: -1.28 },
@@ -144,3 +152,23 @@ export const Typography = {
   buttonMedium: { fontFamily: FontFamily.semiBold, fontSize: 14, lineHeight: 20 },
   buttonSmall: { fontFamily: FontFamily.semiBold, fontSize: 13, lineHeight: 18 },
 } as const;
+
+const arabicFonts: Record<string, string> = {
+  [FontFamily.regular]: ArabicFontFamily.regular,
+  [FontFamily.medium]: ArabicFontFamily.medium,
+  [FontFamily.semiBold]: ArabicFontFamily.semiBold,
+  [FontFamily.bold]: ArabicFontFamily.bold,
+};
+
+/** Letter spacing breaks joined Arabic letters, and its marks need taller lines. */
+export function createArabicTypography() {
+  const styles = Object.entries(Typography).map(([name, style]) => {
+    const { letterSpacing: _letterSpacing, ...rest } = style as typeof style & { letterSpacing?: number };
+    return [name, {
+      ...rest,
+      fontFamily: arabicFonts[style.fontFamily],
+      lineHeight: Math.ceil(style.lineHeight * 1.2),
+    }];
+  });
+  return Object.fromEntries(styles) as unknown as typeof Typography;
+}

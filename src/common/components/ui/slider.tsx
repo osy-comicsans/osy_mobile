@@ -1,6 +1,9 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View, type GestureResponderEvent } from 'react-native';
 
+import { getLanguage } from '@/common/lib/i18n/i18n';
+import { isRtl } from '@/common/lib/i18n/languages';
 import { Colors, Palette, Shadow } from '@/common/lib/theme';
 
 export type SliderProps = {
@@ -23,9 +26,10 @@ export function Slider({
   step = 0.1,
   onChange,
   tone = 'light',
-  accessibilityLabel = 'Slider',
+  accessibilityLabel,
   formatValue,
 }: SliderProps) {
+  const { t } = useTranslation();
   const [width, setWidth] = useState(0);
   const progress = clamp((value - min) / (max - min), 0, 1);
   const dark = tone === 'dark';
@@ -33,7 +37,8 @@ export function Slider({
   const round = (next: number) => Math.round(next / step) * step;
   const move = (event: GestureResponderEvent) => {
     if (width <= 0) return;
-    const ratio = clamp(event.nativeEvent.locationX / width, 0, 1);
+    const position = clamp(event.nativeEvent.locationX / width, 0, 1);
+    const ratio = isRtl(getLanguage()) ? 1 - position : position;
     onChange(clamp(round(min + ratio * (max - min)), min, max));
   };
 
@@ -41,7 +46,7 @@ export function Slider({
     <View
       accessible
       accessibilityRole="adjustable"
-      accessibilityLabel={accessibilityLabel}
+      accessibilityLabel={accessibilityLabel ?? t('common.slider')}
       accessibilityValue={{
         min,
         max,
@@ -49,8 +54,8 @@ export function Slider({
         text: formatValue?.(value) ?? String(value),
       }}
       accessibilityActions={[
-        { name: 'increment', label: 'Increase' },
-        { name: 'decrement', label: 'Decrease' },
+        { name: 'increment', label: t('common.increase') },
+        { name: 'decrement', label: t('common.decrease') },
       ]}
       onAccessibilityAction={({ nativeEvent }) =>
         onChange(clamp(round(value + (nativeEvent.actionName === 'increment' ? step : -step)), min, max))
@@ -74,7 +79,7 @@ export function Slider({
         <View
           style={[
             styles.thumb,
-            { left: `${progress * 100}%`, borderColor: dark ? Palette.purple[300] : Colors.accent },
+            { start: `${progress * 100}%`, borderColor: dark ? Palette.purple[300] : Colors.accent },
           ]}
         />
       </View>
@@ -90,7 +95,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 20,
     height: 20,
-    marginLeft: -10,
+    marginStart: -10,
     top: -7,
     borderRadius: 10,
     backgroundColor: Colors.surface,

@@ -284,6 +284,11 @@ letter-spacing value unchanged.
 font-family: 'Gabarito', system-ui, -apple-system, sans-serif;
 ```
 
+**Arabic:** Gabarito has no Arabic glyphs, so Arabic uses `IBM Plex Sans
+Arabic` at the same weights and sizes. Remove letter-spacing, because it
+breaks joined letters, and use line-heights 20% taller for the marks.
+`createArabicTypography()` in `src/common/lib/tokens.ts` applies this.
+
 ### 3.1 Display Scale (letter-spacing −2% / `-0.02em`, weight 700)
 
   -------------------------------------------------------------------------------------

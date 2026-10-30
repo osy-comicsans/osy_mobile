@@ -1,10 +1,16 @@
+import { useTranslation } from 'react-i18next';
+
 import { PlaceholderScreen } from '@/common/screens/PlaceholderScreen';
 
+import { LanguageSetting } from '../components/LanguageSetting';
+
 export function SettingsScreen() {
+  const { t } = useTranslation();
   return (
     <PlaceholderScreen
-      title="Settings"
-      description="Alert, voice, unit, and privacy preferences will appear here."
-    />
+      title={t('settings.title')}
+      description={t('settings.description')}>
+      <LanguageSetting />
+    </PlaceholderScreen>
   );
 }

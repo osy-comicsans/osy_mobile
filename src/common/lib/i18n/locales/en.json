@@ -1,0 +1,93 @@
+{
+  "tabs": { "home": "Home", "map": "Map", "profile": "Profile" },
+  "common": {
+    "dismiss": "Dismiss",
+    "tryAgain": "Try again",
+    "openSettings": "Open settings",
+    "allowAccess": "Allow access",
+    "slider": "Slider",
+    "increase": "Increase",
+    "decrease": "Decrease"
+  },
+  "status": {
+    "inProgress": "In progress",
+    "approved": "Approved",
+    "synced": "Synced",
+    "rejected": "Rejected",
+    "escalated": "Escalated",
+    "pending": "Pending",
+    "waiting": "Waiting",
+    "stopped": "Stopped"
+  },
+  "units": {
+    "kmh": "km/h",
+    "speed": "{{value}} km/h",
+    "speedSpoken": "Speed {{value}} kilometres per hour",
+    "speedUnknown": "Speed unknown",
+    "distanceMeters": "{{value}} m",
+    "distanceKilometers": "{{value}} km"
+  },
+  "home": {
+    "title": "Home",
+    "description": "Your location, speed, accident risk, and weather will appear here."
+  },
+  "map": {
+    "title": "Map",
+    "description": "Your position, road details, and risky roads will appear here."
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "Your details, emergency contacts, and driving stats will appear here.",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Alert, voice, unit, and privacy preferences will appear here.",
+    "language": "Language",
+    "systemLanguage": "Use device language",
+    "restartHint": "Switching to or from Arabic restarts the app."
+  },
+  "safety": {
+    "alertTitle": "Alert",
+    "alertDescription": "Alert details will appear here.",
+    "checkInTitle": "Are you OK?",
+    "checkInDescription": "The emergency check-in will appear here.",
+    "reportTitle": "Report an accident",
+    "reportDescription": "The accident report form will appear here."
+  },
+  "location": {
+    "driving": { "stationary": "Stationary", "walking": "Walking", "driving": "Driving" },
+    "errors": {
+      "watch": "Could not read your location. Check location services and try again.",
+      "permission": "Could not check location access. Try again."
+    },
+    "permission": {
+      "unavailableTitle": "Location unavailable",
+      "servicesOffTitle": "Location services are off",
+      "servicesOffBody": "Turn on location services for your device so OSY can follow your position and speed.",
+      "requestTitle": "Share your location with OSY",
+      "requestBody": "OSY uses your location and speed while the app is open to warn you about road risks. Motion access helps it notice a crash.",
+      "deniedTitle": "Location access is off",
+      "deniedBody": "OSY cannot show your position or speed without location access.",
+      "limitedTitle": "Precise location is off",
+      "limitedBody": "OSY is using your approximate location, so speed and road details may be wrong.",
+      "motionRequestTitle": "Allow motion access",
+      "motionRequestBody": "Motion access helps OSY notice a crash. Location still works without it.",
+      "motionDeniedTitle": "Motion access is off",
+      "motionDeniedBody": "Location still works, but OSY will not be able to use motion to notice a crash."
+    }
+  },
+  "errors": {
+    "api": {
+      "canceled": "The request was canceled.",
+      "network": "Could not reach the server. Check your connection and try again.",
+      "unauthorized": "Your session has ended. Sign in again.",
+      "conflict": "This information is already in use.",
+      "validation": "Check the highlighted information and try again.",
+      "rate_limited": "Too many attempts. Wait a moment and try again.",
+      "server": "Something went wrong on our side. Try again.",
+      "request": "The request could not be completed.",
+      "invalid_response": "The server sent an unexpected response."
+    }
+  }
+}

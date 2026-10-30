@@ -3,6 +3,7 @@ import { createStore } from 'zustand/vanilla';
 import type {
   DrivingState,
   LocationDriver,
+  LocationError,
   LocationState,
   MotionPermission,
   Removable,
@@ -15,8 +16,8 @@ import {
   toLocationFix,
 } from './location.utils';
 
-const WATCH_ERROR = 'Could not read your location. Check location services and try again.';
-const PERMISSION_ERROR = 'Could not check location access. Try again.';
+const WATCH_ERROR = 'watch';
+const PERMISSION_ERROR = 'permission';
 
 const initialState: LocationState = {
   status: 'idle',
@@ -46,7 +47,7 @@ export function createLocationService(driver: LocationDriver) {
     activeProfile = null;
   };
 
-  const fail = (id: number, error: string) => {
+  const fail = (id: number, error: LocationError) => {
     if (id !== session) return;
     session++;
     removeWatch();
