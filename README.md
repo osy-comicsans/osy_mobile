@@ -49,6 +49,7 @@ src/
     utils/
   features/
     home/
+    location/                   Shared live position, speed, and permissions
     map/
     profile/
     settings/

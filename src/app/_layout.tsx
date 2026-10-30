@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { AnimatedSplashOverlay } from '@/common/components/animated-icon';
 import { AppProviders } from '@/common/providers/AppProviders';
 import { Colors, FontFamily } from '@/common/lib/theme';
+import { LocationProvider } from '@/features/location/providers/LocationProvider';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -52,17 +53,19 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={OsyLightTheme}>
       <AppProviders>
-        <StatusBar style="dark" />
-        <AnimatedSplashOverlay />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen
-            name="check-in"
-            options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
-          />
-          <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
-        </Stack>
+        <LocationProvider>
+          <StatusBar style="dark" />
+          <AnimatedSplashOverlay />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen
+              name="check-in"
+              options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+            />
+            <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
+          </Stack>
+        </LocationProvider>
       </AppProviders>
     </ThemeProvider>
   );

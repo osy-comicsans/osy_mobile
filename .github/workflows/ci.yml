@@ -32,6 +32,9 @@ jobs:
       - name: Test device playground
         run: pnpm test:device-playground
 
+      - name: Test location service
+        run: pnpm test:location
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks
