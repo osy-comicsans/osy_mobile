@@ -54,8 +54,6 @@
   "safety": {
     "alertTitle": "Alert",
     "alertDescription": "Alert details will appear here.",
-    "checkInTitle": "Are you OK?",
-    "checkInDescription": "The emergency check-in will appear here.",
     "reportTitle": "Report an accident",
     "reportDescription": "The accident report form will appear here."
   },
@@ -111,6 +109,23 @@
       "now": "Now",
       "delayed": "In {{seconds}} s"
     }
+  },
+  "checkIn": {
+    "title": "Are you OK?",
+    "stillWaiting": "We haven’t heard from you yet.",
+    "secondsLeft": "{{value}} seconds left to respond",
+    "ok": "I’m OK",
+    "help": "I need help",
+    "sharedTitle": "If you need help, OSY will share:",
+    "shared": {
+      "location": "Your location",
+      "road": "The road you are on",
+      "speed": "Your speed before the crash"
+    },
+    "escalatedTitle": "We could not confirm you’re OK",
+    "escalatedBody": "OSY has not contacted anyone yet. If you need help, call emergency services yourself.",
+    "seconds": "seconds",
+    "confirmedTitle": "Glad you’re OK"
   },
   "errors": {
     "api": {

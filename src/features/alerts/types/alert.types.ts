@@ -29,6 +29,7 @@ export interface AlertText {
 export interface AlertChannel extends AlertText {
   type: AlertType;
   severity: AlertSeverity;
+  actions: { id: string; label: string }[];
 }
 
 export interface PushToken {
@@ -40,14 +41,13 @@ export interface AlertDriver {
   supported: boolean;
   setUp(
     channels: AlertChannel[],
-    viewLabel: string,
     shouldPlaySound: (data: unknown) => boolean,
   ): Promise<void>;
   getPermission(): Promise<AlertPermissionSummary>;
   requestPermission(): Promise<AlertPermissionSummary>;
   getPushToken(): Promise<PushToken | null>;
   onReceived(listener: (data: unknown) => void): Removable;
-  onOpened(listener: (data: unknown) => void): Removable;
+  onOpened(listener: (data: unknown, action: string) => void): Removable;
   present(alert: AppAlert, text: AlertText, delaySeconds: number): Promise<void>;
   playHaptic(severity: AlertSeverity): Promise<void>;
 }

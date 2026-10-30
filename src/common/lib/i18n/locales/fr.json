@@ -54,8 +54,6 @@
   "safety": {
     "alertTitle": "Alerte",
     "alertDescription": "Les détails de l’alerte s’afficheront ici.",
-    "checkInTitle": "Tout va bien ?",
-    "checkInDescription": "La vérification d’urgence s’affichera ici.",
     "reportTitle": "Signaler un accident",
     "reportDescription": "Le formulaire de signalement d’accident s’affichera ici."
   },
@@ -111,6 +109,23 @@
       "now": "Maintenant",
       "delayed": "Dans {{seconds}} s"
     }
+  },
+  "checkIn": {
+    "title": "Tout va bien ?",
+    "stillWaiting": "Nous n’avons pas encore de réponse de votre part.",
+    "secondsLeft": "{{value}} secondes restantes pour répondre",
+    "ok": "Je vais bien",
+    "help": "J’ai besoin d’aide",
+    "sharedTitle": "Si vous avez besoin d’aide, OSY partagera :",
+    "shared": {
+      "location": "Votre position",
+      "road": "La route sur laquelle vous êtes",
+      "speed": "Votre vitesse avant l’accident"
+    },
+    "escalatedTitle": "Nous n’avons pas pu confirmer que tout va bien",
+    "escalatedBody": "OSY n’a encore contacté personne. Si vous avez besoin d’aide, appelez vous-même les secours.",
+    "seconds": "secondes",
+    "confirmedTitle": "Tant mieux, tout va bien"
   },
   "errors": {
     "api": {

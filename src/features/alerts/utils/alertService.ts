@@ -5,7 +5,7 @@ import type { Language } from '@/common/lib/i18n/languages';
 import type {
   AlertChannel, AlertDriver, AlertPermission, AlertPreferences, AlertText, AppAlert, PushToken,
 } from '../types/alert.types';
-import { ALERT_RULES, createAlertGate, parseAlert, usesHaptics, usesSound } from './alertRules';
+import { ALERT_RULES, CHECK_IN_ACTIONS, createAlertGate, parseAlert, toAlertData, usesHaptics, usesSound } from './alertRules';
 
 export interface AlertState {
   banner: AppAlert | null;
@@ -20,10 +20,11 @@ interface AlertServiceOptions {
   driver: AlertDriver;
   navigate: (alert: AppAlert) => void;
   sendPushToken: (token: PushToken & { language: Language }) => Promise<void>;
+  onCheckInAnswer?: (action: string) => void;
   now?: () => number;
 }
 
-export function createAlertService({ driver, navigate, sendPushToken, now = Date.now }: AlertServiceOptions) {
+export function createAlertService({ driver, navigate, sendPushToken, onCheckInAnswer, now = Date.now }: AlertServiceOptions) {
   const store = createStore<AlertState>(() => ({
     banner: null,
     permission: 'undetermined',
@@ -33,6 +34,7 @@ export function createAlertService({ driver, navigate, sendPushToken, now = Date
   }));
   const gate = createAlertGate();
   const alerts = new Map<string, AppAlert>();
+  const raised = new Set<string>();
   let bannerTimer: ReturnType<typeof setTimeout> | undefined;
   let sentLanguage: Language | null = null;
 
@@ -62,17 +64,18 @@ export function createAlertService({ driver, navigate, sendPushToken, now = Date
   };
 
   // Tapping a notification always opens it, even if it was already shown.
-  const open = (alert: AppAlert) => {
+  const open = (alert: AppAlert, action?: string) => {
     gate.record(alert, now());
     alerts.set(alert.id, alert);
     dismissBanner();
-    navigate(alert);
+    if (action === CHECK_IN_ACTIONS.ok || action === CHECK_IN_ACTIONS.help) onCheckInAnswer?.(action);
+    if (action !== CHECK_IN_ACTIONS.ok) navigate(alert);
   };
 
   const shouldPlaySound = (data: unknown) => {
     const alert = parseAlert(data);
-    return alert !== null
-      && gate.allows(alert, now())
+    if (alert === null) return false;
+    return (gate.allows(alert, now()) || raised.delete(alert.id))
       && usesSound(alert.type, store.getState().preferences);
   };
 
@@ -87,13 +90,13 @@ export function createAlertService({ driver, navigate, sendPushToken, now = Date
     open,
     getAlert: (id: string) => alerts.get(id) ?? null,
 
-    start(channels: AlertChannel[], viewLabel: string) {
+    start(channels: AlertChannel[]) {
       const received = driver.onReceived(receive);
-      const opened = driver.onOpened((data) => {
+      const opened = driver.onOpened((data, action) => {
         const alert = parseAlert(data);
-        if (alert) open(alert);
+        if (alert) open(alert, action);
       });
-      void driver.setUp(channels, viewLabel, shouldPlaySound).catch(() => undefined);
+      void driver.setUp(channels, shouldPlaySound).catch(() => undefined);
       void applyPermission(driver.getPermission).catch(() => undefined);
 
       return () => {
@@ -127,6 +130,14 @@ export function createAlertService({ driver, navigate, sendPushToken, now = Date
     sendTest: (alert: AppAlert, text: AlertText, delaySeconds: number) => (
       driver.present(alert, text, delaySeconds)
     ),
+
+    // Reacts at once, so a phone without notification permission still responds.
+    // The notification adds the sound, and a lock-screen entry when backgrounded.
+    raise(alert: AppAlert, text: AlertText) {
+      raised.add(alert.id);
+      receive(toAlertData(alert));
+      void driver.present(alert, text, 0).catch(() => undefined);
+    },
   };
 }
 

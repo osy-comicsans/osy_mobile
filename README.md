@@ -94,6 +94,8 @@ src/app/
   alert/[id].tsx          Modal
 ```
 
+After a crash, `check-in` waits 30, then 60, then 90 seconds. With no answer it calls `escalateCheckIn()`, which stays empty until #8.
+
 Modals can be opened from anywhere with `router.push('/check-in')`, or from a link such as `osymobile://check-in`. The root anchor keeps the tabs beneath a modal opened from a link. `check-in` disables the swipe-down gesture, so it needs an explicit way to leave.
 
 The `todos` and `device-playground` features no longer have routes. Their code stays until location and crash detection replace it.
