@@ -3,6 +3,7 @@ import { Asset } from 'expo-asset';
 import { File } from 'expo-file-system';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { decode } from 'jpeg-js';
+import { NativeModules } from 'react-native';
 
 import type { RgbaImage } from './paddle/image';
 import type { OcrModels, Script } from './paddle/pipeline';
@@ -25,7 +26,9 @@ async function dictionary(moduleId: number): Promise<string[]> {
 }
 
 async function loadModels(): Promise<OcrModels> {
-  // Loaded late, because Expo Go has no native ONNX Runtime and must still open.
+  // Expo Go has no native ONNX Runtime. The package throws while loading without
+  // it, and Metro reports that as an app error even inside a catch, so check first.
+  if (!NativeModules.Onnxruntime) throw new Error('ONNX Runtime is unavailable.');
   const ort = require('onnxruntime-react-native') as Ort;
   const session = async (moduleId: number) => ort.InferenceSession.create(
     (await assetPath(moduleId)).replace('file://', ''),
