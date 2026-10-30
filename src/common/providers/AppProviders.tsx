@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from '@tanstack/react-query';
 import { createContext, useEffect, useState, type PropsWithChildren } from 'react';
 
+import { authSession } from '@/common/lib/api/axios';
 import { createOfflineRuntime, type OfflineRuntime } from '@/common/lib/database/offlineRuntime';
 import { subscribeToForeground } from '@/common/lib/native/appLifecycle';
 import { subscribeToConnectivity } from '@/common/lib/network/connectivity';
@@ -16,7 +17,7 @@ export function AppProviders({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!runtime.status.getState().supported) return;
 
-    // Register real backend adapters here when transport and authentication exist.
+    // Register real backend adapters here when their endpoints exist.
     runtime.start(() => queryClient.invalidateQueries({ queryKey: ['local'] }));
     const unsubscribeNetwork = subscribeToConnectivity((online) => {
       onlineManager.setOnline(online);
@@ -33,6 +34,14 @@ export function AppProviders({ children }: PropsWithChildren) {
       runtime.stop();
     };
   }, [queryClient, runtime]);
+
+  useEffect(() => {
+    const applyStatus = () => runtime.setAuthenticated(authSession.status.getState().status === 'signedIn');
+    const unsubscribe = authSession.status.subscribe(applyStatus);
+    applyStatus();
+    void authSession.restore();
+    return unsubscribe;
+  }, [runtime]);
 
   return (
     <QueryClientProvider client={queryClient}>
