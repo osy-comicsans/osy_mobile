@@ -125,7 +125,8 @@
     "escalatedTitle": "Nous n’avons pas pu confirmer que tout va bien",
     "escalatedBody": "OSY n’a encore contacté personne. Si vous avez besoin d’aide, appelez vous-même les secours.",
     "seconds": "secondes",
-    "confirmedTitle": "Tant mieux, tout va bien"
+    "confirmedTitle": "Tant mieux, tout va bien",
+    "backHome": "Retour à l’accueil"
   },
   "errors": {
     "api": {

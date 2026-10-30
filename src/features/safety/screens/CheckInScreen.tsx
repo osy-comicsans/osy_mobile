@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BackHandler, ScrollView, StyleSheet, View } from 'react-native';
@@ -12,26 +13,30 @@ import { Colors, Space } from '@/common/lib/theme';
 
 import { CountdownRing } from '../components/CountdownRing';
 import { useCheckInService, useCheckInState } from '../hooks/useCheckIn';
-import { useDismissModal } from '../hooks/useDismissModal';
 import { CHECK_IN_ROUNDS_SECONDS } from '../utils/checkInService';
 
 const SHARED_ITEMS = ['location', 'road', 'speed'] as const;
 const CONFIRMED_DURATION = 1500;
 
+// Falls back to replacing this screen when Home is not underneath it.
+const goHome = () => router.dismissTo('/');
+
 function useSecondsLeft(endsAt: number | null) {
   const [now, setNow] = useState(Date.now);
 
+  const running = endsAt !== null;
+
   useEffect(() => {
+    if (!running) return undefined;
     const interval = setInterval(() => setNow(Date.now()), 250);
     return () => clearInterval(interval);
-  }, []);
+  }, [running]);
 
   return endsAt === null ? 0 : Math.max(0, Math.ceil((endsAt - now) / 1000));
 }
 
 export function CheckInScreen() {
   const { t } = useTranslation();
-  const dismiss = useDismissModal();
   const service = useCheckInService();
   const { status, round, endsAt } = useCheckInState();
   const secondsLeft = useSecondsLeft(endsAt);
@@ -51,9 +56,9 @@ export function CheckInScreen() {
   // Leaves the green ring up long enough to be seen.
   useEffect(() => {
     if (!confirmed) return undefined;
-    const timeout = setTimeout(dismiss, CONFIRMED_DURATION);
+    const timeout = setTimeout(goHome, CONFIRMED_DURATION);
     return () => clearTimeout(timeout);
-  }, [confirmed, dismiss]);
+  }, [confirmed]);
 
   const title = confirmed ? 'checkIn.confirmedTitle' : escalated ? 'checkIn.escalatedTitle' : 'checkIn.title';
 
@@ -104,6 +109,12 @@ export function CheckInScreen() {
           <ThemedText type="body" themeColor="textSecondary" style={styles.centered}>
             {t('checkIn.stillWaiting')}
           </ThemedText>
+        )}
+
+        {confirmed && (
+          <View style={styles.actions}>
+            <Button label={t('checkIn.backHome')} size="large" onPress={goHome} style={styles.action} />
+          </View>
         )}
 
         {!confirmed && (

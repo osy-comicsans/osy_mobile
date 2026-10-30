@@ -125,7 +125,8 @@
     "escalatedTitle": "تعذّر التأكد من أنك بخير",
     "escalatedBody": "لم يتصل OSY بأي جهة بعد. إذا احتجت إلى مساعدة، فاتصل بخدمات الطوارئ بنفسك.",
     "seconds": "ثانية",
-    "confirmedTitle": "يسعدنا أنك بخير"
+    "confirmedTitle": "يسعدنا أنك بخير",
+    "backHome": "العودة إلى الرئيسية"
   },
   "errors": {
     "api": {
