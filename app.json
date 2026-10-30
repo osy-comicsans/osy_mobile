@@ -107,7 +107,8 @@
           "microphonePermission": false
         }
       ],
-      "onnxruntime-react-native"
+      "onnxruntime-react-native",
+      "@maplibre/maplibre-react-native"
     ],
     "experiments": {
       "typedRoutes": true,
