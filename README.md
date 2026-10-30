@@ -160,7 +160,7 @@ Users must sign in and add both documents before they can reach the tabs. With n
 | Lost connection | Use `offline@osy.test` |
 | Rejected document | Put `REJECT` in any document field |
 
-OCR is a stand-in until #28, and fills in sample values only under the mock. PDFs skip OCR, so their details are typed by hand.
+Documents are read on the phone with PaddleOCR, which needs a development build. Expo Go falls back to sample values under the mock. PDFs skip OCR, so their details are typed by hand.
 
 The full flow, design notes, and release checklist are in [docs/accounts-and-onboarding.md](docs/accounts-and-onboarding.md).
 
