@@ -1,56 +1,69 @@
-# Welcome to your Expo app 👋
+# OSYMobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo SDK 57 application using Expo Router, React Native, and strict TypeScript.
 
-## Get started
+## Development
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```powershell
+npm ci
+Copy-Item .env.example .env.local
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Set `EXPO_PUBLIC_API_URL` in `.env.local` before making backend requests. Use an address reachable from your device. The app can launch without a backend URL; the shared client rejects requests until one is configured. `EXPO_PUBLIC_*` values are bundled into the app and must never contain secrets. Authentication values belong in SecureStore.
 
-### Other setup steps
+```powershell
+npm run lint
+npm run typecheck
+npx expo-doctor
+npx expo export --platform all
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Use `npx expo install <package>` to add dependencies with SDK-compatible versions. Native configuration lives in `app.json` and config plugins. The `ios/` and `android/` folders are generated; do not create or edit them manually.
 
-## Learn more
+## Startup architecture
 
-To learn more about developing your project with Expo, look at the following resources:
+```text
+src/
+  app/                          Expo Router routes and navigator layout only
+  common/
+    components/                 Shared UI and platform-specific tab navigators
+    screens/                    Shared screens
+    hooks/                      Shared React hooks
+    lib/
+      api/axios.ts              Shared HTTP transport client
+      config.ts                 Public environment configuration
+      database/
+        sqlite.ts               Lazy native database connection
+        sqlite.web.ts           Explicit unsupported-web boundary
+        migrations/             Reserved for schema changes
+        repositories/           Reserved for SQL access
+        sync/                   Reserved for offline synchronization
+      native/                   Expo and platform helpers
+      network/                  Reserved for connectivity integration
+      storage/secureStorage.ts  Sensitive key-value storage
+      theme.ts                  Shared theme and spacing
+    types/
+    utils/
+  features/
+    home/
+    explore/
+      components/
+      screens/
+      hooks/
+      api/
+      types/
+      utils/
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+The `@/` alias resolves to `src/`. For example, use `@/features/home/screens/HomeScreen`, without an extra `src` segment.
 
-## Join the community
+Routes select screens and configure navigation. Screens compose UI; components receive data and callbacks. Hooks own orchestration and call transport functions or repositories. Feature API files use the shared Axios client and contain no React Query logic. SQL stays in `common/lib/database/repositories/`. Native concerns stay in `common/lib/native/`. Empty directories are intentional placeholders tracked with `.gitkeep`.
 
-Join our community of developers creating universal apps.
+SQLite opens on first use, shares one initialization across callers, enables WAL and foreign keys, and permits retries after initialization failures. No feature tables or migrations run yet. The database helper targets Android and iOS; web persistence requires a separate SQLite WASM and cross-origin isolation setup. The web helper rejects with a clear error until configured.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Secure storage exposes asynchronous `getItem`, `setItem`, and `removeItem` operations and an `isAvailable` check. Unsupported platforms reject operations; no browser storage fallback is used for authentication values.
+
+Installed foundations: TanStack Query, Axios, Expo SQLite, Zustand, Expo SecureStore, Expo Network, NetInfo, and Zod. Query providers, connectivity listeners, authentication flows, feature repositories, and offline synchronization are deferred to the integration and offline stages.
+
+The existing Home and Explore starter screens remain available, with their implementations moved outside `src/app/`. Git was already initialized with the starter commit.
