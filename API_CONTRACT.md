@@ -58,11 +58,13 @@ Schemas: `src/features/auth/types/auth.schemas.ts`, `src/common/lib/api/authSess
 | `GET` | `/me/documents` | None | `200` documents response |
 | `POST` | `/me/documents` | `multipart/form-data` | `201` documents response |
 
-The upload contains `file`, `type` (`driver_license`, `vehicle_registration`), `source` (`scan`, `upload`), `captureLanguage` (`fr`, `ar`), and `fields`, a JSON string of confirmed field values. `file` is a JPEG, PNG, or PDF.
+The upload contains `file_front`, `file_back`, `type` (`driver_license`, `vehicle_registration`), `source` (`scan`, `upload`), `captureLanguage` (`fr`, `ar`), `fields` (a JSON string of confirmed field values), `consentVersion`, and `consentedAt`. Each file is a JPEG, PNG, or PDF of up to 10 MB.
 
 A documents response contains `documents` and `onboardingStatus`. Each document contains `type`, `status` (`missing`, `pending`, `verified`, `rejected`), `rejectionReason`, and `updatedAt`.
 
-Field keys are defined in #28. What is uploaded is still an open decision in #23.
+Field keys are defined in #28. A document marked `rejected` must include a `rejectionReason` that can be shown to the user. `onboardingStatus` becomes `complete` once neither document is `missing` or `rejected`, so a `pending` document does not block the app.
+
+`GET /me/documents` also tells the app a user's onboarding state at launch.
 
 ## Incidents and emergency
 

@@ -108,7 +108,7 @@ export function Button({
           borderWidth: colors.borderWidth,
         },
         variant === 'primary' && tone === 'light' && styles.accentGlow,
-        isDisabled && styles.disabled,
+        isDisabled && (variant === 'primary' ? styles.disabledPrimary : styles.disabled),
         style,
       ]}>
       {loading ? (
@@ -137,4 +137,6 @@ const styles = StyleSheet.create({
   },
   accentGlow: { boxShadow: Shadow.accent },
   disabled: { opacity: 0.5 },
+  // DESIGN.md §7.3: purple-300 at 60%, with no glow.
+  disabledPrimary: { backgroundColor: 'rgba(183,138,255,0.6)', boxShadow: 'none' },
 });
