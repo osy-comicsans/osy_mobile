@@ -6,6 +6,7 @@ import { Card } from '@/common/components/ui/card';
 import { formatNumber } from '@/common/lib/i18n/format';
 import { getLanguage } from '@/common/lib/i18n/i18n';
 import { Space } from '@/common/lib/theme';
+import { useCurrentRoad } from '@/features/roads/hooks/useRoad';
 
 import { useCurrentLocation, useCurrentSpeed, useDrivingState } from '../hooks/useLocation';
 
@@ -14,6 +15,7 @@ export function LiveLocationCard() {
   const fix = useCurrentLocation();
   const speed = useCurrentSpeed();
   const drivingState = useDrivingState();
+  const { road, stale } = useCurrentRoad();
   if (!fix) return null;
 
   const language = getLanguage();
@@ -31,6 +33,11 @@ export function LiveLocationCard() {
         <ThemedText type="label" themeColor="textSecondary">{t('units.kmh')}</ThemedText>
       </View>
       <ThemedText type="bodyMedium">{t(`location.driving.${drivingState}`)}</ThemedText>
+      {road && (
+        <ThemedText type="label" themeColor={stale ? 'textTertiary' : 'textSecondary'} style={styles.road}>
+          {[...road.refs, road.name].filter(Boolean).join(' · ')}
+        </ThemedText>
+      )}
       <ThemedText type="label" themeColor="textSecondary">
         {coordinate(fix.latitude)}, {coordinate(fix.longitude)}
       </ThemedText>
@@ -40,4 +47,5 @@ export function LiveLocationCard() {
 
 const styles = StyleSheet.create({
   card: { alignSelf: 'stretch', alignItems: 'center', gap: Space[2] },
+  road: { textAlign: 'center' },
 });
