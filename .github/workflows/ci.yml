@@ -62,6 +62,9 @@ jobs:
       - name: Test roads
         run: pnpm test:roads
 
+      - name: Test map
+        run: pnpm test:map
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks
