@@ -251,17 +251,23 @@ accent backgrounds. Default angle **135°** (top-left → bottom-right).
 
 ### 2.1 `[v2.1]` Canvas ambient gradient
 
-The frames show the app canvas is **not flat** --- there's a faint
-lavender/purple bleed at the top fading to `--neutral-50`. Document as
-the default canvas treatment:
+The app canvas is **not flat** --- there's a faint lavender/purple bleed at
+the top fading to `--neutral-50`. The shipped treatment is a static,
+non-interactive `AmbientBackground` layer behind all light screens:
 
 ``` css
---gradient-canvas: linear-gradient(180deg, #ECE0FF 0%, #F5F5F5 38%);
+--gradient-canvas: linear-gradient(180deg, #ECE0FF 0%, #F5F5F5 38%, #F5F5F5 100%);
 ```
 
-Very subtle, low-saturation. The floating app shell sits on top of it.
-Keep it quiet --- it must never compete with content. Solid
-`--neutral-50` remains an acceptable fallback.
+Two very large, very faint radials sit above that base: a purple haze in the
+top-right at **4.5% opacity** and a white lift in the top-left at **55%**.
+Both fade to transparent before 60% of the screen, so most of the canvas stays
+neutral. No animation, blur, blobs, or per-card gradients.
+
+In React Native this is built with `experimental_backgroundImage`
+(no extra dependency). The Device Playground keeps its own dark charcoal
+surface and does not use this layer. Solid `--neutral-50` remains an
+acceptable fallback. Keep it quiet --- it must never compete with content.
 
 Monochrome gradients (overlays, masks): white→black `#F6F6F6→#000000`,
 and variants in the sheet.

@@ -1,25 +1,26 @@
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnimatedIcon } from '@/common/components/animated-icon';
 import { HintRow } from '@/common/components/hint-row';
+import { AmbientBackground } from '@/common/components/ui/ambient-background';
 import { Card } from '@/common/components/ui/card';
 import { ThemedText } from '@/common/components/themed-text';
-import { ThemedView } from '@/common/components/themed-view';
 import { WebBadge } from '@/common/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/common/lib/theme';
 import { getDeveloperMenuHint } from '@/common/lib/native/device';
 
 export function HomeScreen() {
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
+      <AmbientBackground />
       <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
+        <View style={styles.heroSection}>
           <AnimatedIcon />
           <ThemedText type="display" style={styles.title}>
             Welcome to&nbsp;OSY
           </ThemedText>
-        </ThemedView>
+        </View>
 
         <ThemedText type="overline" themeColor="textTertiary">
           get started
@@ -42,7 +43,7 @@ export function HomeScreen() {
 
         {Platform.OS === 'web' && <WebBadge />}
       </SafeAreaView>
-    </ThemedView>
+    </View>
   );
 }
 

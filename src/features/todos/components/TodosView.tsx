@@ -1,12 +1,12 @@
 import { ActivityIndicator, FlatList, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AmbientBackground } from '@/common/components/ui/ambient-background';
 import { Button } from '@/common/components/ui/button';
 import { Card } from '@/common/components/ui/card';
 import { Input } from '@/common/components/ui/input';
 import { StatusPill, type StatusPillStatus } from '@/common/components/ui/status-pill';
 import { ThemedText } from '@/common/components/themed-text';
-import { ThemedView } from '@/common/components/themed-view';
 import { BottomTabInset, Colors, MaxContentWidth, Spacing } from '@/common/lib/theme';
 import type { TodosController } from '../hooks/useTodosController';
 import { TodoItem } from './TodoItem';
@@ -25,7 +25,8 @@ export function TodosView({ controller }: { controller: TodosController }) {
           : { status: 'synced', label: 'Saved on this device' };
 
   return (
-    <ThemedView style={styles.root}>
+    <View style={styles.root}>
+      <AmbientBackground />
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <FlatList
           data={todos}
@@ -143,7 +144,7 @@ export function TodosView({ controller }: { controller: TodosController }) {
           )}
         />
       </SafeAreaView>
-    </ThemedView>
+    </View>
   );
 }
 
