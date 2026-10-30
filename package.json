@@ -80,7 +80,8 @@
     "test:auth": "node --test tests/auth.test.cjs",
     "test:ocr": "node --test tests/ocr.test.cjs",
     "test:roads": "node --test tests/roads.test.cjs",
-    "test:map": "node --test tests/map.test.cjs"
+    "test:map": "node --test tests/map.test.cjs",
+    "test:escalation": "node --test tests/escalation.test.cjs"
   },
   "private": true
 }

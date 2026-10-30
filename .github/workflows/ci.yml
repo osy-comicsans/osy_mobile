@@ -68,6 +68,9 @@ jobs:
       - name: Test map
         run: pnpm test:map
 
+      - name: Test escalation
+        run: pnpm test:escalation
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks
