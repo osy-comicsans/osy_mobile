@@ -148,6 +148,20 @@ Crash, potential accident, and nearby accident alerts all go through `src/featur
 
 Push needs a development build, not Expo Go. It uses the Expo push service, which also needs an EAS project, an iOS bundle identifier, an Android package name, `google-services.json`, and FCM and APNs credentials uploaded to EAS. None of these are set up yet. The server writes closed-app push text in the language the app registers, using the strings in `src/common/lib/i18n/locales/`.
 
+## Accounts and the mock backend
+
+Users must sign in and add both documents before they can reach the tabs. With no `EXPO_PUBLIC_API_URL`, development builds use the mock backend in `src/common/lib/api/mock/`. It sits behind the real API client, so setting the URL is all that is needed to use a real backend. Release builds never fall back to it unless `EXPO_PUBLIC_MOCK_API` is `true`.
+
+| Mock test | How |
+| --- | --- |
+| Skip onboarding | Sign in as `demo@osy.test` with any password |
+| Already registered | Register with `taken@osy.test` or `+213555000000` |
+| Wrong password | Sign in with the password `Wrong123` |
+| Lost connection | Use `offline@osy.test` |
+| Rejected document | Put `REJECT` in any document field |
+
+OCR is a stand-in until #28, and fills in sample values only under the mock. PDFs skip OCR, so their details are typed by hand.
+
 ## Languages
 
 The app runs in English, French, and Arabic, and follows the device language until the user picks one in Settings. Strings live in `src/common/lib/i18n/locales/`, and `pnpm test:i18n` checks that all three files stay in step. App name and permission text live in `assets/locales/`.
