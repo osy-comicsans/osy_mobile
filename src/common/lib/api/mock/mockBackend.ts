@@ -1,0 +1,176 @@
+import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+
+// Stands in for the backend until it exists, at the HTTP layer, so the real
+// client, interceptors, and schemas all run. It follows API_CONTRACT.md.
+//
+// demo@osy.test     finished onboarding, any password
+// taken@osy.test    needs documents, also shows the "already registered" error
+// offline@osy.test  fails like a lost connection
+// Password `Wrong123`, or any document field containing REJECT, shows that failure.
+
+const STORAGE_KEY = 'osy.mock.backend';
+const LATENCY_MS = 400;
+
+type DocumentType = 'driver_license' | 'vehicle_registration';
+
+interface MockDocument {
+  type: DocumentType;
+  status: 'missing' | 'pending' | 'verified' | 'rejected';
+  rejectionReason: string | null;
+  updatedAt: string | null;
+}
+
+// Passwords and document data are never kept, even in the mock.
+interface MockUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobileNumber: string;
+  documents: Record<DocumentType, MockDocument>;
+}
+
+interface MockStorage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+}
+
+interface MockReply {
+  status: number;
+  data?: unknown;
+}
+
+function emptyDocuments(status: MockDocument['status'] = 'missing') {
+  const document = (type: DocumentType): MockDocument => ({
+    type, status, rejectionReason: null, updatedAt: null,
+  });
+  return { driver_license: document('driver_license'), vehicle_registration: document('vehicle_registration') };
+}
+
+const seedUsers: MockUser[] = [
+  {
+    id: 'mock-demo', firstName: 'Demo', lastName: 'Driver', email: 'demo@osy.test',
+    mobileNumber: '+213555000001', documents: emptyDocuments('verified'),
+  },
+  {
+    id: 'mock-taken', firstName: 'Taken', lastName: 'Driver', email: 'taken@osy.test',
+    mobileNumber: '+213555000000', documents: emptyDocuments(),
+  },
+];
+
+function fail(status: number, code: string, message: string, fields?: Record<string, string>): MockReply {
+  return { status, data: { error: { code, message, ...(fields ? { fields } : {}) } } };
+}
+
+// Reads a text field from web FormData or React Native's FormData.
+function formField(form: unknown, name: string): string {
+  const { get, getParts } = form as {
+    get?: (key: string) => unknown;
+    getParts?: () => { fieldName: string; string?: string }[];
+  };
+  const value = get?.call(form, name) ?? getParts?.call(form).find((part) => part.fieldName === name)?.string;
+  return typeof value === 'string' ? value : '';
+}
+
+export function createMockBackend(storage: MockStorage, latency = LATENCY_MS): AxiosAdapter {
+  const load = (): MockUser[] => {
+    const saved = storage.getItem(STORAGE_KEY);
+    return saved ? (JSON.parse(saved) as MockUser[]) : seedUsers;
+  };
+  const save = (users: MockUser[]) => storage.setItem(STORAGE_KEY, JSON.stringify(users));
+
+  const profile = ({ documents, ...user }: MockUser) => ({ ...user, onboardingStatus: onboardingStatus(documents) });
+
+  function onboardingStatus(documents: MockUser['documents']) {
+    return Object.values(documents).every(({ status }) => status === 'pending' || status === 'verified')
+      ? 'complete'
+      : 'documents_required';
+  }
+
+  const documentsResponse = ({ documents }: MockUser) => ({
+    documents: Object.values(documents),
+    onboardingStatus: onboardingStatus(documents),
+  });
+
+  const authResponse = (user: MockUser) => ({
+    user: profile(user),
+    accessToken: `mock-access.${user.id}`,
+    refreshToken: `mock-refresh.${user.id}`,
+  });
+
+  const signedInUser = (users: MockUser[], request: InternalAxiosRequestConfig) => {
+    const token = String(request.headers.get('Authorization') ?? '');
+    return users.find((user) => token === `Bearer mock-access.${user.id}`);
+  };
+
+  function route(request: InternalAxiosRequestConfig): MockReply {
+    const key = `${request.method?.toUpperCase()} ${request.url}`;
+    const body = typeof request.data === 'string' ? JSON.parse(request.data) : request.data;
+    const users = load();
+
+    if (key === 'POST /auth/register') {
+      const fields: Record<string, string> = {};
+      if (users.some((user) => user.email === body.email)) fields.email = 'This email is already registered.';
+      if (users.some((user) => user.mobileNumber === body.mobileNumber)) {
+        fields.mobileNumber = 'This mobile number is already registered.';
+      }
+      if (Object.keys(fields).length > 0) return fail(409, 'already_registered', 'Already registered.', fields);
+
+      const { firstName, lastName, email, mobileNumber } = body;
+      const user: MockUser = {
+        id: `mock-${users.length}-${email}`, firstName, lastName, email, mobileNumber, documents: emptyDocuments(),
+      };
+      save([...users, user]);
+      return { status: 201, data: authResponse(user) };
+    }
+
+    if (key === 'POST /auth/login') {
+      const user = users.find((candidate) => candidate.email === body.email);
+      if (!user || body.password === 'Wrong123') return fail(401, 'invalid_credentials', 'Wrong email or password.');
+      return { status: 200, data: authResponse(user) };
+    }
+
+    if (key === 'POST /auth/refresh') {
+      const user = users.find(({ id }) => body.refreshToken === `mock-refresh.${id}`);
+      if (!user) return fail(401, 'invalid_token', 'Sign in again.');
+      const { accessToken, refreshToken } = authResponse(user);
+      return { status: 200, data: { accessToken, refreshToken } };
+    }
+
+    const user = signedInUser(users, request);
+    if (!user) return fail(401, 'unauthorized', 'Sign in again.');
+
+    if (key === 'GET /me') return { status: 200, data: profile(user) };
+    if (key === 'GET /me/documents') return { status: 200, data: documentsResponse(user) };
+    if (key === 'POST /me/push-tokens') return { status: 204 };
+
+    if (key === 'POST /me/documents') {
+      const type = formField(body, 'type') as DocumentType;
+      const rejected = formField(body, 'fields').includes('REJECT');
+      user.documents[type] = {
+        type,
+        status: rejected ? 'rejected' : 'pending',
+        rejectionReason: rejected ? 'The document could not be read. Try again in better light.' : null,
+        updatedAt: new Date().toISOString(),
+      };
+      save(users);
+      return { status: 201, data: documentsResponse(user) };
+    }
+
+    return fail(404, 'not_mocked', `No mock for ${key}.`);
+  }
+
+  return async (request) => {
+    await new Promise((resolve) => { setTimeout(resolve, latency); });
+
+    const body = typeof request.data === 'string' ? request.data : '';
+    if (body.includes('offline@osy.test')) {
+      throw new AxiosError('Network Error', AxiosError.ERR_NETWORK, request);
+    }
+
+    const { status, data } = route(request);
+    const response: AxiosResponse = { status, data, statusText: '', headers: {}, config: request };
+    if (status < 400) return response;
+    throw new AxiosError('Request failed', AxiosError.ERR_BAD_RESPONSE, request, null, response);
+  };
+}

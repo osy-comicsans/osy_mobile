@@ -4,7 +4,7 @@ import { parseResponse } from '@/common/lib/api/apiError';
 import type { AuthSession } from '@/common/lib/api/authSession';
 
 import {
-  authResponseSchema, documentsResponseSchema, loginRequestSchema, registerRequestSchema,
+  authResponseSchema, documentsResponseSchema, documentUploadSchema, loginRequestSchema, registerRequestSchema,
   type DocumentUpload, type LoginRequest, type RegisterRequest, type User,
 } from '../types/auth.schemas';
 
@@ -28,14 +28,19 @@ export function createDocumentsApi(client: AxiosInstance) {
   return {
     list: () => parseResponse(client.get('/me/documents'), documentsResponseSchema),
 
-    upload({ type, source, uri, fileName, mimeType, captureLanguage, fields }: DocumentUpload) {
+    upload(upload: DocumentUpload) {
+      const { type, source, pages, captureLanguage, fields, consentVersion, consentedAt } = documentUploadSchema.parse(upload);
       const form = new FormData();
       form.append('type', type);
       form.append('source', source);
       form.append('captureLanguage', captureLanguage);
       form.append('fields', JSON.stringify(fields));
+      form.append('consentVersion', consentVersion);
+      form.append('consentedAt', consentedAt);
       // React Native's FormData accepts a file descriptor in place of a Blob.
-      form.append('file', { uri, name: fileName, type: mimeType } as unknown as Blob);
+      for (const { side, uri, fileName, mimeType } of pages) {
+        form.append(`file_${side}`, { uri, name: fileName, type: mimeType } as unknown as Blob);
+      }
       return parseResponse(
         client.post('/me/documents', form, {
           headers: { 'Content-Type': 'multipart/form-data' },

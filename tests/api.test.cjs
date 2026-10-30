@@ -251,13 +251,16 @@ test('document upload sends a multipart form and parses the status', async () =>
   };
   const { client, requests } = clientWith(() => ({ status: 201, data }));
   const result = await createDocumentsApi(client).upload({
-    type: 'driver_license', source: 'scan', uri: 'file:///licence.jpg', fileName: 'licence.jpg',
-    mimeType: 'image/jpeg', captureLanguage: 'fr', fields: { nin: '123' },
+    type: 'driver_license', source: 'scan', captureLanguage: 'fr', fields: { nin: '123' },
+    pages: ['front', 'back'].map((side) => ({ side, uri: `file:///${side}.jpg`, fileName: `${side}.jpg`, mimeType: 'image/jpeg' })),
+    consentVersion: 'v1', consentedAt: '2026-10-30T10:00:00+01:00',
   });
   assert.equal(requests[0].url, '/me/documents');
   assert.ok(requests[0].data instanceof FormData);
   assert.equal(requests[0].data.get('type'), 'driver_license');
   assert.equal(requests[0].data.get('fields'), '{"nin":"123"}');
+  assert.equal(requests[0].data.get('consentVersion'), 'v1');
+  assert.ok(requests[0].data.has('file_front') && requests[0].data.has('file_back'));
   assert.equal(result.documents[0].status, 'pending');
 });
 
@@ -288,13 +291,13 @@ test('safety and profile modules follow the contract', async () => {
   await profile.getProfile();
   await profile.updateProfile({ firstName: 'Amina', lastName: 'Test', mobileNumber: '+213555000000' });
   await profile.replaceEmergencyContacts([]);
-  await profile.registerPushToken({ token: 'push', platform: 'android' });
+  await profile.registerPushToken({ token: 'push', platform: 'android', language: 'fr' });
   assert.deepEqual(
     requests.map((request) => `${request.method} ${request.url}`),
     ['post /incidents', 'get /incidents/nearby', 'post /emergency/escalate', 'get /me', 'put /me',
       'put /me/emergency-contacts', 'post /me/push-tokens'],
   );
   assert.deepEqual(requests[1].params, { ...location, radiusKm: 5 });
-  assert.throws(() => profile.registerPushToken({ token: '', platform: 'android' }));
+  assert.throws(() => profile.registerPushToken({ token: '', platform: 'android', language: 'fr' }));
   assert.throws(() => safety.createIncident({ ...incident, id: 'not-a-uuid' }));
 });

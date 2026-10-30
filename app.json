@@ -20,6 +20,9 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+      "permissions": [
+        "android.permission.HIGH_SAMPLING_RATE_SENSORS"
+      ],
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -81,6 +84,21 @@
               "ar"
             ]
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#6316DB"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "OSY uses the camera to scan your driver’s licence and car registration.",
+          "photosPermission": "OSY lets you choose a photo of your driver’s licence and car registration.",
+          "microphonePermission": false
         }
       ]
     ],

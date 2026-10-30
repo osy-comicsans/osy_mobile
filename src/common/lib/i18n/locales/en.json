@@ -1,5 +1,9 @@
 {
-  "tabs": { "home": "Home", "map": "Map", "profile": "Profile" },
+  "tabs": {
+    "home": "Home",
+    "map": "Map",
+    "profile": "Profile"
+  },
   "common": {
     "dismiss": "Dismiss",
     "tryAgain": "Try again",
@@ -50,13 +54,15 @@
   "safety": {
     "alertTitle": "Alert",
     "alertDescription": "Alert details will appear here.",
-    "checkInTitle": "Are you OK?",
-    "checkInDescription": "The emergency check-in will appear here.",
     "reportTitle": "Report an accident",
     "reportDescription": "The accident report form will appear here."
   },
   "location": {
-    "driving": { "stationary": "Stationary", "walking": "Walking", "driving": "Driving" },
+    "driving": {
+      "stationary": "Stationary",
+      "walking": "Walking",
+      "driving": "Driving"
+    },
     "errors": {
       "watch": "Could not read your location. Check location services and try again.",
       "permission": "Could not check location access. Try again."
@@ -76,6 +82,156 @@
       "motionDeniedTitle": "Motion access is off",
       "motionDeniedBody": "Location still works, but OSY will not be able to use motion to notice a crash."
     }
+  },
+  "alerts": {
+    "view": "View",
+    "distanceAway": "{{distance}} away",
+    "crash_detected": {
+      "title": "Possible crash detected",
+      "body": "Are you OK? Open OSY to respond."
+    },
+    "potential_accident": {
+      "title": "Accident risk ahead",
+      "body": "Slow down and take extra care."
+    },
+    "accident_nearby": {
+      "title": "Accident nearby",
+      "body": "Someone may need help. Open OSY for details."
+    },
+    "permission": {
+      "requestTitle": "Turn on safety alerts",
+      "requestBody": "OSY uses notifications to warn you about road risks and reach you after a crash.",
+      "deniedTitle": "Safety alerts are off",
+      "deniedBody": "OSY cannot warn you when the app is closed unless notifications are on."
+    },
+    "dev": {
+      "title": "Test alerts",
+      "now": "Now",
+      "delayed": "In {{seconds}} s"
+    }
+  },
+  "checkIn": {
+    "title": "Are you OK?",
+    "stillWaiting": "We haven’t heard from you yet.",
+    "secondsLeft": "{{value}} seconds left to respond",
+    "ok": "I’m OK",
+    "help": "I need help",
+    "sharedTitle": "If you need help, OSY will share:",
+    "shared": {
+      "location": "Your location",
+      "road": "The road you are on",
+      "speed": "Your speed before the crash"
+    },
+    "escalatedTitle": "We could not confirm you’re OK",
+    "escalatedBody": "OSY has not contacted anyone yet. If you need help, call emergency services yourself.",
+    "seconds": "seconds",
+    "confirmedTitle": "Glad you’re OK",
+    "backHome": "Back to home"
+  },
+  "auth": {
+    "loginTitle": "Welcome back",
+    "loginDescription": "Sign in to continue.",
+    "registerTitle": "Create your account",
+    "registerDescription": "Your details help OSY reach the right people in an emergency.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "mobileNumber": "Mobile number",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "haveAccount": "Already have an account?",
+    "offline": "You are offline. This step needs a connection.",
+    "errors": {
+      "nameShort": "Must be at least 2 characters.",
+      "nameLong": "Must be 50 characters or fewer.",
+      "emailInvalid": "Enter a valid email address.",
+      "mobileInvalid": "Enter a valid mobile number, such as +213555123456.",
+      "passwordShort": "Must be at least 8 characters.",
+      "passwordLong": "Must be 72 characters or fewer.",
+      "passwordLowercase": "Must include a lowercase letter.",
+      "passwordUppercase": "Must include an uppercase letter.",
+      "passwordNumber": "Must include a number.",
+      "passwordMismatch": "Passwords do not match.",
+      "passwordRequired": "Enter your password.",
+      "emailTaken": "This email is already registered.",
+      "mobileTaken": "This mobile number is already registered.",
+      "invalidCredentials": "The email or password is wrong."
+    },
+    "mobileHint": "Include your country code, such as +213.",
+    "passwordHint": "At least 8 characters, with upper and lower case letters and a number.",
+    "noAccount": "New to OSY?",
+    "back": "Go back",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "stepOne": "Step 1 of 3",
+    "stepTwo": "Step 2 of 3",
+    "stepThree": "Step 3 of 3"
+  },
+  "documents": {
+    "title": "Your documents",
+    "description": "OSY needs your driver’s licence and car registration before you can use the app.",
+    "continue": "Continue",
+    "loadFailed": "Your documents could not be loaded. Check your connection and try again.",
+    "consentTitle": "How your documents are used",
+    "consentBody": "OSY uses your documents to confirm your identity and your vehicle. Text is read on your phone, then the images and the details you confirm are sent securely to OSY.",
+    "consentAccept": "I agree to OSY using my documents this way",
+    "sideFront": "Add the front of the document.",
+    "sideBack": "Add the back of the document.",
+    "scan": "Scan with camera",
+    "choosePhoto": "Choose a photo",
+    "chooseFile": "Choose a file",
+    "cameraDenied": "OSY cannot use the camera. You can still choose a photo or a file.",
+    "reviewDescription": "Check each detail and correct anything that is wrong.",
+    "confirm": "Confirm and send",
+    "retake": "Retake",
+    "types": {
+      "driver_license": "Driver’s licence",
+      "vehicle_registration": "Car registration"
+    },
+    "status": {
+      "missing": "To add",
+      "pending": "Under review",
+      "verified": "Verified",
+      "rejected": "Rejected"
+    },
+    "errors": {
+      "fileType": "Use a JPG, PNG, or PDF file.",
+      "fileSize": "The file must be 10 MB or smaller.",
+      "captureFailed": "That did not work. Try again, or use another option.",
+      "fieldRequired": "Enter this detail."
+    },
+    "fields": {
+      "category": "Licence category",
+      "nin": "National identification number",
+      "licenseNumber": "Licence number",
+      "lastName": "Last name",
+      "firstName": "First name",
+      "dateOfBirth": "Date of birth",
+      "placeOfBirth": "Place of birth",
+      "genre": "Vehicle kind",
+      "brand": "Make",
+      "type": "Type",
+      "serialNumber": "Serial number",
+      "bodyType": "Body type",
+      "energy": "Fuel",
+      "power": "Power",
+      "seats": "Seats",
+      "grossWeight": "Gross weight",
+      "payload": "Payload",
+      "registrationNumber": "Registration number",
+      "previousNumber": "Previous number",
+      "firstRegistrationYear": "Year of first registration"
+    },
+    "bothSides": "Front and back",
+    "front": "Front",
+    "back": "Back",
+    "scanHint": "Take a photo of the document now",
+    "photoHint": "Use a photo you already have",
+    "fileHint": "Use a JPG, PNG, or PDF, up to 10 MB",
+    "reading": "Reading your document…",
+    "detailsTitle": "Document details"
   },
   "errors": {
     "api": {

@@ -52,6 +52,7 @@ src/
     utils/
   features/
     auth/                       Sign up, sign in, and document API contract
+    crash-detection/            Detects a crash while driving and emits crashDetected
     home/
     location/                   Shared live position, speed, and permissions
     map/
@@ -95,6 +96,8 @@ src/app/
   report-accident.tsx     Modal
   alert/[id].tsx          Modal
 ```
+
+After a crash, `check-in` waits 30, then 60, then 90 seconds. With no answer it calls `escalateCheckIn()`, which stays empty until #8.
 
 Modals can be opened from anywhere with `router.push('/check-in')`, or from a link such as `osymobile://check-in`. The root anchor keeps the tabs beneath a modal opened from a link. `check-in` disables the swipe-down gesture, so it needs an explicit way to leave.
 
@@ -141,6 +144,28 @@ Sync also requires a signed-in user. Once endpoints exist, implement transport, 
 `npm run test:offline` uses Node's built-in SQLite engine (Node 22.13+ or newer) to exercise the production repositories, migrations, and sync manager without an emulator or backend. Tests cover atomic rollback, persistence across reopen, queue ordering, interrupted delivery, idempotency contracts, concurrent edits, conflict retention, cursor rollback, and React Query reads/writes while offline. This does not replace testing Expo's native SQLite bridge on a phone.
 
 Device check: open the task screen, enable airplane mode, add/edit/complete/delete tasks, close and reopen the app, and confirm local state survives. Cloud sync should remain unavailable with the default configuration, and changes should remain queued.
+
+## Alerts
+
+Crash, potential accident, and nearby accident alerts all go through `src/features/alerts/`. Add new alert behaviour to the rules in `utils/alertRules.ts`. In a development build, Settings has a test menu for each alert. Use its delayed button, then leave the app, to test a notification.
+
+Push needs a development build, not Expo Go. It uses the Expo push service, which also needs an EAS project, an iOS bundle identifier, an Android package name, `google-services.json`, and FCM and APNs credentials uploaded to EAS. None of these are set up yet. The server writes closed-app push text in the language the app registers, using the strings in `src/common/lib/i18n/locales/`.
+
+## Accounts and the mock backend
+
+Users must sign in and add both documents before they can reach the tabs. With no `EXPO_PUBLIC_API_URL`, development builds use the mock backend in `src/common/lib/api/mock/`. It sits behind the real API client, so setting the URL is all that is needed to use a real backend. Release builds never fall back to it unless `EXPO_PUBLIC_MOCK_API` is `true`.
+
+| Mock test | How |
+| --- | --- |
+| Skip onboarding | Sign in as `demo@osy.test` with any password |
+| Already registered | Register with `taken@osy.test` or `+213555000000` |
+| Wrong password | Sign in with the password `Wrong123` |
+| Lost connection | Use `offline@osy.test` |
+| Rejected document | Put `REJECT` in any document field |
+
+OCR is a stand-in until #28, and fills in sample values only under the mock. PDFs skip OCR, so their details are typed by hand.
+
+The full flow, design notes, and release checklist are in [docs/accounts-and-onboarding.md](docs/accounts-and-onboarding.md).
 
 ## Languages
 

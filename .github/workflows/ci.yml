@@ -44,6 +44,18 @@ jobs:
       - name: Test startup readiness and emergency loading
         run: pnpm test:startup
 
+      - name: Test crash detection
+        run: pnpm test:crash-detection
+
+      - name: Test alerts
+        run: pnpm test:alerts
+
+      - name: Test check-in
+        run: pnpm test:check-in
+
+      - name: Test registration and onboarding
+        run: pnpm test:auth
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks

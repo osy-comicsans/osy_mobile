@@ -1,5 +1,9 @@
 {
-  "tabs": { "home": "Accueil", "map": "Carte", "profile": "Profil" },
+  "tabs": {
+    "home": "Accueil",
+    "map": "Carte",
+    "profile": "Profil"
+  },
   "common": {
     "dismiss": "Fermer",
     "tryAgain": "Réessayer",
@@ -50,13 +54,15 @@
   "safety": {
     "alertTitle": "Alerte",
     "alertDescription": "Les détails de l’alerte s’afficheront ici.",
-    "checkInTitle": "Tout va bien ?",
-    "checkInDescription": "La vérification d’urgence s’affichera ici.",
     "reportTitle": "Signaler un accident",
     "reportDescription": "Le formulaire de signalement d’accident s’affichera ici."
   },
   "location": {
-    "driving": { "stationary": "À l’arrêt", "walking": "À pied", "driving": "En voiture" },
+    "driving": {
+      "stationary": "À l’arrêt",
+      "walking": "À pied",
+      "driving": "En voiture"
+    },
     "errors": {
       "watch": "Impossible de lire votre position. Vérifiez les services de localisation et réessayez.",
       "permission": "Impossible de vérifier l’accès à la position. Réessayez."
@@ -76,6 +82,156 @@
       "motionDeniedTitle": "L’accès aux mouvements est désactivé",
       "motionDeniedBody": "La position fonctionne toujours, mais OSY ne pourra pas utiliser les mouvements pour détecter un accident."
     }
+  },
+  "alerts": {
+    "view": "Voir",
+    "distanceAway": "À {{distance}}",
+    "crash_detected": {
+      "title": "Accident possible détecté",
+      "body": "Tout va bien ? Ouvrez OSY pour répondre."
+    },
+    "potential_accident": {
+      "title": "Risque d’accident à l’approche",
+      "body": "Ralentissez et redoublez de prudence."
+    },
+    "accident_nearby": {
+      "title": "Accident à proximité",
+      "body": "Quelqu’un a peut-être besoin d’aide. Ouvrez OSY pour en savoir plus."
+    },
+    "permission": {
+      "requestTitle": "Activez les alertes de sécurité",
+      "requestBody": "OSY utilise les notifications pour vous avertir des risques sur la route et vous joindre après un accident.",
+      "deniedTitle": "Les alertes de sécurité sont désactivées",
+      "deniedBody": "OSY ne peut pas vous avertir lorsque l’application est fermée si les notifications sont désactivées."
+    },
+    "dev": {
+      "title": "Tester les alertes",
+      "now": "Maintenant",
+      "delayed": "Dans {{seconds}} s"
+    }
+  },
+  "checkIn": {
+    "title": "Tout va bien ?",
+    "stillWaiting": "Nous n’avons pas encore de réponse de votre part.",
+    "secondsLeft": "{{value}} secondes restantes pour répondre",
+    "ok": "Je vais bien",
+    "help": "J’ai besoin d’aide",
+    "sharedTitle": "Si vous avez besoin d’aide, OSY partagera :",
+    "shared": {
+      "location": "Votre position",
+      "road": "La route sur laquelle vous êtes",
+      "speed": "Votre vitesse avant l’accident"
+    },
+    "escalatedTitle": "Nous n’avons pas pu confirmer que tout va bien",
+    "escalatedBody": "OSY n’a encore contacté personne. Si vous avez besoin d’aide, appelez vous-même les secours.",
+    "seconds": "secondes",
+    "confirmedTitle": "Tant mieux, tout va bien",
+    "backHome": "Retour à l’accueil"
+  },
+  "auth": {
+    "loginTitle": "Bon retour",
+    "loginDescription": "Connectez-vous pour continuer.",
+    "registerTitle": "Créez votre compte",
+    "registerDescription": "Vos informations aident OSY à joindre les bonnes personnes en cas d’urgence.",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "E-mail",
+    "mobileNumber": "Numéro de mobile",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmez le mot de passe",
+    "signIn": "Se connecter",
+    "createAccount": "Créer un compte",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "offline": "Vous êtes hors ligne. Cette étape nécessite une connexion.",
+    "errors": {
+      "nameShort": "Au moins 2 caractères.",
+      "nameLong": "50 caractères au maximum.",
+      "emailInvalid": "Saisissez une adresse e-mail valide.",
+      "mobileInvalid": "Saisissez un numéro valide, par exemple +213555123456.",
+      "passwordShort": "Au moins 8 caractères.",
+      "passwordLong": "72 caractères au maximum.",
+      "passwordLowercase": "Doit contenir une lettre minuscule.",
+      "passwordUppercase": "Doit contenir une lettre majuscule.",
+      "passwordNumber": "Doit contenir un chiffre.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "passwordRequired": "Saisissez votre mot de passe.",
+      "emailTaken": "Cet e-mail est déjà enregistré.",
+      "mobileTaken": "Ce numéro de mobile est déjà enregistré.",
+      "invalidCredentials": "L’e-mail ou le mot de passe est incorrect."
+    },
+    "mobileHint": "Indiquez l’indicatif du pays, par exemple +213.",
+    "passwordHint": "Au moins 8 caractères, avec une majuscule, une minuscule et un chiffre.",
+    "noAccount": "Nouveau sur OSY ?",
+    "back": "Retour",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "stepOne": "Étape 1 sur 3",
+    "stepTwo": "Étape 2 sur 3",
+    "stepThree": "Étape 3 sur 3"
+  },
+  "documents": {
+    "title": "Vos documents",
+    "description": "OSY a besoin de votre permis de conduire et de votre carte grise avant que vous puissiez utiliser l’application.",
+    "continue": "Continuer",
+    "loadFailed": "Impossible de charger vos documents. Vérifiez votre connexion et réessayez.",
+    "consentTitle": "Utilisation de vos documents",
+    "consentBody": "OSY utilise vos documents pour confirmer votre identité et votre véhicule. Le texte est lu sur votre téléphone, puis les images et les informations que vous confirmez sont envoyées à OSY de manière sécurisée.",
+    "consentAccept": "J’accepte qu’OSY utilise mes documents de cette façon",
+    "sideFront": "Ajoutez le recto du document.",
+    "sideBack": "Ajoutez le verso du document.",
+    "scan": "Scanner avec l’appareil photo",
+    "choosePhoto": "Choisir une photo",
+    "chooseFile": "Choisir un fichier",
+    "cameraDenied": "OSY ne peut pas utiliser l’appareil photo. Vous pouvez toujours choisir une photo ou un fichier.",
+    "reviewDescription": "Vérifiez chaque information et corrigez ce qui est inexact.",
+    "confirm": "Confirmer et envoyer",
+    "retake": "Reprendre",
+    "types": {
+      "driver_license": "Permis de conduire",
+      "vehicle_registration": "Carte grise"
+    },
+    "status": {
+      "missing": "À ajouter",
+      "pending": "En cours d’examen",
+      "verified": "Vérifié",
+      "rejected": "Refusé"
+    },
+    "errors": {
+      "fileType": "Utilisez un fichier JPG, PNG ou PDF.",
+      "fileSize": "Le fichier doit faire 10 Mo au maximum.",
+      "captureFailed": "Cela n’a pas fonctionné. Réessayez ou choisissez une autre option.",
+      "fieldRequired": "Saisissez cette information."
+    },
+    "fields": {
+      "category": "Catégorie du permis",
+      "nin": "Numéro d’identification nationale",
+      "licenseNumber": "Numéro du permis",
+      "lastName": "Nom",
+      "firstName": "Prénom",
+      "dateOfBirth": "Date de naissance",
+      "placeOfBirth": "Lieu de naissance",
+      "genre": "Genre",
+      "brand": "Marque",
+      "type": "Type",
+      "serialNumber": "N° dans la série du type",
+      "bodyType": "Carrosserie",
+      "energy": "Énergie",
+      "power": "Puissance",
+      "seats": "Places assises",
+      "grossWeight": "Poids total en charge",
+      "payload": "Charge utile",
+      "registrationNumber": "N° d’immatriculation",
+      "previousNumber": "Précédent numéro",
+      "firstRegistrationYear": "Année de première mise en circulation"
+    },
+    "bothSides": "Recto et verso",
+    "front": "Recto",
+    "back": "Verso",
+    "scanHint": "Photographiez le document maintenant",
+    "photoHint": "Utilisez une photo existante",
+    "fileHint": "Fichier JPG, PNG ou PDF, 10 Mo au maximum",
+    "reading": "Lecture de votre document…",
+    "detailsTitle": "Informations du document"
   },
   "errors": {
     "api": {

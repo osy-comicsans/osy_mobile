@@ -8,7 +8,25 @@ All paths are relative to `EXPO_PUBLIC_API_URL`, and requests use HTTPS. JSON is
 
 Every request sends `Accept-Language` with the app language: `en`, `fr`, or `ar`. The backend uses it for any text it generates.
 
-Alerts and push notifications send a stable key plus values such as road names and distances, never display text. The app holds the text in its translation files, so a safety alert still reads correctly offline. The keys are defined with the alerts work in #5.
+In-app alerts use stable keys plus values such as road names and distances. The app holds their text, so a safety alert still reads correctly offline.
+
+## Push notifications
+
+The backend sends through the Expo push service. `POST /me/push-tokens` receives an Expo push token, the platform, and the app language, and is sent again when the language changes.
+
+Expo push has no field for translation keys, and the phone shows a closed-app push as sent. The backend must write `title` and `body` in the token's language, using the reviewed text under `alerts` in `src/common/lib/i18n/locales/`.
+
+| Alert | `alertType` | `channelId` and `categoryId` | Text key |
+| --- | --- | --- | --- |
+| Crash detected | `crash_detected` | `crash_detected` | `alerts.crash_detected` |
+| Potential accident | `potential_accident` | `potential_accident` | `alerts.potential_accident` |
+| Accident nearby | `accident_nearby` | `accident_nearby` | `alerts.accident_nearby` |
+
+Rules for the backend:
+- `data` contains `alertId` (required and unique per alert), `alertType` (required), `roadName`, and `distanceMeters`, all as strings.
+- Send with `priority: high` and `sound: default`.
+- Keep the same `alertId` when retrying, because the app ignores a repeat for 10 minutes.
+- Remove tokens that Expo reports as `DeviceNotRegistered`.
 
 ## Authentication
 
@@ -40,11 +58,13 @@ Schemas: `src/features/auth/types/auth.schemas.ts`, `src/common/lib/api/authSess
 | `GET` | `/me/documents` | None | `200` documents response |
 | `POST` | `/me/documents` | `multipart/form-data` | `201` documents response |
 
-The upload contains `file`, `type` (`driver_license`, `vehicle_registration`), `source` (`scan`, `upload`), `captureLanguage` (`fr`, `ar`), and `fields`, a JSON string of confirmed field values. `file` is a JPEG, PNG, or PDF.
+The upload contains `file_front`, `file_back`, `type` (`driver_license`, `vehicle_registration`), `source` (`scan`, `upload`), `captureLanguage` (`fr`, `ar`), `fields` (a JSON string of confirmed field values), `consentVersion`, and `consentedAt`. Each file is a JPEG, PNG, or PDF of up to 10 MB.
 
 A documents response contains `documents` and `onboardingStatus`. Each document contains `type`, `status` (`missing`, `pending`, `verified`, `rejected`), `rejectionReason`, and `updatedAt`.
 
-Field keys are defined in #28. What is uploaded is still an open decision in #23.
+Field keys are defined in #28. A document marked `rejected` must include a `rejectionReason` that can be shown to the user. `onboardingStatus` becomes `complete` once neither document is `missing` or `rejected`, so a `pending` document does not block the app.
+
+`GET /me/documents` also tells the app a user's onboarding state at launch.
 
 ## Incidents and emergency
 
@@ -70,7 +90,7 @@ Schemas: `src/features/safety/types/safety.schemas.ts`.
 | `PUT` | `/me` | `firstName`, `lastName`, `mobileNumber` | `200` user |
 | `GET` | `/me/emergency-contacts` | None | `200` `contacts` |
 | `PUT` | `/me/emergency-contacts` | `contacts` | `200` `contacts` |
-| `POST` | `/me/push-tokens` | `token`, `platform` (`ios`, `android`) | `204` |
+| `POST` | `/me/push-tokens` | `token`, `platform` (`ios`, `android`), `language` (`en`, `fr`, `ar`) | `204` |
 
 A contact contains `id`, `name`, `mobileNumber`, and `relationship`. `PUT` replaces the whole list.
 

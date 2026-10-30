@@ -2,7 +2,7 @@ import '@/common/lib/startup/nativeSplash';
 
 import { DefaultTheme, LocaleProvider, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View, useColorScheme } from 'react-native';
 
 import { StartupSplash } from '@/common/components/StartupSplash';
@@ -13,7 +13,12 @@ import { isEmergencyPath } from '@/common/lib/startup/startupCoordinator';
 import { AppProviders } from '@/common/providers/AppProviders';
 import { FontReadinessProvider } from '@/common/providers/FontReadinessProvider';
 import { Colors, FontFamily } from '@/common/lib/theme';
+import { AlertProvider } from '@/features/alerts/providers/AlertProvider';
+import { accountService } from '@/features/auth/authServices';
+import { useAccount } from '@/features/auth/hooks/useAccount';
+import { CrashDetectionProvider } from '@/features/crash-detection/providers/CrashDetectionProvider';
 import { LocationProvider } from '@/features/location/providers/LocationProvider';
+import { CheckInProvider } from '@/features/safety/providers/CheckInProvider';
 
 // Keeps the tabs beneath a modal that was opened directly from a deep link.
 export const unstable_settings = {
@@ -41,35 +46,49 @@ const OsyLightTheme = {
 
 export default function RootLayout() {
   const { startup, snapshot, path } = useStartup();
+  const { phase } = useAccount();
   const tone = useColorScheme() === 'dark' ? 'dark' : 'light';
   const [dismissed, setDismissed] = useState(false);
   const handleDismiss = useCallback(() => setDismissed(true), []);
   const emergency = snapshot.emergency || isEmergencyPath(path);
+
+  useEffect(() => accountService.start(), []);
 
   return (
     <ThemeProvider value={OsyLightTheme}>
       <FontReadinessProvider ready={snapshot.tasks.fonts === 'ready'}>
         <AppProviders>
           <LocationProvider>
-            <StatusBar style={!dismissed && !emergency && tone === 'dark' ? 'light' : 'dark'} />
-            <View style={styles.root} onLayout={startup.markContentReady}>
-              <View style={styles.root} accessibilityElementsHidden={!dismissed && !emergency}
-                importantForAccessibility={!dismissed && !emergency ? 'no-hide-descendants' : 'auto'}>
-                <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="(tabs)" />
-                    <Stack.Screen
-                      name="check-in"
-                      options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
-                    />
-                    <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
-                    <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
-                  </Stack>
-                </LocaleProvider>
+            <CrashDetectionProvider>
+              <StatusBar style={!dismissed && !emergency && tone === 'dark' ? 'light' : 'dark'} />
+              <View style={styles.root} onLayout={startup.markContentReady}>
+                <View style={styles.root} accessibilityElementsHidden={!dismissed && !emergency}
+                  importantForAccessibility={!dismissed && !emergency ? 'no-hide-descendants' : 'auto'}>
+                  <CheckInProvider>
+                    <AlertProvider>
+                      <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
+                        <Stack screenOptions={{ headerShown: false }}>
+                          <Stack.Protected guard={phase === 'ready'} redirectTo="/login">
+                            <Stack.Screen name="(tabs)" />
+                            <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
+                          </Stack.Protected>
+                          <Stack.Protected guard={phase !== 'ready'}>
+                            <Stack.Screen name="(auth)" />
+                          </Stack.Protected>
+                          <Stack.Screen
+                            name="check-in"
+                            options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+                          />
+                          <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
+                        </Stack>
+                      </LocaleProvider>
+                    </AlertProvider>
+                  </CheckInProvider>
+                </View>
+                <StartupSplash snapshot={snapshot} emergency={emergency} tone={tone}
+                  onArtworkReady={startup.markArtworkReady} onDismiss={handleDismiss} />
               </View>
-              <StartupSplash snapshot={snapshot} emergency={emergency} tone={tone}
-                onArtworkReady={startup.markArtworkReady} onDismiss={handleDismiss} />
-            </View>
+            </CrashDetectionProvider>
           </LocationProvider>
         </AppProviders>
       </FontReadinessProvider>

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { LANGUAGES } from '@/common/lib/i18n/languages';
+
 import { mobileNumberField, nameField, userSchema } from '@/features/auth/types/auth.schemas';
 
 export const profileSchema = userSchema;
@@ -22,6 +24,7 @@ export const emergencyContactsSchema = z.object({ contacts: z.array(emergencyCon
 export const pushTokenRequestSchema = z.object({
   token: z.string().min(1),
   platform: z.enum(['ios', 'android']),
+  language: z.enum(LANGUAGES),
 });
 
 export type Profile = z.infer<typeof profileSchema>;
