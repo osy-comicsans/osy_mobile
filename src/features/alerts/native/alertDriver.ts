@@ -31,7 +31,7 @@ function toSummary(result: Notifications.NotificationPermissionsStatus): AlertPe
 export const alertDriver: AlertDriver = {
   supported: true,
 
-  async setUp(channels, viewLabel, shouldPlaySound) {
+  async setUp(channels, shouldPlaySound) {
     // In the foreground the app shows its own banner or screen instead.
     Notifications.setNotificationHandler({
       handleNotification: async (notification) => ({
@@ -42,10 +42,12 @@ export const alertDriver: AlertDriver = {
       }),
     });
 
-    await Promise.all(channels.flatMap(({ type, severity, title, body }) => [
-      Notifications.setNotificationCategoryAsync(type, [
-        { identifier: 'view', buttonTitle: viewLabel, options: { opensAppToForeground: true } },
-      ]),
+    await Promise.all(channels.flatMap(({ type, severity, title, body, actions }) => [
+      Notifications.setNotificationCategoryAsync(type, actions.map(({ id, label }) => ({
+        identifier: id,
+        buttonTitle: label,
+        options: { opensAppToForeground: true },
+      }))),
       ...(Platform.OS === 'android' ? [Notifications.setNotificationChannelAsync(type, {
         name: title,
         description: body,
@@ -76,7 +78,7 @@ export const alertDriver: AlertDriver = {
     const handle = (response: Notifications.NotificationResponse) => {
       // Otherwise the language reload would open this notification a second time.
       Notifications.clearLastNotificationResponse();
-      listener(response.notification.request.content.data);
+      listener(response.notification.request.content.data, response.actionIdentifier);
     };
     const coldStart = Notifications.getLastNotificationResponse();
     if (coldStart) handle(coldStart);

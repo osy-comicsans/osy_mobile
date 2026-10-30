@@ -12,6 +12,7 @@ import { Colors, FontFamily } from '@/common/lib/theme';
 import { AlertProvider } from '@/features/alerts/providers/AlertProvider';
 import { CrashDetectionProvider } from '@/features/crash-detection/providers/CrashDetectionProvider';
 import { LocationProvider } from '@/features/location/providers/LocationProvider';
+import { CheckInProvider } from '@/features/safety/providers/CheckInProvider';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -65,19 +66,21 @@ export default function RootLayout() {
           <CrashDetectionProvider>
             <StatusBar style="dark" />
             <AnimatedSplashOverlay />
-            <AlertProvider>
-              <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="(tabs)" />
-                  <Stack.Screen
-                    name="check-in"
-                    options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
-                  />
-                  <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
-                  <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
-                </Stack>
-              </LocaleProvider>
-            </AlertProvider>
+            <CheckInProvider>
+              <AlertProvider>
+                <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen
+                      name="check-in"
+                      options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+                    />
+                    <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
+                  </Stack>
+                </LocaleProvider>
+              </AlertProvider>
+            </CheckInProvider>
           </CrashDetectionProvider>
         </LocationProvider>
       </AppProviders>

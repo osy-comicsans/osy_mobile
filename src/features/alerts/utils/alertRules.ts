@@ -4,6 +4,9 @@ import type { AlertPreferences, AlertSeverity, AlertType, AppAlert } from '../ty
 
 export const ALERT_TYPES = ['crash_detected', 'potential_accident', 'accident_nearby'] as const;
 
+// Buttons on the crash notification, shown on the lock screen where the platform allows.
+export const CHECK_IN_ACTIONS = { ok: 'im_ok', help: 'need_help' } as const;
+
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
 
