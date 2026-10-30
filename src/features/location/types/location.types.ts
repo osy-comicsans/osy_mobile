@@ -3,6 +3,7 @@ export type LocationError = 'watch' | 'permission';
 
 export type DrivingState = 'stationary' | 'walking' | 'driving';
 
+export type BackgroundPermission = 'undetermined' | 'granted' | 'denied' | 'unavailable';
 export type LocationPermission = 'undetermined' | 'granted' | 'limited' | 'denied';
 export type MotionPermission = 'undetermined' | 'granted' | 'denied' | 'unavailable';
 
@@ -45,6 +46,7 @@ export interface LocationState {
   location: LocationPermission;
   canAskAgain: boolean;
   motion: MotionPermission;
+  background: BackgroundPermission;
   requesting: boolean;
   fix: LocationFix | null;
   drivingState: DrivingState;
@@ -52,7 +54,7 @@ export interface LocationState {
 }
 
 export interface SamplingProfile {
-  accuracy: 'high' | 'navigation';
+  accuracy: 'balanced' | 'high' | 'navigation';
   timeInterval: number;
   distanceInterval: number;
 }
@@ -61,7 +63,16 @@ export interface Removable {
   remove(): void;
 }
 
+export interface BackgroundDriver {
+  available(): Promise<boolean>;
+  getPermission(): Promise<BackgroundPermission>;
+  requestPermission(): Promise<BackgroundPermission>;
+  start(profile: SamplingProfile, onLocation: (location: RawLocation) => void): Promise<void>;
+  stop(): Promise<void>;
+}
+
 export interface LocationDriver {
+  background?: BackgroundDriver;
   servicesEnabled(): Promise<boolean>;
   getPermission(): Promise<PermissionSummary>;
   requestPermission(): Promise<PermissionSummary>;

@@ -30,6 +30,15 @@ export const samplingProfiles: Record<DrivingState, SamplingProfile> = {
   driving: { accuracy: 'navigation', timeInterval: 1_000, distanceInterval: 0 },
 };
 
+// A phone in a pocket should not run the GPS flat out, so only driving gets full accuracy.
+const lowPowerProfile: SamplingProfile = { accuracy: 'balanced', timeInterval: 30_000, distanceInterval: 100 };
+
+export const backgroundProfiles: Record<DrivingState, SamplingProfile> = {
+  stationary: lowPowerProfile,
+  walking: lowPowerProfile,
+  driving: samplingProfiles.driving,
+};
+
 export interface DrivingTracker {
   state: DrivingState;
   fastSamples: number;
