@@ -36,6 +36,7 @@ export function createOfflineRuntime() {
   let initialization: Promise<void> | undefined;
   let interval: ReturnType<typeof setInterval> | undefined;
   let active = false;
+  let authenticated = false;
 
   const changed = async () => {
     if (!status.getState().ready) return;
@@ -49,7 +50,7 @@ export function createOfflineRuntime() {
 
   const canSync = () => {
     const current = status.getState();
-    return active && current.ready && current.online === true && current.foreground
+    return active && authenticated && current.ready && current.online === true && current.foreground
       && config.syncEnabled && config.apiUrl.length > 0;
   };
 
@@ -111,6 +112,10 @@ export function createOfflineRuntime() {
     setForeground(foreground: boolean) {
       status.setState({ foreground });
       if (foreground) void changed();
+      updateSchedule();
+    },
+    setAuthenticated(signedIn: boolean) {
+      authenticated = signedIn;
       updateSchedule();
     },
     registerSyncAdapter(entity: string, adapter: SyncAdapter) {
