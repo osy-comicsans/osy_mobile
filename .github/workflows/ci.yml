@@ -35,6 +35,9 @@ jobs:
       - name: Test location service
         run: pnpm test:location
 
+      - name: API tests
+        run: pnpm test:api
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks

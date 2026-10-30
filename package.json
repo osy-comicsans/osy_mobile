@@ -54,7 +54,8 @@
     "typecheck": "tsc --noEmit",
     "test:offline": "node --test tests/offline.test.cjs",
     "test:device-playground": "node --test tests/device-playground.test.cjs",
-    "test:location": "node --test tests/location.test.cjs"
+    "test:location": "node --test tests/location.test.cjs",
+    "test:api": "node --test tests/api.test.cjs"
   },
   "private": true
 }
