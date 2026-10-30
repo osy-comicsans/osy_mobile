@@ -1,15 +1,19 @@
 import { useFonts } from 'expo-font';
-import { DefaultTheme, ThemeProvider } from 'expo-router';
+import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { AnimatedSplashOverlay } from '@/common/components/animated-icon';
-import AppTabs from '@/common/components/app-tabs';
 import { AppProviders } from '@/common/providers/AppProviders';
 import { Colors, FontFamily } from '@/common/lib/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
+
+// Keeps the tabs beneath a modal that was opened directly from a deep link.
+export const unstable_settings = {
+  anchor: '(tabs)',
+};
 
 const OsyLightTheme = {
   ...DefaultTheme,
@@ -30,7 +34,7 @@ const OsyLightTheme = {
   },
 };
 
-export default function TabLayout() {
+export default function RootLayout() {
   const [loaded, error] = useFonts({
     Gabarito_400Regular: require('@/assets/fonts/Gabarito_400Regular.ttf'),
     Gabarito_500Medium: require('@/assets/fonts/Gabarito_500Medium.ttf'),
@@ -50,7 +54,15 @@ export default function TabLayout() {
       <AppProviders>
         <StatusBar style="dark" />
         <AnimatedSplashOverlay />
-        <AppTabs />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="check-in"
+            options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+          />
+          <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
+        </Stack>
       </AppProviders>
     </ThemeProvider>
   );
