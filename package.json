@@ -63,7 +63,8 @@
     "test:api": "node --test tests/api.test.cjs",
     "test:i18n": "node --test tests/i18n.test.cjs",
     "test:crash-detection": "node --test tests/crash-detection.test.cjs",
-    "test:alerts": "node --test tests/alerts.test.cjs"
+    "test:alerts": "node --test tests/alerts.test.cjs",
+    "test:check-in": "node --test tests/check-in.test.cjs"
   },
   "private": true
 }

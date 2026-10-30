@@ -19,31 +19,32 @@ const nearby = { alertId: 'n1', alertType: 'accident_nearby', roadName: 'RN 5', 
 
 function fixture(overrides = {}) {
   const f = {
-    time: 1_000_000, navigated: [], haptics: [], tokens: [], handler: null,
-    listeners: {}, removed: 0, permission: 'granted', token: { token: 't1', platform: 'android' },
+    time: 1_000_000, navigated: [], haptics: [], tokens: [], answers: [], handler: null,
+    listeners: {}, removed: 0, presented: [], permission: 'granted', token: { token: 't1', platform: 'android' },
   };
   const driver = {
     supported: true,
-    setUp: async (_channels, _label, shouldPlaySound) => { f.shouldPlaySound = shouldPlaySound; },
+    setUp: async (_channels, shouldPlaySound) => { f.shouldPlaySound = shouldPlaySound; },
     getPermission: async () => ({ permission: f.permission, canAskAgain: true }),
     requestPermission: async () => ({ permission: 'granted', canAskAgain: true }),
     getPushToken: async () => f.token,
     onReceived(listener) { f.listeners.received = listener; return { remove: () => { f.removed += 1; } }; },
     onOpened(listener) { f.listeners.opened = listener; return { remove: () => { f.removed += 1; } }; },
-    present: async () => undefined,
+    present: async (alert) => { f.presented.push(alert.id); },
     playHaptic: async (severity) => { f.haptics.push(severity); },
     ...overrides,
   };
   f.service = createAlertService({
     driver,
     navigate: (alert) => f.navigated.push(alert.id),
+    onCheckInAnswer: (action) => f.answers.push(action),
     sendPushToken: async (token) => {
       if (f.pushFails) throw new Error('offline');
       f.tokens.push(token);
     },
     now: () => f.time,
   });
-  f.stop = f.service.start([], 'View');
+  f.stop = f.service.start([]);
   f.banner = () => f.service.store.getState().banner;
   return f;
 }
@@ -206,4 +207,39 @@ test('stopping removes the listeners', () => {
   const f = fixture();
   f.stop();
   assert.equal(f.removed, 2);
+});
+
+test('a raised crash reacts at once and still gets its sound', async () => {
+  const f = fixture();
+  await new Promise(setImmediate);
+  f.service.raise({ id: 'c9', type: 'crash_detected' }, { title: 'T', body: 'B' });
+  assert.deepEqual(f.navigated, ['c9']);
+  assert.deepEqual(f.haptics, ['critical']);
+  assert.deepEqual(f.presented, ['c9']);
+  const data = { alertId: 'c9', alertType: 'crash_detected' };
+  assert.equal(f.shouldPlaySound(data), true);
+  assert.equal(f.shouldPlaySound(data), false);
+  f.listeners.received(data);
+  assert.equal(f.navigated.length, 1);
+});
+
+test('I am OK from a notification answers without opening the screen', () => {
+  const f = fixture();
+  f.listeners.opened(crash, 'im_ok');
+  assert.deepEqual(f.answers, ['im_ok']);
+  assert.deepEqual(f.navigated, []);
+});
+
+test('I need help from a notification answers and opens the screen', () => {
+  const f = fixture();
+  f.listeners.opened(crash, 'need_help');
+  assert.deepEqual(f.answers, ['need_help']);
+  assert.deepEqual(f.navigated, ['c1']);
+});
+
+test('tapping the notification itself gives no answer', () => {
+  const f = fixture();
+  f.listeners.opened(crash, 'expo.modules.notifications.actions.DEFAULT');
+  assert.deepEqual(f.answers, []);
+  assert.deepEqual(f.navigated, ['c1']);
 });
