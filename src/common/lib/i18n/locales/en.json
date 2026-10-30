@@ -45,7 +45,8 @@
     "title": "Profile",
     "description": "Your details, emergency contacts, and driving stats will appear here.",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "emergencyContacts": "Emergency contacts"
   },
   "settings": {
     "title": "Settings",
@@ -126,7 +127,6 @@
       "speed": "Your speed before the crash"
     },
     "escalatedTitle": "We could not confirm you’re OK",
-    "escalatedBody": "OSY has not contacted anyone yet. If you need help, call emergency services yourself.",
     "seconds": "seconds",
     "confirmedTitle": "Glad you’re OK",
     "backHome": "Back to home"
@@ -296,5 +296,26 @@
     "tasks": "Loading saved tasks",
     "action": "Please wait",
     "checkIn": "Open emergency check-in"
+  },
+  "escalation": {
+    "testMode": "Test mode: nobody was contacted.",
+    "call": "Call emergency services ({{number}})",
+    "status": {
+      "idle": "Tell OSY if you need help.",
+      "sending": "Sending your request for help…",
+      "sent": "Your request for help was sent to OSY. Sharing your location.",
+      "waitingForSignal": "No connection. OSY keeps trying. Call if you can.",
+      "noLocation": "OSY does not know your location. Call emergency services.",
+      "canceled": "Your request for help was canceled."
+    }
+  },
+  "contacts": {
+    "description": "OSY alerts these people if you need help after a crash.",
+    "add": "Add a contact",
+    "name": "Name",
+    "save": "Save contact",
+    "remove": "Remove",
+    "invalid": "Enter a name and a valid mobile number.",
+    "failed": "That did not work. Check your connection and try again."
   }
 }

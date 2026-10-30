@@ -45,7 +45,8 @@
     "title": "Profil",
     "description": "Vos informations, vos contacts d’urgence et vos statistiques de conduite s’afficheront ici.",
     "settings": "Réglages",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "emergencyContacts": "Contacts d’urgence"
   },
   "settings": {
     "title": "Réglages",
@@ -126,7 +127,6 @@
       "speed": "Votre vitesse avant l’accident"
     },
     "escalatedTitle": "Nous n’avons pas pu confirmer que tout va bien",
-    "escalatedBody": "OSY n’a encore contacté personne. Si vous avez besoin d’aide, appelez vous-même les secours.",
     "seconds": "secondes",
     "confirmedTitle": "Tant mieux, tout va bien",
     "backHome": "Retour à l’accueil"
@@ -296,5 +296,26 @@
     "tasks": "Chargement des tâches enregistrées",
     "action": "Veuillez patienter",
     "checkIn": "Ouvrir la vérification d’urgence"
+  },
+  "escalation": {
+    "testMode": "Mode test : personne n’a été contacté.",
+    "call": "Appeler les secours ({{number}})",
+    "status": {
+      "idle": "Dites à OSY si vous avez besoin d’aide.",
+      "sending": "Envoi de votre demande d’aide…",
+      "sent": "Votre demande d’aide a été envoyée à OSY. Votre position est partagée.",
+      "waitingForSignal": "Pas de connexion. OSY continue d’essayer. Appelez si vous le pouvez.",
+      "noLocation": "OSY ne connaît pas votre position. Appelez les secours.",
+      "canceled": "Votre demande d’aide a été annulée."
+    }
+  },
+  "contacts": {
+    "description": "OSY prévient ces personnes si vous avez besoin d’aide après un accident.",
+    "add": "Ajouter un contact",
+    "name": "Nom",
+    "save": "Enregistrer le contact",
+    "remove": "Retirer",
+    "invalid": "Saisissez un nom et un numéro de mobile valide.",
+    "failed": "Cela n’a pas fonctionné. Vérifiez votre connexion et réessayez."
   }
 }
