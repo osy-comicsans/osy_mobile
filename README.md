@@ -49,6 +49,7 @@ src/
     utils/
   features/
     auth/                       Sign up, sign in, and document API contract
+    crash-detection/            Detects a crash while driving and emits crashDetected
     home/
     location/                   Shared live position, speed, and permissions
     map/
