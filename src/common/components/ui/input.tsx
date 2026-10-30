@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ComponentRef, type Ref } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,7 +11,10 @@ import {
 
 import { Colors, Radius, Typography } from '@/common/lib/theme';
 
+export type InputHandle = ComponentRef<typeof TextInput>;
+
 export type InputProps = TextInputProps & {
+  ref?: Ref<InputHandle>;
   label?: string;
   error?: string;
   containerStyle?: StyleProp<ViewStyle>;
