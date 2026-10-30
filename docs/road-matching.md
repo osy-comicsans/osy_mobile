@@ -16,7 +16,9 @@ Stopped or slow drivers still refresh every 15 seconds.
 
 ## Server
 
-Set `EXPO_PUBLIC_OSRM_URL` to your server. Development falls back to the public demo server, which is non-commercial, limited to 1 request per second, and receives GPS traces. **Production must use a server you run.**
+The app uses the public demo server, `router.project-osrm.org`, in every build. Set `EXPO_PUBLIC_OSRM_URL` to use another server.
+
+The demo server is for reasonable non-commercial use, is limited to 1 request per second, has no uptime guarantee, and receives users' GPS traces. Move to a server you run before real users rely on it.
 
 The OSRM client is separate from the API client, so the user's access token never reaches the OSRM server.
 

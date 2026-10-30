@@ -1,7 +1,7 @@
 const apiUrl = process.env.EXPO_PUBLIC_API_URL?.trim() ?? '';
 
-// The public demo server is for development only: it is non-commercial and rate limited.
-const osrmUrl = process.env.EXPO_PUBLIC_OSRM_URL?.trim() || (__DEV__ ? 'https://router.project-osrm.org' : '');
+// The public demo server is the default. It is rate limited and has no uptime guarantee.
+const osrmUrl = process.env.EXPO_PUBLIC_OSRM_URL?.trim() || 'https://router.project-osrm.org';
 
 export const config = {
   apiUrl,
