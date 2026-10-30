@@ -65,10 +65,11 @@ test('text without an MRZ gives nothing', () => {
   assert.equal(parseMrz(['Permis de conduire', 'Algerie']), null);
 });
 
-test('detection input is sized in steps of 32 and stays within the limit', () => {
-  const { dims, tensor } = prepareDetection(solidImage(1600, 1000));
-  assert.deepEqual(dims, [1, 3, 608, 960]);
-  assert.equal(tensor.length, 3 * 608 * 960);
+test('detection input is sized in steps of 32, and small photos are enlarged', () => {
+  const large = prepareDetection(solidImage(1600, 1000));
+  assert.deepEqual(large.dims, [1, 3, 800, 1280]);
+  assert.equal(large.tensor.length, 3 * 800 * 1280);
+  assert.deepEqual(prepareDetection(solidImage(488, 629)).dims, [1, 3, 1280, 992]);
 });
 
 test('joined text pixels become one box, scaled to the image', () => {
@@ -120,20 +121,20 @@ test('resizing and cropping keep the right pixels', () => {
 });
 
 test('the pipeline reads each box with both models and keeps the surer one', async () => {
-  const [width] = [64];
-  const map = new Float32Array(32 * 64);
-  for (let y = 8; y < 16; y += 1) for (let x = 8; x < 50; x += 1) map[y * width + x] = 0.9;
+  const [width, height] = [1280, 640];
+  const map = new Float32Array(height * width);
+  for (let y = 100; y < 160; y += 1) for (let x = 100; x < 600; x += 1) map[y * width + x] = 0.9;
   const scored = (best, score) => {
     const data = new Float32Array(3);
     data[best] = score;
     return { data, dims: [1, 1, 3] };
   };
   const models = {
-    detect: async () => ({ data: map, dims: [1, 1, 32, 64] }),
+    detect: async () => ({ data: map, dims: [1, 1, height, width] }),
     recognize: async (script) => (script === 'latin' ? scored(1, 0.6) : scored(2, 0.95)),
     dictionaries: { latin: ['x', 'y'], arabic: ['ا', 'ب'] },
   };
-  const [result] = await readPage(solidImage(64, 32), models);
+  const [result] = await readPage(solidImage(width, height), models);
   assert.equal(result.text, 'ب');
   assert.equal(result.latin, 'x');
 });
@@ -185,6 +186,41 @@ test('registration values are found beside and below their labels', () => {
   assert.ok(lowConfidence.includes('brand'));
   assert.ok(!lowConfidence.includes('type'));
   assert.ok(lowConfidence.includes('energy'));
+});
+
+test('a boxed card is read from values printed above their labels', () => {
+  const box = (text, x, y, overrides = {}) => line(text, x, y, { width: 60, height: 20, ...overrides });
+  const lines = [
+    box('XY', 100, 400, { width: 30 }), box('طراز', 150, 400, { latin: '0', text: 'طراز', arabic: 'طراز', width: 40 }),
+    box('ABCDEF1234', 300, 390, { width: 120 }), box('R000123', 300, 412, { width: 80 }),
+    box('TYPE', 150, 440, { width: 40 }), box('N° DANS LA SERIE DU TYPE', 300, 440, { width: 130 }),
+    box('GO', 10, 470), box('008.', 80, 470), box('0051', 150, 470), box('00000', 220, 470), box('00000', 300, 470),
+    box('ENEAGIE', 10, 500), box('PUISSANCE', 80, 500), box('PLACES', 150, 500), box('POIDS TOTAL', 220, 500), box('CHARGE', 300, 500),
+    box('ASSISES', 150, 520), box('EN CHARGE', 220, 520), box('UTILE', 300, 520),
+    box('012345:678.16', 10, 540, { width: 110 }), box('098765.00.48', 150, 540, { width: 110 }),
+    box('DATRICITION', 10, 580, { width: 110 }), box('PRECEDENT NUMERO', 150, 580, { width: 110 }),
+  ];
+  const { fields, lowConfidence } = parseDocument('vehicle_registration', [lines]);
+  assert.equal(fields.type, 'XY');
+  assert.equal(fields.serialNumber, 'ABCDEF1234R000123');
+  assert.equal(fields.energy, 'GO');
+  assert.equal(fields.power, '008');
+  assert.equal(fields.grossWeight, '00000');
+  assert.equal(fields.payload, '00000');
+  assert.equal(fields.registrationNumber, '012345 678 16');
+  assert.equal(fields.previousNumber, '098765 00 48');
+  assert.equal(fields.seats, undefined);
+  assert.ok(lowConfidence.includes('seats'));
+});
+
+test('weak Arabic-only readings stay empty', () => {
+  const lines = [
+    line('خط', 10, 10, { arabic: 'خط', latin: '', confidence: 0.6 }),
+    line('MARQUE', 10, 40),
+  ];
+  const { fields, lowConfidence } = parseDocument('vehicle_registration', [lines]);
+  assert.equal(fields.brand, undefined);
+  assert.ok(lowConfidence.includes('brand'));
 });
 
 test('a low-confidence reading is flagged', () => {

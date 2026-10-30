@@ -7,7 +7,8 @@ export interface TextBox {
   height: number;
 }
 
-const MAX_SIDE = 960;
+// Small photos are enlarged as well, because close text merges at low resolution.
+const TARGET_SIDE = 1280;
 const SIZE_STEP = 32;
 const PIXEL_THRESHOLD = 0.3;
 const BOX_THRESHOLD = 0.6;
@@ -19,7 +20,7 @@ const STD = [0.229, 0.224, 0.225];
 
 // PaddleOCR models are trained on BGR images.
 export function prepareDetection(image: RgbaImage) {
-  const scale = Math.min(1, MAX_SIDE / Math.max(image.width, image.height));
+  const scale = TARGET_SIDE / Math.max(image.width, image.height);
   const stepped = (side: number) => Math.max(SIZE_STEP, Math.round((side * scale) / SIZE_STEP) * SIZE_STEP);
   const width = stepped(image.width);
   const height = stepped(image.height);
