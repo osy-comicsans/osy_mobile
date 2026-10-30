@@ -42,7 +42,8 @@
   "profile": {
     "title": "Profil",
     "description": "Vos informations, vos contacts d’urgence et vos statistiques de conduite s’afficheront ici.",
-    "settings": "Réglages"
+    "settings": "Réglages",
+    "logout": "Se déconnecter"
   },
   "settings": {
     "title": "Réglages",

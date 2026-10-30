@@ -42,7 +42,8 @@
   "profile": {
     "title": "Profile",
     "description": "Your details, emergency contacts, and driving stats will appear here.",
-    "settings": "Settings"
+    "settings": "Settings",
+    "logout": "Log out"
   },
   "settings": {
     "title": "Settings",
