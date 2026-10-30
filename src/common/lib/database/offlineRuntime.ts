@@ -5,6 +5,7 @@ import { supportsLocalDatabase } from '../native/appLifecycle';
 import { createId } from '../native/uuid';
 import { LocalDatabase } from './localDatabase';
 import { TodoRepository } from './repositories/todoRepository';
+import { WeatherRepository } from './repositories/weatherRepository';
 import { getDatabase } from './sqlite';
 import { SyncManager } from './sync/syncManager';
 import { syncPolicy } from './sync/syncPolicy';
@@ -26,6 +27,7 @@ export interface OfflineStatus extends QueueSummary {
 export function createOfflineRuntime() {
   const database = new LocalDatabase(getDatabase);
   const todos = new TodoRepository(database, createId);
+  const weather = new WeatherRepository(database);
   const queue = new SyncQueue(database);
   const status = createStore<OfflineStatus>(() => ({
     supported: supportsLocalDatabase, ready: false, online: null, foreground: true,
@@ -91,7 +93,7 @@ export function createOfflineRuntime() {
   };
 
   return {
-    status, todos, queue, sync, initialize, changed,
+    status, todos, weather, queue, sync, initialize, changed,
     start(onChange: () => Promise<void>) {
       active = true;
       invalidate = onChange;

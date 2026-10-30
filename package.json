@@ -58,6 +58,8 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "weather:server": "node --env-file-if-exists=server/weather/.env.local server/weather/start.mjs",
+    "test:weather": "node --test tests/weather.test.cjs",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",

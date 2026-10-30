@@ -44,4 +44,5 @@ example
 
 
 
-docs
+docs/*
+!docs/weather.md

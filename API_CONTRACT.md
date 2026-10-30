@@ -114,6 +114,14 @@ Every error response uses this shape:
 
 Error text may be shown to users, so it must never contain passwords, tokens, or document data.
 
+## Weather
+
+`GET /weather?latitude=<decimal>&longitude=<decimal>` returns current model conditions, up to six future hourly readings, local-day sunrise/sunset, area metadata and freshness timestamps. The standalone implementation is in `server/weather/`; the main backend can mount the same service later. Its read-only endpoint is unauthenticated and protected by limits/budgets, independently of account onboarding.
+
+The Zod contract is `src/features/weather/types/weather.types.ts`. Units are Celsius, metres, metres/second, millimetres and UTC ISO timestamps. Each precipitation amount includes its accumulation interval in seconds. `validAt` is provider-valid time, not retrieval time. Missing fields are null. Condition identifiers are translated by the app. `schemaVersion` is 1 and `dataKind` is `model`.
+
+Invalid coordinates return `422`; the standalone per-client rate limit returns `429`; provider failure without a usable cache returns `503`. Error bodies use the common `error` shape and never include a key or upstream request URL. A server-cache fallback preserves the original timestamps so the app can identify stale data. See [weather integration](docs/weather.md) for configuration, cache/risk rules and testing.
+
 ## Offline sync
 
 Offline sync requires a signed-in user and stays disabled until `EXPO_PUBLIC_SYNC_ENABLED` is `true`, an adapter is registered, and the endpoints exist. No sync endpoints are defined yet. The backend must deduplicate `clientOperationId`, keep client-generated IDs, and return `409` for conflicts.

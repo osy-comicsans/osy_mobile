@@ -24,7 +24,8 @@ function createClient(): AxiosInstance {
   // Allow startup without a backend, but prevent accidental requests to the
   // web app's own origin when the backend URL has not been configured.
   client.interceptors.request.use((request) => {
-    if (!config.apiUrl && !config.useMockApi) {
+    const standaloneWeather = config.weatherApiUrl && request.url === `${config.weatherApiUrl}/weather`;
+    if (!config.apiUrl && !config.useMockApi && !standaloneWeather) {
       throw new Error('Set EXPO_PUBLIC_API_URL in .env.local before making API requests.');
     }
 
