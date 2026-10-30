@@ -231,7 +231,9 @@
     "photoHint": "Utilisez une photo existante",
     "fileHint": "Fichier JPG, PNG ou PDF, 10 Mo au maximum",
     "reading": "Lecture de votre document…",
-    "detailsTitle": "Informations du document"
+    "detailsTitle": "Informations du document",
+    "checkField": "Vérifiez ce champ. Il a peut-être été mal lu.",
+    "nameMismatch": "Le nom sur ce permis ne correspond pas à votre compte."
   },
   "errors": {
     "api": {

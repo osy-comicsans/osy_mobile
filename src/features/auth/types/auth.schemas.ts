@@ -57,6 +57,7 @@ export const capturedPageSchema = z.object({
   uri: z.string().min(1),
   fileName: z.string().min(1),
   mimeType: mimeTypeSchema,
+  width: z.number().optional(),
 });
 
 export const documentUploadSchema = z.object({

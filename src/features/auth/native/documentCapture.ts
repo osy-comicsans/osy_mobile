@@ -7,6 +7,7 @@ export interface PickedFile {
   fileName: string;
   mimeType: string;
   sizeBytes: number;
+  width?: number;
 }
 
 export type CaptureResult =
@@ -24,6 +25,7 @@ const fromImage = (result: ImagePicker.ImagePickerResult): CaptureResult => {
       fileName: asset.fileName ?? 'document.jpg',
       mimeType: asset.mimeType ?? 'image/jpeg',
       sizeBytes: asset.fileSize ?? 0,
+      width: asset.width,
     },
   };
 };

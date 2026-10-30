@@ -231,7 +231,9 @@
     "photoHint": "Use a photo you already have",
     "fileHint": "Use a JPG, PNG, or PDF, up to 10 MB",
     "reading": "Reading your document…",
-    "detailsTitle": "Document details"
+    "detailsTitle": "Document details",
+    "checkField": "Check this one. It may not have been read correctly.",
+    "nameMismatch": "The name on this licence does not match your account."
   },
   "errors": {
     "api": {
