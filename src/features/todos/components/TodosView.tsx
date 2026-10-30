@@ -130,7 +130,7 @@ export function TodosView({ controller }: { controller: TodosController }) {
                   Add your first task above. Internet is optional.
                 </ThemedText>
               </View>
-            ) : null
+            ) : undefined
           }
           renderItem={({ item }) => (
             <TodoItem

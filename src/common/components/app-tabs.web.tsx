@@ -38,9 +38,13 @@ export default function AppTabs() {
   );
 }
 
-export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
+export function TabButton({ children, isFocused, ref, ...props }: TabTriggerSlotProps) {
   return (
-    <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
+    <Pressable
+      {...props}
+      // expo-router types this ref as RefAttributes<View>, which no longer matches Pressable's instance ref under RN 0.88's strict types.
+      ref={ref as React.ComponentProps<typeof Pressable>['ref']}
+      style={({ pressed }) => pressed && styles.pressed}>
       <View style={[styles.tabButtonView, isFocused ? styles.tabActive : styles.tabInactive]}>
         <ThemedText
           type="bodyMedium"
