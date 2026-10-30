@@ -4,6 +4,12 @@ Draft v1, for review with the backend team. The zod schemas named below are the 
 
 All paths are relative to `EXPO_PUBLIC_API_URL`, and requests use HTTPS. JSON is used unless stated otherwise. Timestamps are ISO 8601 with an offset, coordinates are decimal degrees, and mobile numbers use E.164.
 
+## Language
+
+Every request sends `Accept-Language` with the app language: `en`, `fr`, or `ar`. The backend uses it for any text it generates.
+
+Alerts and push notifications send a stable key plus values such as road names and distances, never display text. The app holds the text in its translation files, so a safety alert still reads correctly offline. The keys are defined with the alerts work in #5.
+
 ## Authentication
 
 Protected requests send `Authorization: Bearer <accessToken>`.
