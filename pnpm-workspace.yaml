@@ -1,12 +1,10 @@
-# Exact versions already locked on main and approved for installation.
-# Leave the release-age policy in place for all other package versions.
+allowBuilds:
+  unrs-resolver: false
+
 minimumReleaseAgeExclude:
   - i18next@26.5.12
   - electron-to-chromium@1.5.468
 
-# Use the packaged native resolver binding without running its install script.
-allowBuilds:
-  unrs-resolver: false
-
 patchedDependencies:
+  expo-sensors@58.0.4: patches/expo-sensors@58.0.4.patch
   onnxruntime-react-native@1.24.3: patches/onnxruntime-react-native@1.24.3.patch

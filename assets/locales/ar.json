@@ -4,7 +4,8 @@
     "NSLocationWhenInUseUsageDescription": "يستخدم OSY موقعك وسرعتك أثناء فتح التطبيق لتحذيرك من مخاطر الطريق.",
     "NSMotionUsageDescription": "يستخدم OSY بيانات الحركة للمساعدة على رصد وقوع حادث.",
     "NSCameraUsageDescription": "يستخدم OSY الكاميرا لمسح رخصة القيادة وبطاقة ترقيم السيارة.",
-    "NSPhotoLibraryUsageDescription": "يتيح لك OSY اختيار صورة لرخصة القيادة وبطاقة ترقيم السيارة."
+    "NSPhotoLibraryUsageDescription": "يتيح لك OSY اختيار صورة لرخصة القيادة وبطاقة ترقيم السيارة.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "يستخدم OSY موقعك في الخلفية أثناء القيادة لرصد الحادث عندما يكون هاتفك مقفلًا."
   },
   "android": {
     "app_name": "OSY"

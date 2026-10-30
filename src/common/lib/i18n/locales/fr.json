@@ -85,6 +85,12 @@
       "motionRequestBody": "L’accès aux mouvements aide OSY à détecter un accident. La position fonctionne aussi sans cet accès.",
       "motionDeniedTitle": "L’accès aux mouvements est désactivé",
       "motionDeniedBody": "La position fonctionne toujours, mais OSY ne pourra pas utiliser les mouvements pour détecter un accident."
+    },
+    "background": {
+      "serviceTitle": "OSY surveille votre trajet",
+      "serviceBody": "La détection d’accident est activée.",
+      "title": "Gardez la détection d’accident active",
+      "body": "OSY a besoin de votre position en permanence pour détecter un accident lorsque votre téléphone est verrouillé ou qu’une autre application est ouverte. Il ne fonctionne à pleine puissance que pendant la conduite, et votre position n’est pas enregistrée."
     }
   },
   "alerts": {
@@ -111,7 +117,8 @@
     "dev": {
       "title": "Tester les alertes",
       "now": "Maintenant",
-      "delayed": "Dans {{seconds}} s"
+      "delayed": "Dans {{seconds}} s",
+      "lockedCrash": "Simuler un accident dans 15 s (verrouillez le téléphone)"
     }
   },
   "checkIn": {

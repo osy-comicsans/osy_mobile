@@ -85,6 +85,12 @@
       "motionRequestBody": "Motion access helps OSY notice a crash. Location still works without it.",
       "motionDeniedTitle": "Motion access is off",
       "motionDeniedBody": "Location still works, but OSY will not be able to use motion to notice a crash."
+    },
+    "background": {
+      "serviceTitle": "OSY is watching your drive",
+      "serviceBody": "Crash detection is on.",
+      "title": "Keep crash detection on",
+      "body": "OSY needs your location all the time to notice a crash while your phone is locked or another app is open. It runs at full power only while you drive, and your location is not recorded."
     }
   },
   "alerts": {
@@ -111,7 +117,8 @@
     "dev": {
       "title": "Test alerts",
       "now": "Now",
-      "delayed": "In {{seconds}} s"
+      "delayed": "In {{seconds}} s",
+      "lockedCrash": "Simulate a crash in 15 s (lock the phone now)"
     }
   },
   "checkIn": {
