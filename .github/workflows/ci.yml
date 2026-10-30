@@ -50,6 +50,9 @@ jobs:
       - name: Test check-in
         run: pnpm test:check-in
 
+      - name: Test registration and onboarding
+        run: pnpm test:auth
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks
