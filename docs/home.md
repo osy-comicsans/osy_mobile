@@ -9,6 +9,7 @@ Cards use the shared OSY purple, lavender, charcoal, spacing, Gabarito/Arabic ty
 ## Live information
 
 - Speed and heading come from the single foreground location store. A real zero remains zero; missing, denied, or older-than-30-second speed is unknown. Permission and service failures leave the rest of Home accessible.
+- The speedometer fills a semicircular dial and moves its needle with live speed, with a display maximum of 240 km/h (`SPEEDOMETER_MAX_KMH` in `features/home/components/Speedometer.tsx`). This range is separate from the road's legal limit. The arc clamps at its maximum while the number retains the actual reading. Reduced Motion disables the transition; unknown speed leaves an empty dial with no needle.
 - Road name and refs reuse OSRM matching while driving. Paused or stopped matching marks the retained road stale. This change does not add a durable road cache or road-rules dataset.
 - Area names use native reverse geocoding, coalesced into approximately 1 km cells, at most once a minute. SQLite caches up to 60 coarse area labels for seven days, refreshing labels after one day. No raw GPS trace is stored or added to cloud sync. The device's platform geocoder may require a network connection; cached labels and coordinates remain usable without one. Web shows coordinates and the unavailable-area text.
 - Weather reuses the existing cached query and offline repository. The compact card expands for astronomy, icing guidance, and the next hours. See [weather configuration](weather.md).
