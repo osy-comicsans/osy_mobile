@@ -1,6 +1,8 @@
 import type { PropsWithChildren } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { ThemedText } from '@/common/components/themed-text';
+import { Button } from '@/common/components/ui/button';
 import { Card } from '@/common/components/ui/card';
 import { useTheme } from '@/common/hooks/use-theme';
 import { Radius, Space } from '@/common/lib/theme';
@@ -34,6 +36,14 @@ export function ChoiceRow<T extends string | number>({ label, value, options, di
         <ThemedText type="label" themeColor={option.value === value ? 'accent' : 'textSecondary'}>{option.label}</ThemedText>
       </Pressable>)}
     </View>
+  </View>;
+}
+export function PermissionRow({ label, status, requesting, onRequest }: { label: string; status: string; requesting?: boolean; onRequest?(): void }) {
+  const { t } = useTranslation();
+  return <View style={styles.row}>
+    <View style={styles.label}><ThemedText type="bodyMedium">{label}</ThemedText>
+      <ThemedText type="small" themeColor="textSecondary">{status}</ThemedText></View>
+    {onRequest ? <Button label={t('common.allowAccess')} accessibilityHint={label} variant="secondary" loading={requesting} onPress={onRequest} /> : null}
   </View>;
 }
 const styles = StyleSheet.create({ group: { gap: Space[4] }, row: { flexDirection: 'row', alignItems: 'center', gap: Space[4], minHeight: 48 },

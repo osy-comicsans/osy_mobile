@@ -1,7 +1,7 @@
 import type { Language } from '@/common/lib/i18n/languages';
 import { speak, stopSpeaking } from '@/common/lib/native/speech';
 
-import type { VoiceDriver } from '../utils/voiceCheckIn';
+import type { VoiceDriver, VoicePermission } from '../utils/voiceCheckIn';
 
 type Recognition = typeof import('expo-speech-recognition').ExpoSpeechRecognitionModule;
 type Subscription = ReturnType<Recognition['addListener']>;
@@ -30,6 +30,20 @@ const release = () => {
 
 export const voiceDriver: VoiceDriver = {
   available: () => recognition()?.isRecognitionAvailable() ?? false,
+
+  // Covers the microphone and, on iOS, speech recognition. Without a recognizer
+  // the check-in never asks, so the permission reads as unavailable.
+  getPermission: async (): Promise<VoicePermission> => {
+    try {
+      const module = recognition();
+      if (!module?.isRecognitionAvailable()) return 'unavailable';
+      const { granted, status } = await module.getPermissionsAsync();
+      if (granted) return 'granted';
+      return status === 'denied' ? 'denied' : 'undetermined';
+    } catch {
+      return 'unavailable';
+    }
+  },
 
   requestPermission: async () => {
     try {
