@@ -66,14 +66,14 @@ export function Speedometer({ speedKmh }: { speedKmh: number | null }) {
                 marginTop: -(major ? Space[3] : Space[1]) / 2,
                 backgroundColor: major ? Colors.textSecondary : Colors.borderStrong,
                 transform: [
-                  { translateX: Math.cos(angle) * tickRadius },
+                  { translateX: Math.cos(angle) * tickRadius - 1 },
                   { translateY: -Math.sin(angle) * tickRadius },
                   { rotate: `${position * 180 - 90}deg` },
                 ],
               }]} />
               {major ? <ThemedText type="small" maxFontSizeMultiplier={1.2} style={[styles.scale, {
                 top: radius,
-                transform: [{ translateX: Math.cos(angle) * labelRadius }, { translateY: -Math.sin(angle) * labelRadius }],
+                transform: [{ translateX: Math.cos(angle) * labelRadius - 20 }, { translateY: -Math.sin(angle) * labelRadius }],
               }]}>{formatNumber(language, position * SPEEDOMETER_MAX_KMH)}</ThemedText> : null}
             </View>
           );
@@ -98,11 +98,12 @@ const styles = StyleSheet.create({
   ring: { position: 'absolute', top: 0, left: 0, borderWidth: TRACK_WIDTH, borderColor: Colors.accentSoft },
   // A half ring rotates behind a second upper-half clip: empty -> full.
   fill: { borderColor: Colors.accent },
-  tick: { position: 'absolute', left: '50%', marginLeft: -1, width: 2, borderRadius: Radius.full },
-  scale: { position: 'absolute', left: '50%', width: 40, marginLeft: -20, marginTop: -10, textAlign: 'center', color: Colors.textSecondary },
+  // Center the dial parts with physical transforms so RTL cannot mirror the scale.
+  tick: { position: 'absolute', left: '50%', width: 2, borderRadius: Radius.full },
+  scale: { position: 'absolute', left: '50%', width: 40, marginTop: -10, textAlign: 'center', color: Colors.textSecondary },
   needleFrame: { position: 'absolute', top: 0, left: 0 },
-  needle: { position: 'absolute', left: '50%', marginLeft: -2, width: 4, borderRadius: Radius.full, backgroundColor: Colors.accent },
-  hub: { position: 'absolute', left: '50%', marginLeft: -Space[2], width: Space[4], height: Space[4], borderRadius: Radius.full,
+  needle: { position: 'absolute', left: '50%', transform: [{ translateX: -2 }], width: 4, borderRadius: Radius.full, backgroundColor: Colors.accent },
+  hub: { position: 'absolute', left: '50%', transform: [{ translateX: -Space[2] }], width: Space[4], height: Space[4], borderRadius: Radius.full,
     borderWidth: Space[1], borderColor: Colors.accent, backgroundColor: Colors.surface },
   reading: { alignItems: 'center', gap: Space[1] },
 });
