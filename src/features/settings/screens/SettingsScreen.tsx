@@ -48,6 +48,8 @@ export function SettingsScreen() {
   const choices = <T extends string | number,>(values: readonly T[], labels: (value: T) => string) => values.map((value) => ({ value, label: labels(value) }));
   const permission = (value: string) => t('preferences.permissionValue', { value: t(`preferences.permission.${value}`, { defaultValue: t('preferences.permission.unavailable') }) });
   const voiceLanguage = settings.voiceLanguage === 'app' ? getLanguage() : settings.voiceLanguage;
+  const confirmationWord = t('preferences.confirmationWord');
+  const confirmed = confirmation.trim().toUpperCase() === confirmationWord.toUpperCase();
   const requestMicrophone = async () => {
     setRequestingMicrophone(true);
     await voiceDriver.requestPermission();
@@ -117,9 +119,9 @@ export function SettingsScreen() {
         <Button variant="secondary" label={t('preferences.deleteData')} disabled={activeEmergency || !profile.cache} onPress={() => setDeleting('data')} />
         <Button variant="logout" label={t('preferences.deleteAccount')} disabled={activeEmergency || !profile.cache} onPress={() => setDeleting('account')} />
       </> : <>
-        <Input label={t('preferences.confirmation')} value={confirmation} onChangeText={setConfirmation} autoCapitalize="characters" autoCorrect={false} />
+        <Input label={t('preferences.confirmation', { word: confirmationWord })} value={confirmation} onChangeText={setConfirmation} autoCapitalize="characters" autoCorrect={false} />
         <Button variant="destructive" label={t('preferences.confirmDelete')} loading={privacy.busy}
-          disabled={confirmation !== 'DELETE' || online !== true || activeEmergency || profile.syncing}
+          disabled={!confirmed || online !== true || activeEmergency || profile.syncing}
           onPress={() => { void privacy.erase(deleting === 'account').then((done) => { if (done) { setDeleting(null); setConfirmation(''); } }); }} />
         <Button variant="text" label={t('preferences.cancel')} disabled={privacy.busy} onPress={() => { setDeleting(null); setConfirmation(''); }} />
       </>}
