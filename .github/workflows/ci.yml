@@ -68,6 +68,9 @@ jobs:
       - name: Test map
         run: pnpm test:map
 
+      - name: Test Home dashboard and monitoring override
+        run: pnpm test:home
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks

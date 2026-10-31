@@ -11,7 +11,7 @@ import {
   Typography as LatinTypography,
 } from './tokens';
 
-export { Colors, Palette, Priority, Radius, Shadow, Space, type ThemeColor } from './tokens';
+export { Colors, Glass, Palette, Priority, Radius, Shadow, Space, type ThemeColor } from './tokens';
 
 // Switching to or from Arabic reloads the app, so these are fixed for each run.
 const arabic = isRtl(getLanguage());

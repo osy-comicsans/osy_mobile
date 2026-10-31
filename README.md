@@ -105,6 +105,10 @@ Modals can be opened from anywhere with `router.push('/check-in')`, or from a li
 
 The `todos` and `device-playground` features no longer have routes. Their code stays until location and crash detection replace it.
 
+## Home dashboard
+
+The Home dashboard shows live speed, current road/locality, cached weather, and a labelled risk example, with automatic monitoring and a persistent Pause/Resume override. Glass cards follow the shared design system. Behavior, configuration links, and device checks are documented in [docs/home.md](docs/home.md).
+
 ## Offline use
 
 The task screen has no route at the moment, so this flow needs a temporary route to try on a device. Create, rename, complete, and delete tasks with or without internet. Changes are committed locally before the list refreshes; no account, API URL, username, or password is required. Closing and reopening the app preserves tasks and queued changes. Removing the app or clearing its storage can remove this local database; it is not a cloud backup.

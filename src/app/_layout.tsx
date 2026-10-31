@@ -18,6 +18,8 @@ import { accountService } from '@/features/auth/authServices';
 import { useAccount } from '@/features/auth/hooks/useAccount';
 import { CrashDetectionProvider } from '@/features/crash-detection/providers/CrashDetectionProvider';
 import { LocationProvider } from '@/features/location/providers/LocationProvider';
+import { DrivingModeProvider } from '@/features/driving/providers/DrivingModeProvider';
+import { AreaProvider } from '@/features/location/providers/AreaProvider';
 import { RoadProvider } from '@/features/roads/providers/RoadProvider';
 import { CheckInProvider } from '@/features/safety/providers/CheckInProvider';
 
@@ -25,6 +27,10 @@ import { CheckInProvider } from '@/features/safety/providers/CheckInProvider';
 export const unstable_settings = {
   anchor: '(tabs)',
 };
+
+// Temporary Home preview: set to false to restore login in development.
+// Release builds always keep the normal account gate.
+const SKIP_LOGIN_FOR_HOME_PREVIEW = __DEV__;
 
 const OsyLightTheme = {
   ...DefaultTheme,
@@ -48,6 +54,7 @@ const OsyLightTheme = {
 export default function RootLayout() {
   const { startup, snapshot, path } = useStartup();
   const { phase } = useAccount();
+  const canAccessApp = SKIP_LOGIN_FOR_HOME_PREVIEW || phase === 'ready';
   const tone = useColorScheme() === 'dark' ? 'dark' : 'light';
   const [dismissed, setDismissed] = useState(false);
   const handleDismiss = useCallback(() => setDismissed(true), []);
@@ -59,40 +66,44 @@ export default function RootLayout() {
     <ThemeProvider value={OsyLightTheme}>
       <FontReadinessProvider ready={snapshot.tasks.fonts === 'ready'}>
         <AppProviders>
-          <LocationProvider>
-            <RoadProvider>
-              <CrashDetectionProvider>
-                <StatusBar style={!dismissed && !emergency && tone === 'dark' ? 'light' : 'dark'} />
-                <View style={styles.root} onLayout={startup.markContentReady}>
-                  <View style={styles.root} accessibilityElementsHidden={!dismissed && !emergency}
-                    importantForAccessibility={!dismissed && !emergency ? 'no-hide-descendants' : 'auto'}>
-                    <CheckInProvider>
-                      <AlertProvider>
-                        <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
-                          <Stack screenOptions={{ headerShown: false }}>
-                            <Stack.Protected guard={phase === 'ready'} redirectTo="/login">
-                              <Stack.Screen name="(tabs)" />
-                              <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
-                            </Stack.Protected>
-                            <Stack.Protected guard={phase !== 'ready'}>
-                              <Stack.Screen name="(auth)" />
-                            </Stack.Protected>
-                            <Stack.Screen
-                              name="check-in"
-                              options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
-                            />
-                            <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
-                          </Stack>
-                        </LocaleProvider>
-                      </AlertProvider>
-                    </CheckInProvider>
-                  </View>
-                  <StartupSplash snapshot={snapshot} emergency={emergency} tone={tone}
-                    onArtworkReady={startup.markArtworkReady} onDismiss={handleDismiss} />
-                </View>
-              </CrashDetectionProvider>
-            </RoadProvider>
-          </LocationProvider>
+          <DrivingModeProvider>
+            <LocationProvider>
+              <AreaProvider>
+                <RoadProvider>
+                  <CrashDetectionProvider>
+                    <StatusBar style={!dismissed && !emergency && tone === 'dark' ? 'light' : 'dark'} />
+                    <View style={styles.root} onLayout={startup.markContentReady}>
+                      <View style={styles.root} accessibilityElementsHidden={!dismissed && !emergency}
+                        importantForAccessibility={!dismissed && !emergency ? 'no-hide-descendants' : 'auto'}>
+                        <CheckInProvider>
+                          <AlertProvider>
+                            <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
+                              <Stack screenOptions={{ headerShown: false }}>
+                                <Stack.Protected guard={canAccessApp} redirectTo="/login">
+                                  <Stack.Screen name="(tabs)" />
+                                  <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
+                                </Stack.Protected>
+                                <Stack.Protected guard={!canAccessApp}>
+                                  <Stack.Screen name="(auth)" />
+                                </Stack.Protected>
+                                <Stack.Screen
+                                  name="check-in"
+                                  options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+                                />
+                                <Stack.Screen name="alert/[id]" options={{ presentation: 'modal' }} />
+                              </Stack>
+                            </LocaleProvider>
+                          </AlertProvider>
+                        </CheckInProvider>
+                      </View>
+                      <StartupSplash snapshot={snapshot} emergency={emergency} tone={tone}
+                        onArtworkReady={startup.markArtworkReady} onDismiss={handleDismiss} />
+                    </View>
+                  </CrashDetectionProvider>
+                </RoadProvider>
+              </AreaProvider>
+            </LocationProvider>
+          </DrivingModeProvider>
         </AppProviders>
       </FontReadinessProvider>
     </ThemeProvider>

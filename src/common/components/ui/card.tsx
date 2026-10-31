@@ -1,7 +1,8 @@
 import type { PropsWithChildren } from 'react';
 import { StyleSheet, View, type ViewProps } from 'react-native';
 
-import { Colors, Radius, Shadow } from '@/common/lib/theme';
+import { Colors, Glass, Radius, Shadow } from '@/common/lib/theme';
+import { GlassBackdrop } from './glass-backdrop';
 
 export type CardTone = 'surface' | 'muted' | 'accentSoft';
 
@@ -9,6 +10,7 @@ export type CardProps = PropsWithChildren<
   ViewProps & {
     tone?: CardTone;
     padded?: boolean;
+    glass?: boolean;
   }
 >;
 
@@ -18,11 +20,12 @@ const toneStyles = {
   accentSoft: { backgroundColor: Colors.accentSoft },
 } as const;
 
-export function Card({ tone = 'surface', padded = true, style, children, ...rest }: CardProps) {
+export function Card({ tone = 'surface', padded = true, glass = false, style, children, ...rest }: CardProps) {
   return (
     <View
-      style={[styles.base, toneStyles[tone], padded && styles.padded, style]}
+      style={[styles.base, glass ? styles.glass : toneStyles[tone], padded && styles.padded, style]}
       {...rest}>
+      {glass ? <GlassBackdrop accented={tone === 'accentSoft'} /> : null}
       {children}
     </View>
   );
@@ -35,4 +38,5 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   padded: { padding: 24 },
+  glass: { overflow: 'hidden', backgroundColor: 'transparent', borderColor: Glass.edge, boxShadow: Shadow.soft },
 });

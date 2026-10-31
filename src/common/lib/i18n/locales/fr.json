@@ -252,6 +252,48 @@
       "invalid_response": "Le serveur a envoyé une réponse inattendue."
     }
   },
+  "dashboard": {
+    "eyebrow": "OSY · Aperçu en direct",
+    "title": "Votre trajet en un regard",
+    "subtitle": "Votre route, votre allure, votre environnement.",
+    "monitoring": {
+      "restoring": "Restauration de la préférence de surveillance",
+      "paused": "Surveillance de conduite en pause",
+      "automatic": "Surveillance automatique prête",
+      "monitoring": "Surveillance de conduite active",
+      "waiting": "En attente de mesures récentes",
+      "limited": "Surveillance limitée",
+      "automaticDetail": "La surveillance suit vos déplacements lorsque l’application est ouverte.",
+      "pausedDetail": "La position et la météo restent disponibles pendant la pause.",
+      "limitedDetail": "Certaines autorisations ou certains capteurs sont indisponibles. Consultez les messages ci-dessous.",
+      "saveError": "La surveillance est en pause. Votre préférence n’a pas pu être lue ou enregistrée."
+    },
+    "speed": {
+      "title": "Vitesse actuelle", "waiting": "En attente du GPS", "loading": "Chargement de la vitesse", "unit": "km/h",
+      "limit": "Limitation de vitesse", "limitUnknown": "Indisponible", "signed": "Limite signalée · OpenStreetMap", "default": "Limite par défaut · non signalée"
+    },
+    "location": {
+      "title": "Votre position", "map": "Voir la carte", "loading": "Recherche d’une position GPS",
+      "permission": "Autorisez la localisation pour obtenir des mesures en direct.", "unavailable": "Position en direct indisponible.",
+      "stale": "En attente d’une position récente. Les dernières informations peuvent être périmées.", "live": "Position en direct",
+      "roadUnknown": "Route non identifiée", "areaLoading": "Recherche de la zone…", "areaUnknown": "Zone indisponible",
+      "lastRoad": "Dernière route confirmée", "lastArea": "Dernière zone connue",
+      "coordinates": "Coordonnées : {{latitude}}, {{longitude}}", "updated": "Position actualisée à {{time}}", "heading": "Direction {{value}}°",
+      "attribution": "© Contributeurs OpenStreetMap"
+    },
+    "risk": {
+      "title": "Risque d’accident", "preview": "DONNÉES D’EXEMPLE", "scale": "sur 100",
+      "low": "Faible", "moderate": "Modéré", "high": "Élevé", "unknown": "Non évalué",
+      "exampleDescription": "Évaluation d’exemple uniquement. Ce n’est pas une estimation du risque en direct.",
+      "factors": "Facteurs d’exemple", "liveFactors": "Principaux facteurs",
+      "factorWet": "Chaussée mouillée", "factorVisibility": "Visibilité réduite"
+    },
+    "actions": {
+      "title": "Actions rapides", "pause": "Mettre en pause", "resume": "Reprendre",
+      "hint": "La pause de surveillance n’annule pas une vérification d’urgence."
+    },
+    "weather": { "more": "Détails météo", "less": "Masquer les détails" }
+  },
   "weather": {
     "title": "Météo",
     "refresh": "Actualiser",
