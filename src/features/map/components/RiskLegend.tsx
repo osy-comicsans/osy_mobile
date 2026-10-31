@@ -39,7 +39,7 @@ export function RiskLegend({ visible, onToggle, status }: RiskLegendProps) {
             {RISK_LEVELS.map((level) => (
               <View key={level} style={styles.level}>
                 <View style={[styles.swatch, { backgroundColor: RISK_LEVEL_COLORS[level] }]} />
-                <ThemedText type="label" themeColor="textSecondary">{t(`roadRisk.level.${level}`)}</ThemedText>
+                <ThemedText type="label" themeColor="textSecondary">{t(level === 'high' ? 'roadRisk.dangerous' : `roadRisk.level.${level}`)}</ThemedText>
               </View>
             ))}
           </View>

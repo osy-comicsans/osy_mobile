@@ -508,6 +508,8 @@
       "hazard": "Road hazard"
     },
     "hazardDistance": "{{name}} in {{distance}}",
+    "dangerous": "Dangerous road",
+    "dangerLabel": "DANGEROUS",
     "hazardsNearby": "Road hazards ahead",
     "warningOne": "{{first}}. Slow down.",
     "warningTwo": "{{first}}, {{second}}. Slow down."
@@ -663,6 +665,8 @@
     "connectToLoad": "Connect once to load and save your account for offline use."
   },
   "nearby": {
+    "driver": "Driver",
+    "vehicle": "Car",
     "severity": {
       "minor": "Minor accident",
       "serious": "Serious accident",

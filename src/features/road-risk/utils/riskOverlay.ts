@@ -45,6 +45,19 @@ export function toRiskFeatures(segments: RoadSegment[], risks: Map<string, Segme
   });
 }
 
+// A road is split into segments, so every part sharing the current one's name is lit.
+export function currentRoadFeatures(segments: RoadSegment[], current: RoadSegment | null): OverlayFeature[] {
+  if (!current) return [];
+  const parts = current.name ? segments.filter(({ name }) => name === current.name) : [];
+  return (parts.length ? parts : [current]).map(({ id, coordinates }) => ({
+    id: `current-${id}`,
+    geometry: {
+      type: 'LineString' as const,
+      coordinates: coordinates.map(({ latitude, longitude }): [number, number] => [longitude, latitude]),
+    },
+  }));
+}
+
 export type RiskMapStatus = 'ready' | 'loading' | 'failed';
 
 export function riskMapStatus(queries: { isLoading: boolean; isError: boolean }[]): RiskMapStatus {

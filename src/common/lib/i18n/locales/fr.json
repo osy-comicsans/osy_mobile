@@ -508,6 +508,8 @@
       "hazard": "Danger"
     },
     "hazardDistance": "{{name}} dans {{distance}}",
+    "dangerous": "Route dangereuse",
+    "dangerLabel": "DANGEREUX",
     "hazardsNearby": "Dangers à venir",
     "warningOne": "{{first}}. Ralentissez.",
     "warningTwo": "{{first}}, {{second}}. Ralentissez."
@@ -663,6 +665,8 @@
     "connectToLoad": "Connectez-vous une fois pour charger le compte et le conserver hors ligne."
   },
   "nearby": {
+    "driver": "Conducteur",
+    "vehicle": "Voiture",
     "severity": {
       "minor": "Accident léger",
       "serious": "Accident grave",

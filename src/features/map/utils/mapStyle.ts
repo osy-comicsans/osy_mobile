@@ -12,3 +12,4 @@ export function mapStyleUrl(scheme: string | null | undefined): string {
 export const DEFAULT_CENTER: [number, number] = [3.0588, 36.7538];
 export const DEFAULT_ZOOM = 11;
 export const FOLLOW_ZOOM = 16;
+export const ROUTE_ZOOM = 13;

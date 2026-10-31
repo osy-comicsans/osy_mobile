@@ -508,6 +508,8 @@
       "hazard": "خطر على الطريق"
     },
     "hazardDistance": "{{name}} بعد {{distance}}",
+    "dangerous": "طريق خطير",
+    "dangerLabel": "خطير",
     "hazardsNearby": "مخاطر على الطريق أمامك",
     "warningOne": "{{first}}. خفف السرعة.",
     "warningTwo": "{{first}}، {{second}}. خفف السرعة."
@@ -663,6 +665,8 @@
     "connectToLoad": "اتصل مرة واحدة لتحميل الحساب وحفظه للاستخدام دون اتصال."
   },
   "nearby": {
+    "driver": "السائق",
+    "vehicle": "السيارة",
     "severity": {
       "minor": "حادث بسيط",
       "serious": "حادث خطير",

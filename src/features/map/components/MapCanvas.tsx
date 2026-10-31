@@ -18,6 +18,8 @@ export interface MapCanvasHandle {
 
 interface MapCanvasProps {
   following: boolean;
+  dangerLabel: string;
+  zoom: number | undefined;
   overlays: MapOverlays;
   onFollowingChange: (following: boolean) => void;
   onViewChange: (bounds: Bounds) => void;
@@ -27,13 +29,14 @@ interface MapCanvasProps {
 const RISK_HITBOX = { top: 12, right: 12, bottom: 12, left: 12 };
 
 export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function MapCanvas(
-  { following, overlays, onFollowingChange, onViewChange, onRoadPress },
+  { following, dangerLabel, zoom, overlays, onFollowingChange, onViewChange, onRoadPress },
   ref,
 ) {
   const camera = useRef<CameraRef>(null);
   const theme = useTheme();
   const scheme = theme.background === Colors.background ? 'light' : 'dark';
   // A new object makes MapLibre rebuild the layer, so it only changes with the roads.
+  const currentRoad = useMemo(() => toFeatureCollection(overlays['current-road']), [overlays]);
   const riskRoads = useMemo(() => toFeatureCollection(overlays['risk-roads']), [overlays]);
   const hazards = useMemo(() => toFeatureCollection(overlays.hazards), [overlays]);
   const route = useMemo(() => toFeatureCollection(overlays.route), [overlays]);
@@ -54,6 +57,7 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
       <Camera
         ref={camera}
         initialViewState={{ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM }}
+        zoom={zoom}
         trackUserLocation={following ? 'course' : undefined}
         // Dragging the map ends tracking, so the recenter button can bring it back.
         onTrackUserLocationChange={({ nativeEvent }) => onFollowingChange(nativeEvent.trackUserLocation !== null)}
@@ -72,10 +76,30 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
           type="line"
           style={{
             lineColor: ['match', ['get', 'level'], 'high', RISK_LEVEL_COLORS.high, 'medium', RISK_LEVEL_COLORS.medium, RISK_LEVEL_COLORS.low],
-            lineWidth: 5,
-            lineOpacity: 0.7,
+            lineWidth: ['match', ['get', 'level'], 'high', 7, 5],
+            lineOpacity: ['match', ['get', 'level'], 'high', 0.95, 0.7],
           }}
         />
+        <Layer
+          id="risk-roads-danger"
+          type="symbol"
+          filter={['==', ['get', 'level'], 'high']}
+          style={{
+            symbolPlacement: 'line',
+            symbolSpacing: 220,
+            textField: dangerLabel,
+            textFont: ['Noto Sans Bold'],
+            textSize: 11,
+            textColor: Colors.error,
+            textHaloColor: Colors.surface,
+            textHaloWidth: 2,
+            textOffset: [0, -1.1],
+          }}
+        />
+      </GeoJSONSource>
+      <GeoJSONSource id="current-road" data={currentRoad}>
+        <Layer id="current-road-casing" type="line" style={{ lineColor: Colors.surface, lineWidth: 11, lineCap: 'round', lineJoin: 'round' }} />
+        <Layer id="current-road-line" type="line" style={{ lineColor: Colors.accent, lineWidth: 6, lineCap: 'round', lineJoin: 'round' }} />
       </GeoJSONSource>
       <GeoJSONSource id="hazards" data={hazards}>
         <Layer
