@@ -90,6 +90,7 @@
     "background": {
       "serviceTitle": "OSY is watching your drive",
       "serviceBody": "Crash detection is on.",
+      "serviceBodyDetectionOff": "Using your location while you drive.",
       "title": "Keep crash detection on",
       "body": "OSY needs your location all the time to notice a crash while your phone is locked or another app is open. It runs at full power only while you drive, and your location is not recorded."
     }

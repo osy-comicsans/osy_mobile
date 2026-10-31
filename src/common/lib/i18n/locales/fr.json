@@ -90,6 +90,7 @@
     "background": {
       "serviceTitle": "OSY surveille votre trajet",
       "serviceBody": "La détection d’accident est activée.",
+      "serviceBodyDetectionOff": "Utilise votre position pendant que vous conduisez.",
       "title": "Gardez la détection d’accident active",
       "body": "OSY a besoin de votre position en permanence pour détecter un accident lorsque votre téléphone est verrouillé ou qu’une autre application est ouverte. Il ne fonctionne à pleine puissance que pendant la conduite, et votre position n’est pas enregistrée."
     }
