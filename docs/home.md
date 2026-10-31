@@ -13,7 +13,7 @@ Cards use the shared OSY purple, lavender, charcoal, spacing, Gabarito/Arabic ty
 - Road name and refs reuse OSRM matching while driving. Paused or stopped matching marks the retained road stale. This change does not add a durable road cache or road-rules dataset.
 - Area names use native reverse geocoding, coalesced into approximately 1 km cells, at most once a minute. SQLite caches up to 60 coarse area labels for seven days, refreshing labels after one day. No raw GPS trace is stored or added to cloud sync. The device's platform geocoder may require a network connection; cached labels and coordinates remain usable without one. Web shows coordinates and the unavailable-area text.
 - Weather reuses the existing cached query and offline repository. The compact card expands for astronomy, icing guidance, and the next hours. See [weather configuration](weather.md).
-- Speed limits stay **unknown** until a real road-rules source exists. OSRM travel speeds are never presented as legal limits.
+- Speed limits and nearby hazards come from OpenStreetMap, through `useRoadRules()`. A road with no marked limit stays **unknown**, and OSRM travel speeds are never presented as legal limits.
 - Risk is a clearly labelled **static example**, including its sample factors. It neither consumes live readings nor triggers alerts. `useRiskAssessment()` is the replacement point for the future model.
 
 ## Automatic monitoring and manual override
