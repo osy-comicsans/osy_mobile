@@ -340,5 +340,6 @@ test('the mock backend answers nearby incidents', async () => {
   const storage = { value: null, getItem() { return this.value; }, setItem(_key, value) { this.value = value; } };
   const client = create({ adapter: createMockBackend(storage, 0), headers: { Authorization: 'Bearer mock-access.mock-demo' } });
   const { incidents } = await createSafetyApi(client).getNearbyIncidents({ latitude: 36.75, longitude: 3.05, radiusKm: 3 });
-  assert.deepEqual(incidents, []);
+  // Each area has one test accident, for nearby alerts.
+  assert.equal(incidents.length, 1);
 });

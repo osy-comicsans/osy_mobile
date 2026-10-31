@@ -101,6 +101,8 @@ src/app/
 
 After a crash, `check-in` waits 30, then 60, then 90 seconds. With no answer it calls `escalateCheckIn()`, which stays empty until #8.
 
+The check-in can also be answered by voice. At the start of each round it asks out loud with `expo-speech`, then listens through `expo-speech-recognition` for "I'm OK" or "Help" in English, French, or Arabic, including some Algerian Darija. Only short, final replies count, and "help" or "not OK" outranks "OK", so a radio or a misheard word is less likely to call off help. After escalating it keeps listening, and "I'm OK" cancels the request. With no microphone permission, no recognizer, or a build made before the module was added, the screen says so and the buttons work as before. Recognition needs a development build; Expo Go and the web preview fall back to the buttons.
+
 Modals can be opened from anywhere with `router.push('/check-in')`, or from a link such as `osymobile://check-in`. The root anchor keeps the tabs beneath a modal opened from a link. `check-in` disables the swipe-down gesture, so it needs an explicit way to leave.
 
 The `todos` and `device-playground` features no longer have routes. Their code stays until location and crash detection replace it.
@@ -170,6 +172,7 @@ Users must sign in and add both documents before they can reach the tabs. With n
 | Wrong password | Sign in with the password `Wrong123` |
 | Lost connection | Use `offline@osy.test` |
 | Rejected document | Put `REJECT` in any document field |
+| Accident nearby | Signed in, every area has one test accident about 1.5 km north. It raises a nearby alert once, and Navigate draws the route on the map (development build) |
 
 Documents are read on the phone with PaddleOCR, which needs a development build. Expo Go falls back to sample values under the mock. PDFs skip OCR, so their details are typed by hand.
 

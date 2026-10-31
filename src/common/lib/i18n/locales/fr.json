@@ -135,7 +135,15 @@
     "escalatedTitle": "Nous n’avons pas pu confirmer que tout va bien",
     "seconds": "secondes",
     "confirmedTitle": "Tant mieux, tout va bien",
-    "backHome": "Retour à l’accueil"
+    "backHome": "Retour à l’accueil",
+    "voice": {
+      "prompt": "Tout va bien ? Dites « Je vais bien » ou « Au secours ».",
+      "speaking": "Question posée à voix haute",
+      "listening": "J’écoute. Dites « Je vais bien » ou « Au secours ».",
+      "listeningEscalated": "J’écoute. Dites « Je vais bien » pour annuler la demande d’aide.",
+      "denied": "Le micro est désactivé. Répondez avec les boutons.",
+      "unavailable": "La réponse vocale n’est pas disponible sur ce téléphone. Répondez avec les boutons."
+    }
   },
   "auth": {
     "loginTitle": "Bon retour",
@@ -631,5 +639,18 @@
     "offline": "Hors ligne · informations enregistrées du compte",
     "unavailable": "Profil pas encore disponible",
     "connectToLoad": "Connectez-vous une fois pour charger le compte et le conserver hors ligne."
+  },
+  "nearby": {
+    "severity": {
+      "minor": "Accident léger",
+      "serious": "Accident grave",
+      "critical": "Accident très grave"
+    },
+    "navigate": "Itinéraire",
+    "routeTitle": "Itinéraire vers l’accident",
+    "routeSummary": "{{distance}}, environ {{minutes}} min",
+    "routeLoading": "Recherche d’un itinéraire",
+    "routeFailed": "Aucun itinéraire trouvé. Vérifiez votre connexion.",
+    "endRoute": "Terminer"
   }
 }

@@ -46,6 +46,8 @@ interface EscalationOptions {
     removeItem(key: string): Promise<void>;
   };
   createId: () => string;
+  // Told the id of the incident this escalation reports, so nearby alerts skip it.
+  onIncident?: (id: string) => void;
   now?: () => number;
   shareMedicalInfo?: () => boolean;
 }
@@ -54,7 +56,9 @@ const STORAGE_KEY = 'osy.escalation.pending';
 const RETRY_MS = 15_000;
 const SHARE_LOCATION_MS = 30_000;
 
-export function createEscalationService({ api, location, currentRoad, storage, createId, shareMedicalInfo, now = Date.now }: EscalationOptions) {
+export function createEscalationService({
+  api, location, currentRoad, storage, createId, onIncident, shareMedicalInfo, now = Date.now,
+}: EscalationOptions) {
   const store = createStore<EscalationState>(() => ({ status: 'idle', liveLocationUrl: null, audit: [] }));
   let pending: PendingEscalation | null = null;
   let retryTimer: ReturnType<typeof setTimeout> | undefined;
@@ -137,6 +141,7 @@ export function createEscalationService({ api, location, currentRoad, storage, c
       const road = currentRoad();
       const coordinate = { latitude: place.latitude, longitude: place.longitude };
       const incidentId = createId();
+      onIncident?.(incidentId);
       pending = {
         sent: false,
         audit: [],

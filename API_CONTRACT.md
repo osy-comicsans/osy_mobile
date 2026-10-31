@@ -26,6 +26,7 @@ Rules for the backend:
 - `data` contains `alertId` (required and unique per alert), `alertType` (required), `roadName`, and `distanceMeters`, all as strings.
 - Send with `priority: high` and `sound: default`.
 - Keep the same `alertId` when retrying, because the app ignores a repeat for 10 minutes.
+- For `accident_nearby`, `alertId` is the incident's `id`, so the app can look up its location for a route. Never send it to the user who reported the incident or crashed.
 - Remove tokens that Expo reports as `DeviceNotRegistered`.
 
 ## Authentication

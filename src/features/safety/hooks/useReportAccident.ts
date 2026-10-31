@@ -7,6 +7,7 @@ import { deleteCapturedFiles, type PickedFile } from '@/features/auth/native/doc
 
 import { createSafetyApi } from '../api/safetyApi';
 import { reportPhotos } from '../native/reportPhotos';
+import { nearbyIncidents } from '../nearbyServices';
 import { reportPhotoName, toIncidentRequest, type AccidentReportForm } from '../utils/accidentReport';
 
 const safetyApi = createSafetyApi(api);
@@ -23,6 +24,7 @@ export function useReportAccident() {
     setSaving(true);
     setFailed(false);
     const report = toIncidentRequest(form, createId(), Date.now());
+    void nearbyIncidents.markOwn(report.id);
     const photoName = photo ? reportPhotoName(report.id, photo.mimeType) : null;
     try {
       // The web build has no local database, so it can only send straight away.

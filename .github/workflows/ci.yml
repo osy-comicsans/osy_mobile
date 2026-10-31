@@ -89,6 +89,12 @@ jobs:
       - name: Risk warning tests
         run: pnpm test:risk-warnings
 
+      - name: Voice check-in tests
+        run: pnpm test:voice
+
+      - name: Nearby accident tests
+        run: pnpm test:nearby
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks

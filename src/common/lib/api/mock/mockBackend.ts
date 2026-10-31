@@ -7,6 +7,7 @@ import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRe
 // taken@osy.test    needs documents, also shows the "already registered" error
 // offline@osy.test  fails like a lost connection
 // Password `Wrong123`, or any document field containing REJECT, shows that failure.
+// Every area has one test accident about 1.5 km north, for nearby alerts.
 
 const STORAGE_KEY = 'osy.mock.backend';
 const LATENCY_MS = 400;
@@ -63,6 +64,25 @@ const seedUsers: MockUser[] = [
     mobileNumber: '+213555000000', documents: emptyDocuments(),
   },
 ];
+
+// Fixed to the asker's ~1 km grid cell, so each area has one stable accident
+// instead of a new one on every check.
+function mockNearbyIncident(latitude: number, longitude: number) {
+  const cellLatitude = Math.round(latitude * 100) / 100;
+  const cellLongitude = Math.round(longitude * 100) / 100;
+  const cell = `${Math.abs(Math.round(latitude * 100))}${Math.abs(Math.round(longitude * 100))}`;
+  return {
+    id: `00000000-0000-4000-8000-${cell.padStart(12, '0').slice(-12)}`,
+    source: 'user_report',
+    location: { latitude: cellLatitude + 0.0135, longitude: cellLongitude },
+    occurredAt: new Date(Date.now() - 6 * 60_000).toISOString(),
+    type: 'collision',
+    severity: 'serious',
+    injuriesVisible: true,
+    roadName: 'RN 5',
+    distanceMeters: 1500,
+  };
+}
 
 function fail(status: number, code: string, message: string, fields?: Record<string, string>): MockReply {
   return { status, data: { error: { code, message, ...(fields ? { fields } : {}) } } };
@@ -201,7 +221,10 @@ export function createMockBackend(storage: MockStorage, latency = LATENCY_MS, op
     if (request.method?.toUpperCase() === 'POST' && /^\/incidents\/[^/]+\/photo$/.test(request.url ?? '')) {
       return { status: 204 };
     }
-    if (key === 'GET /incidents/nearby') return { status: 200, data: { incidents: [] } };
+    if (key === 'GET /incidents/nearby') {
+      const { latitude, longitude } = request.params as { latitude: number; longitude: number };
+      return { status: 200, data: { incidents: [mockNearbyIncident(latitude, longitude)] } };
+    }
     if (key === 'POST /emergency/escalate') {
       return { status: 201, data: { id: body.id, status: 'escalating', liveLocationUrl: null } };
     }

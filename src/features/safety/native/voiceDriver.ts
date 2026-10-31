@@ -1,0 +1,80 @@
+import type { Language } from '@/common/lib/i18n/languages';
+import { speak, stopSpeaking } from '@/common/lib/native/speech';
+
+import type { VoiceDriver } from '../utils/voiceCheckIn';
+
+type Recognition = typeof import('expo-speech-recognition').ExpoSpeechRecognitionModule;
+type Subscription = ReturnType<Recognition['addListener']>;
+
+// Loaded on use, because a build made before this module was added has no native
+// side and would crash on import. Voice then reports itself unavailable.
+function recognition(): Recognition | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return (require('expo-speech-recognition') as typeof import('expo-speech-recognition'))
+      .ExpoSpeechRecognitionModule;
+  } catch {
+    return null;
+  }
+}
+
+// ar-SA is the Arabic recognizer both platforms offer.
+const locales: Record<Language, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-SA' };
+
+let subscriptions: Subscription[] = [];
+
+const release = () => {
+  subscriptions.forEach((subscription) => subscription.remove());
+  subscriptions = [];
+};
+
+export const voiceDriver: VoiceDriver = {
+  available: () => recognition()?.isRecognitionAvailable() ?? false,
+
+  requestPermission: async () => {
+    try {
+      return (await recognition()?.requestPermissionsAsync())?.granted ?? false;
+    } catch {
+      return false;
+    }
+  },
+
+  speak,
+  stopSpeaking,
+
+  listen(language, phrases, handlers) {
+    release();
+    const module = recognition();
+    if (!module) {
+      handlers.onError('service-not-allowed');
+      handlers.onEnd();
+      return;
+    }
+    subscriptions = [
+      module.addListener('result', ({ results, isFinal }) => {
+        handlers.onResult(results.map(({ transcript }) => transcript), isFinal);
+      }),
+      module.addListener('volumechange', ({ value }) => handlers.onLevel(value)),
+      module.addListener('error', ({ error }) => handlers.onError(error)),
+      module.addListener('end', () => {
+        release();
+        handlers.onEnd();
+      }),
+    ];
+    module.start({
+      lang: locales[language],
+      interimResults: false,
+      maxAlternatives: 3,
+      contextualStrings: phrases,
+      // Both settings tune the recognizer for a short answer rather than dictation.
+      iosTaskHint: 'confirmation',
+      androidIntentOptions: { EXTRA_LANGUAGE_MODEL: 'web_search' },
+      volumeChangeEventOptions: { enabled: true, intervalMillis: 100 },
+    });
+  },
+
+  stopListening() {
+    release();
+    recognition()?.abort();
+  },
+};

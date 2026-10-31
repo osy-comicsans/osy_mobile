@@ -14,7 +14,9 @@ import { useTheme } from '@/common/hooks/use-theme';
 
 import { CountdownRing } from '../components/CountdownRing';
 import { EscalationPanel } from '../components/EscalationPanel';
+import { VoiceIndicator } from '../components/VoiceIndicator';
 import { useCheckInService, useCheckInState } from '../hooks/useCheckIn';
+import { useVoiceCheckIn } from '../hooks/useVoiceCheckIn';
 
 const SHARED_ITEMS = ['location', 'road', 'speed'] as const;
 const CONFIRMED_DURATION = 1500;
@@ -45,6 +47,7 @@ export function CheckInScreen() {
   const escalated = status === 'escalated';
   const confirmed = status === 'confirmed';
   const language = getLanguage();
+  const voice = useVoiceCheckIn();
 
   // Covers a check-in opened from a notification or a link.
   useEffect(() => service.begin(), [service]);
@@ -110,6 +113,8 @@ export function CheckInScreen() {
             {t('checkIn.stillWaiting')}
           </ThemedText>
         )}
+
+        {!confirmed && <VoiceIndicator voice={voice} escalated={escalated} />}
 
         {confirmed && (
           <View style={styles.actions}>

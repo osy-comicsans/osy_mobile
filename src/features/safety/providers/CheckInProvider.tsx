@@ -9,6 +9,7 @@ import { RoadContext } from '@/features/roads/providers/RoadProvider';
 import { settingsService } from '@/features/settings/settingsService';
 
 import { createSafetyApi } from '../api/safetyApi';
+import { nearbyIncidents } from '../nearbyServices';
 import { createCheckInService, type CheckInService } from '../utils/checkInService';
 import { createEscalationService, type EscalationService } from '../utils/escalationService';
 
@@ -29,6 +30,7 @@ export function CheckInProvider({ children }: PropsWithChildren) {
     currentRoad: () => road?.store.getState().road ?? null,
     storage: secureStorage,
     createId: randomUUID,
+    onIncident: (id) => void nearbyIncidents.markOwn(id),
     shareMedicalInfo: () => {
       const state = settingsService.store.getState();
       return state.ready && state.consentOwner !== null && state.consentOwner === authSession.status.getState().userId && state.settings.shareMedicalInfo;
