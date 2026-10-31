@@ -275,30 +275,57 @@
       "saveError": "Monitoring is paused. Your saved preference could not be read or updated."
     },
     "speed": {
-      "title": "Current speed", "waiting": "Waiting for GPS", "loading": "Loading live speed", "unit": "km/h",
-      "limit": "Road speed limit", "limitUnknown": "Not available", "signed": "Signed limit · OpenStreetMap", "default": "Default limit · not a signed limit"
+      "title": "Current speed",
+      "waiting": "Waiting for GPS",
+      "loading": "Loading live speed",
+      "unit": "km/h",
+      "limit": "Road speed limit",
+      "limitUnknown": "Not available",
+      "signed": "Signed limit · OpenStreetMap",
+      "default": "Default limit · not a signed limit"
     },
     "location": {
-      "title": "Where you are", "map": "View map", "loading": "Getting a GPS fix",
-      "permission": "Allow location access for live readings.", "unavailable": "Live location is unavailable.",
-      "stale": "Waiting for a recent position. Last-known details may be out of date.", "live": "Live position",
-      "roadUnknown": "Road not identified yet", "areaLoading": "Finding the area…", "areaUnknown": "Area unavailable",
-      "lastRoad": "Last confirmed road", "lastArea": "Last-known area",
-      "coordinates": "Coordinates: {{latitude}}, {{longitude}}", "updated": "Position updated {{time}}", "heading": "Heading {{value}}°",
+      "title": "Where you are",
+      "map": "View map",
+      "loading": "Getting a GPS fix",
+      "permission": "Allow location access for live readings.",
+      "unavailable": "Live location is unavailable.",
+      "stale": "Waiting for a recent position. Last-known details may be out of date.",
+      "live": "Live position",
+      "roadUnknown": "Road not identified yet",
+      "areaLoading": "Finding the area…",
+      "areaUnknown": "Area unavailable",
+      "lastRoad": "Last confirmed road",
+      "lastArea": "Last-known area",
+      "coordinates": "Coordinates: {{latitude}}, {{longitude}}",
+      "updated": "Position updated {{time}}",
+      "heading": "Heading {{value}}°",
       "attribution": "© OpenStreetMap contributors"
     },
     "risk": {
-      "title": "Accident risk", "preview": "EXAMPLE DATA", "scale": "out of 100",
-      "low": "Low", "moderate": "Moderate", "high": "High", "unknown": "Not assessed",
+      "title": "Accident risk",
+      "preview": "EXAMPLE DATA",
+      "scale": "out of 100",
+      "low": "Low",
+      "moderate": "Moderate",
+      "high": "High",
+      "unknown": "Not assessed",
       "exampleDescription": "Example assessment only. This is not a live risk estimate.",
-      "factors": "Example factors", "liveFactors": "Top factors",
-      "factorWet": "Wet road surface", "factorVisibility": "Reduced visibility"
+      "factors": "Example factors",
+      "liveFactors": "Top factors",
+      "factorWet": "Wet road surface",
+      "factorVisibility": "Reduced visibility"
     },
     "actions": {
-      "title": "Quick actions", "pause": "Pause monitoring", "resume": "Resume monitoring",
+      "title": "Quick actions",
+      "pause": "Pause monitoring",
+      "resume": "Resume monitoring",
       "hint": "Pausing monitoring does not cancel an emergency check-in."
     },
-    "weather": { "more": "Weather details", "less": "Hide details" }
+    "weather": {
+      "more": "Weather details",
+      "less": "Hide details"
+    }
   },
   "weather": {
     "title": "Weather",
@@ -453,6 +480,24 @@
       "darkness": "Dark, poorly lit road",
       "speeding": "Speed above the limit",
       "incidents": "Recent accidents nearby"
-    }
+    },
+    "legendTitle": "Road risk",
+    "show": "Show road risk",
+    "zoomIn": "Zoom in to see road risk.",
+    "loading": "Loading road data…",
+    "failed": "Some road data could not load.",
+    "credit": "Road data © OpenStreetMap contributors",
+    "estimate": "An estimate, not a guarantee that a road is safe.",
+    "noWeather": "Weather is unavailable, so this may be too low.",
+    "close": "Close",
+    "hazard": {
+      "bump": "Speed bump",
+      "camera": "Speed camera",
+      "school": "School",
+      "animals": "Animals",
+      "hazard": "Road hazard"
+    },
+    "hazardDistance": "{{name}} in {{distance}} m",
+    "hazardsNearby": "Road hazards ahead"
   }
 }
