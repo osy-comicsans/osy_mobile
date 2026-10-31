@@ -168,6 +168,7 @@ Users must sign in and add both documents before they can reach the tabs. With n
 | Wrong password | Sign in with the password `Wrong123` |
 | Lost connection | Use `offline@osy.test` |
 | Rejected document | Put `REJECT` in any document field |
+| Accident nearby | Signed in, every area has one test accident about 1.5 km north. It raises a nearby alert once, and Navigate draws the route on the map (development build) |
 
 Documents are read on the phone with PaddleOCR, which needs a development build. Expo Go falls back to sample values under the mock. PDFs skip OCR, so their details are typed by hand.
 
