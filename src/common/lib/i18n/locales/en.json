@@ -135,7 +135,15 @@
     "escalatedTitle": "We could not confirm you’re OK",
     "seconds": "seconds",
     "confirmedTitle": "Glad you’re OK",
-    "backHome": "Back to home"
+    "backHome": "Back to home",
+    "voice": {
+      "prompt": "Are you OK? Say “I’m OK” or “Help”.",
+      "speaking": "Asking you out loud",
+      "listening": "Listening. Say “I’m OK” or “Help”.",
+      "listeningEscalated": "Listening. Say “I’m OK” to cancel the request for help.",
+      "denied": "The microphone is off. Answer with the buttons.",
+      "unavailable": "Voice answers are not available on this phone. Answer with the buttons."
+    }
   },
   "auth": {
     "loginTitle": "Welcome back",
