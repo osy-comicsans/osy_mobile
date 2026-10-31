@@ -9,7 +9,7 @@ import { Space } from '@/common/lib/theme';
 import { useAlertService, useAlertState } from '../hooks/useAlerts';
 import { alertDriver } from '../native/alertDriver';
 
-export function AlertPermissionCard() {
+export function AlertPermissionCard({ glass = false }: { glass?: boolean }) {
   const { t } = useTranslation();
   const service = useAlertService();
   const { permission, canAskAgain, requesting } = useAlertState();
@@ -18,7 +18,7 @@ export function AlertPermissionCard() {
   const denied = permission === 'denied';
 
   return (
-    <Card tone="accentSoft" style={styles.card}>
+    <Card glass={glass} tone="accentSoft" style={styles.card}>
       <ThemedText type="headingS">{t(denied ? 'alerts.permission.deniedTitle' : 'alerts.permission.requestTitle')}</ThemedText>
       <ThemedText type="body" themeColor="textSecondary">
         {t(denied ? 'alerts.permission.deniedBody' : 'alerts.permission.requestBody')}

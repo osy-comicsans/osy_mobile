@@ -1,6 +1,7 @@
 import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
@@ -12,7 +13,9 @@ import { Colors, Radius, Space } from '@/common/lib/theme';
 
 import { useWeather } from '../hooks/useWeather';
 
-export function WeatherWidget() {
+export function WeatherWidget({ compact = false, glass = false }: { compact?: boolean; glass?: boolean }) {
+  const [expanded, setExpanded] = useState(false);
+  const showDetails = !compact || expanded;
   const weather = useWeather();
   const { t } = useTranslation();
   const language = getLanguage();
@@ -26,7 +29,7 @@ export function WeatherWidget() {
     : weather.awaitingLocation ? 'locationRequired' : 'unavailable';
 
   return (
-    <Card style={styles.card}>
+    <Card glass={glass} style={styles.card}>
       <View style={styles.header}>
         <ThemedText type="headingS">{t('weather.title')}</ThemedText>
         <Button label={t('weather.refresh')} variant="text" size="small"
@@ -55,15 +58,17 @@ export function WeatherWidget() {
             })} />
             <Metric label={t('weather.visibility')} value={t('weather.metres', { value: number(value.current.visibilityM) })} />
             <Metric label={t('weather.wind')} value={t('weather.windValue', { value: number(value.current.windSpeedMs, 1) })} />
-            <Metric label={t('weather.gusts')} value={t('weather.windValue', { value: number(value.current.windGustMs, 1) })} />
-            <Metric label={t('weather.sunrise')} value={time(value.sun.sunriseAt)} />
-            <Metric label={t('weather.sunset')} value={time(value.sun.sunsetAt)} />
+            {showDetails ? <>
+              <Metric label={t('weather.gusts')} value={t('weather.windValue', { value: number(value.current.windGustMs, 1) })} />
+              <Metric label={t('weather.sunrise')} value={time(value.sun.sunriseAt)} />
+              <Metric label={t('weather.sunset')} value={time(value.sun.sunsetAt)} />
+            </> : null}
           </View>
-          <View style={styles.icing}>
+          {showDetails ? <View style={styles.icing}>
             <ThemedText type="label">{t(weather.riskInputs?.icingRisk === 'possible' ? 'weather.icingPossible' : 'weather.icingUnknown')}</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">{t('weather.icingEstimate')}</ThemedText>
-          </View>
-          {weather.hourly.length ? (
+          </View> : null}
+          {showDetails && weather.hourly.length ? (
             <>
               <ThemedText type="label">{t('weather.nextHours')}</ThemedText>
               <View style={styles.forecast}>
@@ -81,6 +86,8 @@ export function WeatherWidget() {
               </View>
             </>
           ) : null}
+          {compact ? <Button variant="text" label={t(expanded ? 'dashboard.weather.less' : 'dashboard.weather.more')}
+            accessibilityState={{ expanded }} onPress={() => setExpanded((current) => !current)} /> : null}
           {weather.error ? <ThemedText type="label" themeColor="textSecondary">{t('weather.refreshFailed')}</ThemedText> : null}
         </>
       )}

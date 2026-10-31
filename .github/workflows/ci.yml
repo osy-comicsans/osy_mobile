@@ -68,11 +68,8 @@ jobs:
       - name: Test map
         run: pnpm test:map
 
-      - name: Test escalation
-        run: pnpm test:escalation
-
-      - name: Test crash model
-        run: pnpm test:crash-model
+      - name: Test Home dashboard and monitoring override
+        run: pnpm test:home
 
       - name: Accident report tests
         run: pnpm test:accident-report

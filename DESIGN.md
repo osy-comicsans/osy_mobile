@@ -961,6 +961,21 @@ export default config;
 
 ## 20. Do's and Don'ts
 
+### Mobile glass surfaces
+
+Home may use the shared `Card glass` variant. Keep the existing 16px card
+radius, pill actions, Gabarito/Arabic typography, and OSY palette. Glass
+tokens in `src/common/lib/tokens.ts` define translucent white/lavender
+fills, a fine white edge, and soft charcoal shadows; feature screens must
+not invent their own material colors.
+
+Use guarded native Liquid Glass on supported iOS devices, frosted
+translucent fills on Android/older iOS, and backdrop blur on web. Keep
+text and controls above the decorative material with normal contrast.
+Reduce Transparency and increased web contrast select solid white or
+lavender surfaces. Do not animate native-glass opacity or add a glass
+overlay above emergency actions.
+
 **Do** - Use `#6316DB` (purple-500) as the one accent; darken to 600/700
 for hover/active. - Make every button a pill; nav items and filters are
 pills too. Cards 16px; shell/banners 24px. - Implement the full state

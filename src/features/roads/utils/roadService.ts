@@ -108,6 +108,7 @@ export function createRoadService(
     const driving = state.status === 'watching' && state.drivingState === 'driving';
     if (!driving) {
       if (trace.length > 0) reset();
+      markStale();
       lastFix = state.fix;
       return;
     }
@@ -130,6 +131,7 @@ export function createRoadService(
       unsubscribe?.();
       unsubscribe = null;
       reset();
+      markStale();
     },
   };
 }

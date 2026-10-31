@@ -66,7 +66,7 @@ function useMessage() {
   return null;
 }
 
-export function LocationPermissionCard() {
+export function LocationPermissionCard({ glass = false }: { glass?: boolean }) {
   const { t } = useTranslation();
   const service = useLocationService();
   const { requesting } = useLocationState();
@@ -76,7 +76,7 @@ export function LocationPermissionCard() {
   const canOpenSettings = message.action === 'settings' && Platform.OS !== 'web';
 
   return (
-    <Card tone="accentSoft" style={styles.card}>
+    <Card glass={glass} tone="accentSoft" style={styles.card}>
       <ThemedText type="headingS">{message.title}</ThemedText>
       <ThemedText type="body" themeColor="textSecondary">{message.body}</ThemedText>
       {message.action === 'request' && (
