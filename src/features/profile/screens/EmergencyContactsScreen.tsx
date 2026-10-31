@@ -34,7 +34,7 @@ function ContactsEditor() {
     setSaving(true);
     setFailed(false);
     try {
-      const latest = service.store.getState().cache?.bundle;
+      const latest = (await service.read())?.bundle;
       if (!latest || latest.profile.id !== cache?.bundle.profile.id) throw new Error('Sign in before editing.');
       await service.save({ ...latest, contacts: next });
       return true;

@@ -8,6 +8,8 @@ import { createProfileService, profileForAccount, type ProfileService } from '..
 import type { ProfileBundle } from '../types/profile.schemas';
 import type { ProfileCache } from '@/common/lib/database/repositories/profileRepository';
 import { profilePhotos } from '@/common/lib/native/profilePhoto';
+import { useProfileCache, useProfileCacheInvalidation } from '../hooks/useProfileCache';
+import { createPreferencesSync } from '@/common/lib/database/sync/preferencesSync';
 
 const ProfileContext = createContext<ProfileService | null>(null);
 export function ProfileDataProvider({ children }: PropsWithChildren) {
@@ -30,6 +32,7 @@ export function ProfileDataProvider({ children }: PropsWithChildren) {
     return createProfileService(repository, profileApi, profilePhotos,
       (id) => authSession.status.getState().status === 'signedIn' && authSession.status.getState().userId === id);
   });
+  useProfileCacheInvalidation(service);
   useEffect(() => { void settingsService.start(); }, []);
   useEffect(() => { if (status !== 'unknown') void settingsService.setAccount(status === 'signedIn' ? userId : null); }, [status, userId]);
   useEffect(() => { void service.connect(status === 'signedIn' ? userId : null); return () => { void service.connect(null); }; }, [service, status, userId]);
@@ -43,34 +46,19 @@ export function ProfileDataProvider({ children }: PropsWithChildren) {
       return () => { active = false; };
     }
     const timer = setInterval(() => { void service.refresh(); }, 30_000);
-    let active = true; let syncing = false; let lastSent: string | null = null;
-    const syncPreferences = async () => {
-      if (syncing) return; syncing = true;
-      try {
-        while (active) {
-          const state = settingsService.store.getState();
-          const payload = JSON.stringify(state.settings);
-          if (!state.ready || state.consentOwner !== userId || authSession.status.getState().status !== 'signedIn'
-            || authSession.status.getState().userId !== userId) return;
-          if (payload === lastSent) {
-            if (state.accountSync !== 'synced') settingsService.store.setState({ accountSync: 'synced' });
-            return;
-          }
-          await profileApi.updatePreferences(state.settings); lastSent = payload;
-        }
-      } catch { if (active) settingsService.store.setState({ accountSync: 'failed' }); }
-      finally { syncing = false; }
-    };
-    syncPreferences();
-    const unsubscribe = settingsService.store.subscribe(() => { void syncPreferences(); });
-    const preferenceTimer = setInterval(() => { void syncPreferences(); }, 30_000);
-    return () => { active = false; clearInterval(timer); clearInterval(preferenceTimer); unsubscribe(); };
+    const preferences = createPreferencesSync(settingsService.store, userId, profileApi.updatePreferences,
+      () => authSession.status.getState().status === 'signedIn' && authSession.status.getState().userId === userId);
+    preferences.start();
+    return () => { clearInterval(timer); preferences.stop(); };
   }, [foreground, online, service, status, userId]);
   return <ProfileContext value={service}>{children}</ProfileContext>;
 }
 export function useProfileService() { const value = useContext(ProfileContext); if (!value) throw new Error('Profile provider required.'); return value; }
 export function useProfile() {
-  const state = useStore(useProfileService().store);
+  const service = useProfileService();
+  const state = useStore(service.store);
   const { userId, status } = useStore(authSession.status);
-  return profileForAccount(state, userId, status === 'signedIn');
+  const query = useProfileCache(service, userId, status === 'signedIn' && userId !== null && state.userId === userId);
+  return profileForAccount({ ...state, cache: query.data ?? null, loading: state.loading || (query.isFetching && !query.data),
+    error: state.error || query.isError }, userId, status === 'signedIn');
 }

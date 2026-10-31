@@ -94,8 +94,8 @@ test('offline profile edits are durable, account-scoped and never replaced by a 
   assert.equal((await repository.read('alice')).bundle.profile.firstName, 'Edited');
   assert.equal(await repository.read('bob'), null);
   const service = createProfileService(repository, transport().api); await service.connect('alice');
-  assert.equal(service.store.getState().cache.dirty, true);
-  assert.equal(service.store.getState().cache.bundle.profile.medical.allergies, 'Penicillin');
+  assert.equal((await service.read()).dirty, true);
+  assert.equal((await service.read()).bundle.profile.medical.allergies, 'Penicillin');
   await repository.acknowledge('alice', local.revision - 1);
   assert.equal((await repository.read('alice')).dirty, true);
 });
@@ -105,12 +105,12 @@ test('reconnecting sends pending profile and contacts, then acknowledges the exa
   await repository.write(initial, false); const backend = transport(initial);
   const service = createProfileService(repository, backend.api); await service.connect('alice');
   const changed = structuredClone(initial); changed.profile.vehicle = 'Clio'; changed.profile.medical.bloodType = 'O+';
-  await service.save(changed); assert.equal(service.store.getState().cache.dirty, true);
+  await service.save(changed); assert.equal((await service.read()).dirty, true);
   service.setOnline(true); await flush(); await flush();
   assert.equal(backend.remote().profile.vehicle, 'Clio');
   assert.equal(backend.remote().profile.medical.bloodType, 'O+');
   assert.equal((await repository.read('alice')).dirty, false);
-  assert.equal(service.store.getState().cache.bundle.stats.trips, 2);
+  assert.equal((await service.read()).bundle.stats.trips, 2);
 });
 
 test('an edit made during upload stays pending and is eventually sent', async (t) => {
@@ -136,7 +136,7 @@ test('switching accounts ignores an old response and never sends its contacts as
   const service = createProfileService(repository, backend.api); await service.connect('alice');
   service.setOnline(true); await flush(); service.setOnline(false); await service.connect('bob');
   pending.resolve(); await flush();
-  assert.equal(contactWrites, 0); assert.equal(service.store.getState().cache.bundle.profile.id, 'bob');
+  assert.equal(contactWrites, 0); assert.equal((await service.read()).bundle.profile.id, 'bob');
   assert.equal((await repository.read('alice')).dirty, true);
 });
 

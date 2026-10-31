@@ -1,8 +1,12 @@
 import { createStore } from 'zustand/vanilla';
 import { defaultSettings, settingsSchema, type SettingsPatch } from '../types/settings.types';
+export interface SettingsState {
+  settings: typeof defaultSettings; ready: boolean; saving: boolean; error: boolean;
+  consentOwner: string | null; accountSync: 'waiting' | 'synced' | 'failed';
+}
 
 export function createSettingsService(storage: { getItem(key: string): Promise<string | null>; setItem(key: string, value: string): Promise<void> }) {
-  const store = createStore<{ settings: typeof defaultSettings; ready: boolean; saving: boolean; error: boolean; consentOwner: string | null; accountSync: 'waiting' | 'synced' | 'failed' }>(() => ({ settings: defaultSettings, ready: false, saving: false, error: false, consentOwner: null, accountSync: 'waiting' }));
+  const store = createStore<SettingsState>(() => ({ settings: defaultSettings, ready: false, saving: false, error: false, consentOwner: null, accountSync: 'waiting' }));
   let restore: Promise<void> | undefined;
   let tail = Promise.resolve();
   const start = () => restore ??= (async () => {

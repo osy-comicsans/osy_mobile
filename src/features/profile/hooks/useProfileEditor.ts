@@ -15,12 +15,9 @@ export function useProfileEditor(bundle: ProfileBundle) {
     const files = staged.current;
     return () => {
       active.current = false;
-      const latest = service.store.getState().cache?.bundle;
-      for (const name of files) {
-        if (latest?.pendingPhoto !== name && !latest?.profile.photoUrl?.endsWith(name)) profilePhotos.remove(name);
-      }
+      for (const name of files) void service.releasePhoto(bundle.profile.id, name);
     };
-  }, [service]);
+  }, [bundle.profile.id, service]);
   return { draft, setDraft, photo, saving, failed, saved,
     async choosePhoto() {
       try {
@@ -34,7 +31,7 @@ export function useProfileEditor(bundle: ProfileBundle) {
       setFailed(false); setSaved(false); setSaving(true);
       try {
         const update = profileUpdateSchema.parse({ ...draft, vehicle: draft.vehicle.trim() || null });
-        const latest = service.store.getState().cache?.bundle;
+        const latest = (await service.read())?.bundle;
         if (!latest || latest.profile.id !== bundle.profile.id) throw new Error('Account changed.');
         await service.save({ ...latest, profile: { ...latest.profile, ...update }, pendingPhoto: photo ?? latest.pendingPhoto });
         if (active.current) { setPhoto(null); setSaved(true); }
