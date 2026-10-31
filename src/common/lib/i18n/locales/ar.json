@@ -291,9 +291,16 @@
     "refreshFailed": "تعذّر تحديث الطقس. تبقى آخر القيم المحفوظة ظاهرة.",
     "attribution": "الطقس من Open-Meteo · البيانات معدّلة بواسطة OSY",
     "conditions": {
-      "clear": "صافٍ", "partly_cloudy": "غائم جزئيًا", "cloudy": "غائم", "fog": "ضباب",
-      "drizzle": "رذاذ", "rain": "مطر", "freezing_precipitation": "هطول متجمّد",
-      "snow": "ثلج", "thunderstorm": "عاصفة رعدية", "unknown": "الظروف غير متاحة"
+      "clear": "صافٍ",
+      "partly_cloudy": "غائم جزئيًا",
+      "cloudy": "غائم",
+      "fog": "ضباب",
+      "drizzle": "رذاذ",
+      "rain": "مطر",
+      "freezing_precipitation": "هطول متجمّد",
+      "snow": "ثلج",
+      "thunderstorm": "عاصفة رعدية",
+      "unknown": "الظروف غير متاحة"
     }
   },
   "loading": {
@@ -324,5 +331,16 @@
     "remove": "إزالة",
     "invalid": "أدخل اسمًا ورقم هاتف صحيحًا.",
     "failed": "لم تنجح العملية. تحقق من اتصالك وأعد المحاولة."
+  },
+  "crashModel": {
+    "title": "فحص نموذج الحوادث",
+    "hint": "يستخدم المستشعرات الحقيقية لمدة 16 ثانية. هزّ الهاتف لترى تغيّر النتائج. لن يُطلق أي تنبيه.",
+    "run": "بدء فحص لمدة 16 ثانية",
+    "running": "جارٍ قراءة المستشعرات…",
+    "result": "حادث {{crash}} · شبه حادث {{nearMiss}} · عادي {{normal}}",
+    "stats": "مقياس التسارع {{accelerometer}} هرتز · الجيروسكوب {{gyroscope}} هرتز · الذروة {{peak}} g",
+    "noRuntime": "ONNX Runtime غير متاح. يتطلب ذلك نسخة تطوير.",
+    "noSensors": "لم تصل بيانات من المستشعرات.",
+    "failed": "فشل فحص النموذج."
   }
 }

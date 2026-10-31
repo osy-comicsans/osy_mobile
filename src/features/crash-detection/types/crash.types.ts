@@ -25,6 +25,7 @@ export interface CrashSnapshot {
 export interface CrashEvent {
   detectedAt: number;
   confidence: number;
+  source?: 'rules' | 'model';
   snapshot: CrashSnapshot;
 }
 
@@ -34,11 +35,27 @@ export interface CrashTrace {
   fixes: LocationFix[];
 }
 
+export interface NearMissEvent {
+  at: number;
+  probability: number;
+}
+
+export type ModelCheckResult = {
+  accelerationHz: number;
+  rotationHz: number;
+  peakG: number;
+} & (
+  | { status: 'done'; probabilities: { crash: number; nearMiss: number; normal: number } }
+  | { status: 'noRuntime' | 'noSensors' | 'failed'; reason?: string }
+);
+
 export type CrashDetectionStatus = 'idle' | 'monitoring' | 'unavailable';
 
 export interface CrashDetectionState {
   status: CrashDetectionStatus;
   lastCrash: CrashEvent | null;
+  // A dangerous moment the model noticed. It raises no alert yet.
+  lastNearMiss: NearMissEvent | null;
 }
 
 export interface CrashSensorDriver {

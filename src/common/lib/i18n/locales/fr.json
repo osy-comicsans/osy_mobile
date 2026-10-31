@@ -291,9 +291,16 @@
     "refreshFailed": "Actualisation impossible. Les dernières valeurs enregistrées restent affichées.",
     "attribution": "Météo par Open-Meteo · données adaptées par OSY",
     "conditions": {
-      "clear": "Ciel dégagé", "partly_cloudy": "Partiellement nuageux", "cloudy": "Nuageux", "fog": "Brouillard",
-      "drizzle": "Bruine", "rain": "Pluie", "freezing_precipitation": "Précipitations verglaçantes",
-      "snow": "Neige", "thunderstorm": "Orage", "unknown": "Conditions indisponibles"
+      "clear": "Ciel dégagé",
+      "partly_cloudy": "Partiellement nuageux",
+      "cloudy": "Nuageux",
+      "fog": "Brouillard",
+      "drizzle": "Bruine",
+      "rain": "Pluie",
+      "freezing_precipitation": "Précipitations verglaçantes",
+      "snow": "Neige",
+      "thunderstorm": "Orage",
+      "unknown": "Conditions indisponibles"
     }
   },
   "loading": {
@@ -324,5 +331,16 @@
     "remove": "Retirer",
     "invalid": "Saisissez un nom et un numéro de mobile valide.",
     "failed": "Cela n’a pas fonctionné. Vérifiez votre connexion et réessayez."
+  },
+  "crashModel": {
+    "title": "Vérification du modèle d’accident",
+    "hint": "Utilise les vrais capteurs pendant 16 secondes. Secouez le téléphone pour voir les scores changer. Aucune alerte n’est déclenchée.",
+    "run": "Lancer une vérification de 16 secondes",
+    "running": "Lecture des capteurs…",
+    "result": "Accident {{crash}} · Quasi-accident {{nearMiss}} · Normal {{normal}}",
+    "stats": "Accéléromètre {{accelerometer}} Hz · Gyroscope {{gyroscope}} Hz · Pic {{peak}} g",
+    "noRuntime": "ONNX Runtime n’est pas disponible. Une version de développement est nécessaire.",
+    "noSensors": "Aucune donnée de capteur reçue.",
+    "failed": "La vérification du modèle a échoué."
   }
 }

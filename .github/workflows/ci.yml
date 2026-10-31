@@ -71,6 +71,9 @@ jobs:
       - name: Test escalation
         run: pnpm test:escalation
 
+      - name: Test crash model
+        run: pnpm test:crash-model
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks
