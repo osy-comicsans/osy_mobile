@@ -511,5 +511,18 @@
     "hazardsNearby": "مخاطر على الطريق أمامك",
     "warningOne": "{{first}}. خفف السرعة.",
     "warningTwo": "{{first}}، {{second}}. خفف السرعة."
+  },
+  "nearby": {
+    "severity": {
+      "minor": "حادث بسيط",
+      "serious": "حادث خطير",
+      "critical": "حادث بالغ الخطورة"
+    },
+    "navigate": "الاتجاهات",
+    "routeTitle": "الطريق إلى الحادث",
+    "routeSummary": "{{distance}}، حوالي {{minutes}} دقيقة",
+    "routeLoading": "جارٍ البحث عن طريق",
+    "routeFailed": "لم يُعثر على طريق. تحقّق من اتصالك.",
+    "endRoute": "إنهاء"
   }
 }

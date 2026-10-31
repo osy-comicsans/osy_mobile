@@ -511,5 +511,18 @@
     "hazardsNearby": "Road hazards ahead",
     "warningOne": "{{first}}. Slow down.",
     "warningTwo": "{{first}}, {{second}}. Slow down."
+  },
+  "nearby": {
+    "severity": {
+      "minor": "Minor accident",
+      "serious": "Serious accident",
+      "critical": "Critical accident"
+    },
+    "navigate": "Navigate",
+    "routeTitle": "Route to the accident",
+    "routeSummary": "{{distance}}, about {{minutes}} min",
+    "routeLoading": "Finding a route",
+    "routeFailed": "No route found. Check your connection.",
+    "endRoute": "End route"
   }
 }

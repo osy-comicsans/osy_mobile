@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -10,14 +12,17 @@ import { PlaceholderScreen } from '@/common/screens/PlaceholderScreen';
 import { useVisibleRoadRisk } from '@/features/road-risk/hooks/useVisibleRoadRisk';
 import type { Bounds } from '@/features/road-risk/types/roadRisk.types';
 import { riskAreasInView, type RiskArea } from '@/features/road-risk/utils/roadSegments';
+import { osrmApi } from '@/features/roads/api/osrmClient';
 import { ReportAccidentButton } from '@/features/safety/components/ReportAccidentButton';
+import { useNearbyIncident, useNearbyIncidents } from '@/features/safety/hooks/useNearbyIncidents';
 
 import type { MapCanvas as MapCanvasType, MapCanvasHandle } from '../components/MapCanvas';
 import { RiskLegend } from '../components/RiskLegend';
 import { RiskRoadCard } from '../components/RiskRoadCard';
 import { RoadInfoCard } from '../components/RoadInfoCard';
+import { RouteCard } from '../components/RouteCard';
 import { isMapAvailable } from '../utils/mapAvailability';
-import { EMPTY_OVERLAYS, type MapOverlays } from '../utils/mapOverlays';
+import { EMPTY_OVERLAYS, incidentFeatures, routeFeatures, type MapOverlays } from '../utils/mapOverlays';
 
 // Waits for a pan to settle, so a drag sends no requests and moves no state.
 const VIEW_SETTLE_MS = 600;
@@ -36,10 +41,25 @@ export function MapScreen() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const settle = useRef<ReturnType<typeof setTimeout>>(undefined);
   const risk = useVisibleRoadRisk(showRisk ? areas ?? [] : []);
-  const overlays = useMemo<MapOverlays>(
-    () => (showRisk ? { ...EMPTY_OVERLAYS, 'risk-roads': risk.features, hazards: risk.hazardFeatures } : EMPTY_OVERLAYS),
-    [showRisk, risk.features, risk.hazardFeatures],
-  );
+  // Set by "Navigate" on a nearby accident alert.
+  const { incident: incidentId } = useLocalSearchParams<{ incident?: string }>();
+  const incidents = useNearbyIncidents();
+  const target = useNearbyIncident(incidentId);
+  const origin = fix ? { latitude: fix.latitude, longitude: fix.longitude } : null;
+  const route = useQuery({
+    queryKey: ['nearby', 'route', target?.id],
+    enabled: target !== null && origin !== null,
+    // From where the user chose to go, so the line does not move with every fix.
+    queryFn: () => osrmApi.route(origin!, target!.location),
+    staleTime: Infinity,
+  });
+  const incidentLayer = useMemo(() => incidentFeatures(incidents), [incidents]);
+  const routeLayer = useMemo(() => routeFeatures(route.data?.coordinates ?? []), [route.data]);
+  const overlays = useMemo<MapOverlays>(() => ({
+    ...(showRisk ? { ...EMPTY_OVERLAYS, 'risk-roads': risk.features, hazards: risk.hazardFeatures } : EMPTY_OVERLAYS),
+    incidents: incidentLayer,
+    route: routeLayer,
+  }), [showRisk, risk.features, risk.hazardFeatures, incidentLayer, routeLayer]);
 
   useEffect(() => () => clearTimeout(settle.current), []);
 
@@ -82,6 +102,13 @@ export function MapScreen() {
       />
       <View pointerEvents="box-none" style={[styles.top, { top: top + Space[3] }]}>
         <RoadInfoCard />
+        {incidentId && (
+          <RouteCard
+            route={route.data ?? null}
+            failed={target === null || route.isError}
+            onEnd={() => router.setParams({ incident: undefined })}
+          />
+        )}
         {showRisk && selected && (
           <RiskRoadCard risk={selected} weatherKnown={risk.weatherKnown} onClose={() => setSelectedId(null)} />
         )}

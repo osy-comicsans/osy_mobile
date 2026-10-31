@@ -89,6 +89,9 @@ jobs:
       - name: Voice check-in tests
         run: pnpm test:voice
 
+      - name: Nearby accident tests
+        run: pnpm test:nearby
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks
