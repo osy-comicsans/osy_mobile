@@ -1,7 +1,13 @@
+import { create } from 'axios';
+
 import { publicApi } from '@/common/lib/api/axios';
 import { config } from '@/common/lib/config';
 
-import { createWeatherApi } from './api/weatherApi';
+import { createOpenMeteoApi, createWeatherApi } from './api/weatherApi';
 
-export const weatherConfigured = Boolean(config.weatherApiUrl || config.apiUrl);
-export const getWeather = createWeatherApi(publicApi, () => config.weatherApiUrl || config.apiUrl);
+const serviceUrl = config.weatherApiUrl || config.apiUrl;
+
+// A separate client, so a provider request carries nothing from the app's API setup.
+export const getWeather = serviceUrl
+  ? createWeatherApi(publicApi, () => serviceUrl)
+  : createOpenMeteoApi(create());

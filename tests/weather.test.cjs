@@ -18,7 +18,7 @@ const { WeatherRepository } = require('../src/common/lib/database/repositories/w
 const { weatherSnapshotSchema } = require('../src/features/weather/types/weather.types.ts');
 const { weatherArea, weatherPolicy, weatherFreshness, nextWeatherHours } = require('../src/features/weather/utils/weatherPolicy.ts');
 const { toWeatherRiskInputs } = require('../src/features/weather/utils/weatherRiskInputs.ts');
-const { createWeatherApi } = require('../src/features/weather/api/weatherApi.ts');
+const { createOpenMeteoApi, createWeatherApi } = require('../src/features/weather/api/weatherApi.ts');
 
 const start = Date.parse('2026-10-30T10:16:00Z');
 const area = weatherArea(36.75, 3.06);
@@ -173,7 +173,6 @@ test('mobile transport uses the backend, bypasses account mock data, forwards ca
   await assert.rejects(getWeather(area), (error) => error.kind === 'invalid_response');
   response = { unexpected: true };
   await assert.rejects(getWeather(area), (error) => error.kind === 'invalid_response');
-  await assert.rejects(createWeatherApi(client, () => '')(area), /not configured/);
 });
 
 test('backend coalesces simultaneous requests and shares one snapshot within an area/time bucket', async () => {
@@ -308,4 +307,16 @@ test('HTTP service validates coordinates, limits clients, applies CORS and never
   let limited;
   for (let i = 0; i < 121; i++) limited = await fetch(`${base}/weather?latitude=0&longitude=0`);
   assert.equal(limited.status, 429);
+});
+
+test('with no service, the app reads Open-Meteo directly and normalizes the answer', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: start });
+  let captured;
+  const getWeather = createOpenMeteoApi({ get: async (url, options) => { captured = { url, options }; return { data: rawWeather(start) }; } });
+  const value = await getWeather(area);
+  assert.equal(captured.url, 'https://api.open-meteo.com/v1/forecast');
+  assert.equal(captured.options.params.latitude, String(area.latitude));
+  assert.equal(captured.options.params.apikey, undefined);
+  assert.deepEqual(value.area, area);
+  weatherSnapshotSchema.parse(value);
 });
