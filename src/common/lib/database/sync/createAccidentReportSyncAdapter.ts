@@ -1,4 +1,4 @@
-import { ApiError } from '../../api/apiError';
+import { isPermanentError } from '../../api/apiError';
 import type { IncidentRequest } from '../../../../features/safety/types/safety.schemas';
 import type { QueuedReportPhoto } from '../repositories/accidentReportRepository';
 import { SyncConflictError, type SyncAdapter } from './syncTypes';
@@ -13,11 +13,6 @@ interface ReportPhotoStore {
   remove(name: string): void;
 }
 
-// These will fail the same way on every attempt, so retrying cannot help.
-const isPermanent = (error: unknown) => (
-  error instanceof ApiError && ['conflict', 'validation', 'request'].includes(error.kind)
-);
-
 export function createAccidentReportSyncAdapter(transport: AccidentReportTransport, photos: ReportPhotoStore): SyncAdapter {
   return {
     async push({ operation, entityId, payload }) {
@@ -25,7 +20,7 @@ export function createAccidentReportSyncAdapter(transport: AccidentReportTranspo
         try {
           await transport.createIncident(payload as unknown as IncidentRequest);
         } catch (error) {
-          throw isPermanent(error) ? new SyncConflictError() : error;
+          throw isPermanentError(error) ? new SyncConflictError() : error;
         }
         return;
       }
@@ -37,7 +32,7 @@ export function createAccidentReportSyncAdapter(transport: AccidentReportTranspo
         await transport.uploadIncidentPhoto(entityId, { uri, mimeType });
       } catch (error) {
         // The report already arrived, and the photo is optional.
-        if (!isPermanent(error)) throw error;
+        if (!isPermanentError(error)) throw error;
       }
       photos.remove(photoName);
     },

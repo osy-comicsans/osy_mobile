@@ -40,6 +40,10 @@ export type EmergencyContact = z.infer<typeof emergencyContactSchema>;
 export type PushTokenRequest = z.infer<typeof pushTokenRequestSchema>;
 
 export const drivingStatsSchema = z.object({ trips: z.number().int().nonnegative(), distanceMeters: z.number().nonnegative(), warnings: z.number().int().nonnegative() });
+// Totals only: no coordinates or route leave the phone.
+export const tripSchema = z.object({ id: z.uuid(), startedAt: z.iso.datetime({ offset: true }), endedAt: z.iso.datetime({ offset: true }),
+  distanceMeters: z.number().int().nonnegative(), warnings: z.number().int().nonnegative() });
+export type TripUpload = z.infer<typeof tripSchema>;
 export const reportHistorySchema = z.object({ reports: z.array(z.object({
   id: z.string(), occurredAt: z.iso.datetime({ offset: true }), type: z.string(), severity: z.string(),
   status: z.enum(['received', 'reviewing', 'resolved']),

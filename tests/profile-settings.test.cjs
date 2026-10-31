@@ -13,7 +13,8 @@ Module._resolveFilename = function (request, ...args) {
 const { LocalDatabase } = require('../src/common/lib/database/localDatabase.ts');
 const { migrateDatabase } = require('../src/common/lib/database/migrations/index.ts');
 const { ProfileRepository } = require('../src/common/lib/database/repositories/profileRepository.ts');
-const { createProfileService, profileForAccount } = require('../src/features/profile/utils/profileService.ts');
+const { createProfileService, profileForAccount, rejectedFields } = require('../src/features/profile/utils/profileService.ts');
+const { ApiError, isPermanentError } = require('../src/common/lib/api/apiError.ts');
 const { profileBundleSchema } = require('../src/features/profile/types/profile.schemas.ts');
 const { createSettingsService } = require('../src/features/settings/utils/settingsService.ts');
 const { createPreferencesSync } = require('../src/common/lib/database/sync/preferencesSync.ts');
@@ -39,6 +40,10 @@ async function database(t) {
   const connection = new SQLiteConnection(); t.after(() => connection.close()); await migrateDatabase(connection);
   return { connection, repository: new ProfileRepository(new LocalDatabase(async () => connection)) };
 }
+const photoName = (letter) => `${letter.repeat(64)}/${randomUUID()}.jpg`;
+const photoStore = (exists, removed = [], cleared = []) => ({ uriOf: (name) => (exists ? `file:///${name}` : null),
+  remove: (name) => removed.push(name), clearOwner: async (owner) => { cleared.push(owner); } });
+const settle = async () => { for (let i = 0; i < 5; i++) await flush(); };
 const transport = (initial = bundle()) => {
   let remote = structuredClone(initial);
   const api = {
@@ -347,4 +352,129 @@ test('an account switch hides the previous profile immediately, before provider 
   assert.equal(profileForAccount(state, 'bob', true).cache, null);
   assert.equal(profileForAccount(state, 'bob', true).loading, true);
   assert.equal(profileForAccount(state, null, false).cache, null);
+});
+
+test('a staged photo whose file is gone is dropped, and the rest of the edit still syncs', async (t) => {
+  const { repository } = await database(t); const initial = bundle(); await repository.write(initial, false);
+  const backend = transport(initial); let uploads = 0;
+  backend.api.uploadPhoto = async () => { uploads++; return { photoUrl: 'https://example.test/avatar.jpg' }; };
+  const service = createProfileService(repository, backend.api, photoStore(false)); await service.connect('alice');
+  await service.save({ ...initial, profile: { ...initial.profile, firstName: 'Edited' }, pendingPhoto: photoName('a') });
+  service.setOnline(true); await settle();
+  assert.equal(uploads, 0); assert.equal(backend.remote().profile.firstName, 'Edited');
+  const cache = await repository.read('alice');
+  assert.equal(cache.dirty, false); assert.equal(cache.bundle.pendingPhoto, null); assert.equal(service.store.getState().error, false);
+});
+
+test('an uploaded photo is kept when the profile update then fails, so it is never uploaded twice', async (t) => {
+  const { repository } = await database(t); const initial = bundle(); await repository.write(initial, false);
+  const backend = transport(initial); const name = photoName('b'); const removed = []; let uploads = 0; let failing = true;
+  backend.api.uploadPhoto = async () => { uploads++; return { photoUrl: 'https://example.test/avatar.jpg' }; };
+  const update = backend.api.updateProfile;
+  backend.api.updateProfile = async (patch) => { if (failing) throw new ApiError('network', 'Could not reach the server.'); return update(patch); };
+  const service = createProfileService(repository, backend.api, photoStore(true, removed)); await service.connect('alice');
+  await service.save({ ...initial, pendingPhoto: name });
+  service.setOnline(true); await settle();
+  const pending = await repository.read('alice');
+  assert.equal(pending.dirty, true); assert.equal(pending.bundle.pendingPhoto, null);
+  assert.equal(pending.bundle.profile.photoUrl, 'https://example.test/avatar.jpg'); assert.deepEqual(removed, [name]);
+  assert.equal(service.store.getState().error, true); assert.equal(service.store.getState().rejection, null);
+  failing = false; await service.refresh();
+  assert.equal(uploads, 1); assert.equal((await repository.read('alice')).dirty, false);
+});
+
+test('a refused change stops retrying, keeps the edit and names the field until the user changes it', async (t) => {
+  const { repository } = await database(t); const initial = bundle(); await repository.write(initial, false);
+  const backend = transport(initial); const update = backend.api.updateProfile; let attempts = 0;
+  backend.api.updateProfile = async (patch) => {
+    attempts++;
+    if (patch.mobileNumber === '+213555000000') throw new ApiError('conflict', 'Taken.', 409, 'mobile_taken', { mobileNumber: 'Taken.' });
+    return update(patch);
+  };
+  const service = createProfileService(repository, backend.api); await service.connect('alice');
+  await service.save({ ...initial, profile: { ...initial.profile, mobileNumber: '+213555000000', vehicle: 'Clio' } });
+  service.setOnline(true); await settle();
+  const state = service.store.getState(); const cache = await repository.read('alice');
+  assert.equal(state.rejection.kind, 'conflict'); assert.deepEqual(rejectedFields(state.rejection), ['mobileNumber']);
+  assert.equal(state.error, false); assert.equal(cache.dirty, true); assert.equal(cache.bundle.profile.mobileNumber, '+213555000000');
+  assert.equal(profileForAccount({ ...state, cache }, 'alice', true).rejection, state.rejection);
+  // A newer edit hides the refusal, because the server has not refused it yet.
+  assert.equal(profileForAccount({ ...state, cache: { ...cache, revision: cache.revision + 1 } }, 'alice', true).rejection, null);
+
+  await service.refresh(); service.setOnline(true); await settle();
+  assert.equal(attempts, 1);
+  await service.save({ ...cache.bundle, profile: { ...cache.bundle.profile, mobileNumber: '+213555000009' } }); await settle();
+  assert.equal(attempts, 2); assert.equal(backend.remote().profile.mobileNumber, '+213555000009');
+  assert.equal(service.store.getState().rejection, null); assert.equal((await repository.read('alice')).dirty, false);
+});
+
+test('retrying a refused change sends it again, and field paths group under their section', async (t) => {
+  const { repository } = await database(t); const initial = bundle(); await repository.write(initial, false);
+  const backend = transport(initial); let refusing = true; let attempts = 0; const update = backend.api.updateProfile;
+  backend.api.updateProfile = async (patch) => {
+    attempts++;
+    if (refusing) throw new ApiError('validation', 'Invalid.', 422, 'invalid', { 'medical.bloodType': 'Too long.', 'contacts.0.mobileNumber': 'Invalid.' });
+    return update(patch);
+  };
+  const service = createProfileService(repository, backend.api); await service.connect('alice');
+  await service.save({ ...initial, profile: { ...initial.profile, firstName: 'Edited' } });
+  service.setOnline(true); await settle();
+  assert.deepEqual(rejectedFields(service.store.getState().rejection), ['medical', 'contacts']);
+  await service.retry(); assert.equal(attempts, 2); assert.equal(service.store.getState().rejection.kind, 'validation');
+  refusing = false; await service.retry();
+  assert.equal(attempts, 3); assert.equal(service.store.getState().rejection, null);
+  assert.equal(backend.remote().profile.firstName, 'Edited');
+});
+
+test('discarding a refused change restores the server copy and removes its staged photo', async (t) => {
+  const { repository } = await database(t); const initial = bundle(); await repository.write(initial, false);
+  const backend = transport(initial); const name = photoName('c'); const removed = [];
+  backend.api.uploadPhoto = async () => { throw new ApiError('request', 'Too large.', 413); };
+  const service = createProfileService(repository, backend.api, photoStore(true, removed)); await service.connect('alice');
+  const contacts = [{ id: randomUUID(), name: 'Family', mobileNumber: '+213555000002', relationship: null }];
+  await service.save({ ...initial, profile: { ...initial.profile, firstName: 'Local' }, contacts, pendingPhoto: name });
+  await assert.rejects(service.discard());
+  service.setOnline(true); await settle();
+  assert.equal(service.store.getState().rejection.kind, 'request');
+  await service.discard();
+  const cache = await repository.read('alice');
+  assert.equal(cache.dirty, false); assert.equal(cache.bundle.profile.firstName, 'Alice'); assert.deepEqual(cache.bundle.contacts, []);
+  assert.equal(cache.bundle.pendingPhoto, null); assert.equal(cache.bundle.stats.trips, 2);
+  assert.deepEqual(removed, [name]); assert.equal(service.store.getState().rejection, null);
+});
+
+test('discarding never replaces an edit saved after the one the user saw', async (t) => {
+  const { repository } = await database(t); const initial = bundle(); const seen = await repository.write(initial, true);
+  const newer = await repository.write({ ...initial, profile: { ...initial.profile, firstName: 'Newer' } }, true);
+  await repository.discard(seen.revision, initial);
+  const cache = await repository.read('alice');
+  assert.equal(cache.revision, newer.revision); assert.equal(cache.dirty, true); assert.equal(cache.bundle.profile.firstName, 'Newer');
+});
+
+test('an escalation sends pending profile edits and makes no requests when there are none', async (t) => {
+  const { repository } = await database(t); const initial = bundle(); await repository.write(initial, false);
+  const backend = transport(initial); const calls = [];
+  for (const name of Object.keys(backend.api)) { const call = backend.api[name]; backend.api[name] = (...args) => { calls.push(name); return call(...args); }; }
+  const service = createProfileService(repository, backend.api); await service.connect('alice'); service.setOnline(true); await settle();
+  calls.length = 0;
+  await service.syncPending(); assert.deepEqual(calls, []);
+  await repository.write({ ...initial, contacts: [{ id: randomUUID(), name: 'Family', mobileNumber: '+213555000002', relationship: null }] }, true);
+  await service.syncPending();
+  assert.equal(backend.remote().contacts.length, 1); assert.equal((await repository.read('alice')).dirty, false);
+});
+
+test('signing out removes that account profile and photos, and keeps other accounts', async (t) => {
+  const { repository } = await database(t); await repository.write(bundle(), true); await repository.write(bundle('bob'), false);
+  const cleared = []; const service = createProfileService(repository, transport().api, photoStore(true, [], cleared));
+  await service.forget('alice');
+  assert.equal(await repository.read('alice'), null); assert.ok(await repository.read('bob')); assert.deepEqual(cleared, ['alice']);
+});
+
+test('the mock refuses a mobile number used by another account and names the field', async () => {
+  let value = null; const client = create({ adapter: createMockBackend({ getItem: () => value, setItem: (_key, next) => { value = next; } }, 0),
+    headers: { Authorization: 'Bearer mock-access.mock-demo' } });
+  const api = createProfileApi(client); const original = await api.getProfile();
+  await assert.rejects(api.updateProfile({ ...original, mobileNumber: '+213555000000' }),
+    (error) => isPermanentError(error) && error.status === 409 && Object.keys(error.fields).includes('mobileNumber'));
+  await assert.doesNotReject(api.updateProfile({ ...original, mobileNumber: original.mobileNumber }));
 });

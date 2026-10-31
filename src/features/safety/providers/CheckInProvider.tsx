@@ -7,6 +7,7 @@ import { secureStorage } from '@/common/lib/storage/secureStorage';
 import { useLocationService } from '@/features/location/hooks/useLocation';
 import { RoadContext } from '@/features/roads/providers/RoadProvider';
 import { settingsService } from '@/features/settings/settingsService';
+import { useProfileService } from '@/features/profile/providers/ProfileDataProvider';
 
 import { createSafetyApi } from '../api/safetyApi';
 import { nearbyIncidents } from '../nearbyServices';
@@ -24,6 +25,7 @@ const safetyApi = createSafetyApi(api);
 export function CheckInProvider({ children }: PropsWithChildren) {
   const location = useLocationService();
   const road = useContext(RoadContext);
+  const profile = useProfileService();
   const [escalation] = useState(() => createEscalationService({
     api: safetyApi,
     location: location.store,
@@ -37,7 +39,11 @@ export function CheckInProvider({ children }: PropsWithChildren) {
     },
   }));
   const [service] = useState(() => createCheckInService({
-    escalate: (trigger, event) => void escalation.start(trigger, event),
+    escalate: (trigger, event) => {
+      // Responders read contacts and medical details from the backend, so unsent edits are sent now.
+      void profile.syncPending();
+      void escalation.start(trigger, event);
+    },
     remind: () => checkInReminder.send(),
     cancelEscalation: () => void escalation.cancel(),
     getCountdownSeconds: () => settingsService.store.getState().settings.countdownSeconds,

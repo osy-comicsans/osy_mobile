@@ -11,6 +11,8 @@ Drivers and passengers report an accident from **Report accident** on the Home a
 5. The queue sends the report when the phone is online, the user is signed in, and the app is open. The photo follows as a separate step, so a failed upload never sends the report twice.
 6. A delivered photo is deleted, and delivered reports are cleared at the next launch.
 
+Until it is delivered, Profile lists the report under My reports as Waiting to send.
+
 Reports use `id` values from the device, so a retry is safe. A `4xx` other than `401` or `429` stops the retries. The web build has no local database, so it sends at once, without a photo, and shows an error if that fails.
 
 ## What the backend must do

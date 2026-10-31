@@ -6,8 +6,8 @@ import { settingsSchema, type AppSettings } from '@/features/settings/types/sett
 
 import {
   emergencyContactsSchema, profileSchema, profileUpdateSchema, pushTokenRequestSchema,
-  drivingStatsSchema, reportHistorySchema,
-  type EmergencyContact, type ProfileUpdate, type PushTokenRequest,
+  drivingStatsSchema, reportHistorySchema, tripSchema,
+  type EmergencyContact, type ProfileUpdate, type PushTokenRequest, type TripUpload,
 } from '../types/profile.schemas';
 
 export function createProfileApi(client: AxiosInstance, getOwner?: () => string | null) {
@@ -16,6 +16,8 @@ export function createProfileApi(client: AxiosInstance, getOwner?: () => string 
     getProfile: () => parseResponse(client.get('/me', owned()), profileSchema),
     getDrivingStats: () => parseResponse(client.get('/me/driving-stats', owned()), drivingStatsSchema),
     getReports: () => parseResponse(client.get('/me/reports', owned()), reportHistorySchema),
+    // Bound to the account that drove it, which may not be the one signed in now.
+    recordTrip: (trip: TripUpload, owner: string) => sendRequest(client.post('/me/trips', tripSchema.parse(trip), { headers: { 'X-OSY-Owner': owner } })),
     updatePreferences: (settings: AppSettings) => sendRequest(client.put('/me/preferences', settingsSchema.parse(settings), owned())),
     deleteAccount: () => sendRequest(client.delete('/me', owned())),
     deleteData: () => sendRequest(client.delete('/me/data', owned())),

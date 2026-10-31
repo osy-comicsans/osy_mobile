@@ -4,7 +4,7 @@ When a driver presses "I need help", or a check-in times out, `escalationService
 
 ## How it works
 
-1. It creates an incident, then sends the escalation with location, speed before impact, and road name and number.
+1. It creates an incident, then sends the escalation with location, speed before impact, and road name and number. A detected crash is a `crash_detected` incident of type `crash`; a request for help without one is a `user_report` of type `other`. Any profile edit that has not synced is sent at the same time, because the backend notifies contacts from its own copy.
 2. If that fails, it retries every 15 seconds with the same IDs, so the server sees one request. The request is saved in SecureStore, so it survives the app closing.
 3. Once sent, it shares the latest location every 30 seconds until canceled.
 4. "I'm OK" cancels it. An unsent request never goes out.

@@ -27,12 +27,21 @@ export function ProfileDataProvider({ children }: PropsWithChildren) {
         const cache = { bundle, dirty, revision: (previous?.revision ?? 0) + 1 }; memory.set(bundle.profile.id, cache); return cache;
       },
       acknowledge: async (id: string, revision: number) => { const cache = memory.get(id); if (cache?.revision === revision) cache.dirty = false; },
+      // The web preview cannot choose a photo, so none is ever pending.
+      settlePhoto: async () => {},
+      discard: async (revision: number, bundle: ProfileBundle) => {
+        if (memory.get(bundle.profile.id)?.revision === revision) memory.set(bundle.profile.id, { bundle, dirty: false, revision: revision + 1 });
+      },
       remove: async (id: string) => { memory.delete(id); },
     };
     return createProfileService(repository, profileApi, profilePhotos,
       (id) => authSession.status.getState().status === 'signedIn' && authSession.status.getState().userId === id);
   });
   useProfileCacheInvalidation(service);
+  // A delivered report or trip changes the history and totals the server returns.
+  useEffect(() => runtime.status.subscribe((state, previous) => {
+    if (state.lastSyncAt !== previous.lastSyncAt) void service.refresh();
+  }), [runtime, service]);
   useEffect(() => { void settingsService.start(); }, []);
   useEffect(() => { if (status !== 'unknown') void settingsService.setAccount(status === 'signedIn' ? userId : null); }, [status, userId]);
   useEffect(() => { void service.connect(status === 'signedIn' ? userId : null); return () => { void service.connect(null); }; }, [service, status, userId]);

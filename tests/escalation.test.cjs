@@ -77,6 +77,7 @@ test('a crash sends its location, speed, and road', async () => {
   const [{ value: incident }] = f.named('createIncident');
   const [{ value: request }] = f.named('escalate');
   assert.equal(incident.source, 'crash_detected');
+  assert.equal(incident.type, 'crash');
   assert.equal(incident.occurredAt, new Date(crash.detectedAt).toISOString());
   assert.deepEqual(request.location, { latitude: 36.8, longitude: 3.2 });
   assert.equal(request.incidentId, incident.id);
@@ -94,7 +95,10 @@ test('without a crash it uses the current location', async () => {
   const f = fixture();
   await f.service.start('user_requested', null);
   assert.deepEqual(f.named('escalate')[0].value.location, fix);
-  assert.equal(f.named('createIncident')[0].value.source, 'user_report');
+  const [{ value: incident }] = f.named('createIncident');
+  assert.equal(incident.source, 'user_report');
+  // The contract has no crash type for user reports, and history would show an unknown type as Other.
+  assert.equal(incident.type, 'other');
   f.service.stop();
 });
 

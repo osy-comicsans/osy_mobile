@@ -93,7 +93,8 @@
     "test:risk-warnings": "node --test tests/risk-warnings.test.cjs",
     "test:home": "node --test tests/home.test.cjs",
     "test:voice": "node --test tests/voice-check-in.test.cjs",
-    "test:nearby": "node --test tests/nearby-incidents.test.cjs"
+    "test:nearby": "node --test tests/nearby-incidents.test.cjs",
+    "test:driving-stats": "node --test tests/driving-stats.test.cjs"
   },
   "private": true
 }

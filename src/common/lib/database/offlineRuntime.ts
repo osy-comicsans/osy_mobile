@@ -10,6 +10,7 @@ import { TodoRepository } from './repositories/todoRepository';
 import { WeatherRepository } from './repositories/weatherRepository';
 import { AreaRepository } from './repositories/areaRepository';
 import { ProfileRepository } from './repositories/profileRepository';
+import { TripRepository } from './repositories/tripRepository';
 import { getDatabase } from './sqlite';
 import { SyncManager } from './sync/syncManager';
 import { syncPolicy } from './sync/syncPolicy';
@@ -36,6 +37,7 @@ export function createOfflineRuntime(options: { finishPrivacyReset?: (owner: str
   const weather = new WeatherRepository(database);
   const areas = new AreaRepository(database);
   const profiles = new ProfileRepository(database);
+  const trips = new TripRepository(database, createId);
   const queue = new SyncQueue(database);
   const status = createStore<OfflineStatus>(() => ({
     supported: supportsLocalDatabase, ready: false, online: null, foreground: true,
@@ -88,6 +90,7 @@ export function createOfflineRuntime(options: { finishPrivacyReset?: (owner: str
     initialization ??= database.read(async () => undefined)
       .then(() => queue.recoverInterrupted())
       .then(() => reports.clearDelivered())
+      .then(() => trips.clearDelivered())
       .then(async () => {
         const owner = await privacyReset.read();
         if (owner) {
@@ -110,7 +113,7 @@ export function createOfflineRuntime(options: { finishPrivacyReset?: (owner: str
   };
 
   return {
-    status, todos, reports, weather, areas, profiles, queue, sync, initialize, changed,
+    status, todos, reports, weather, areas, profiles, trips, queue, sync, initialize, changed,
     start(onChange: () => Promise<void>) {
       active = true;
       invalidate = onChange;

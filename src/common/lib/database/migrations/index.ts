@@ -3,11 +3,13 @@ import { initialSchema } from './001_initial';
 import { weatherSchema } from './002_weather';
 import { locationAreasSchema } from './003_location_areas';
 import { profilesSchema } from './004_profiles';
+import { tripsSchema } from './005_trips';
 
 const migrations = [
   { version: 1, sql: initialSchema }, { version: 2, sql: weatherSchema },
   { version: 3, sql: locationAreasSchema },
   { version: 4, sql: profilesSchema },
+  { version: 5, sql: tripsSchema },
 ];
 
 export async function migrateDatabase(database: DatabaseConnection): Promise<void> {

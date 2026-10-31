@@ -399,11 +399,13 @@
   "contacts": {
     "description": "OSY prévient ces personnes si vous avez besoin d’aide après un accident.",
     "add": "Ajouter un contact",
+    "edit": "Modifier le contact",
     "name": "Nom",
     "save": "Enregistrer le contact",
     "remove": "Retirer",
+    "removeConfirm": "Retirer {{name}} de vos contacts d’urgence ?",
     "invalid": "Saisissez un nom et un numéro de mobile valide.",
-    "failed": "Cela n’a pas fonctionné. Vérifiez votre connexion et réessayez."
+    "failed": "Impossible d’enregistrer cette modification sur votre téléphone. Réessayez."
   },
   "crashModel": {
     "title": "Vérification du modèle d’accident",
@@ -455,6 +457,7 @@
       "pedestrian": "Piéton renversé",
       "rollover": "Tonneau",
       "fire": "Véhicule en feu",
+      "crash": "Accident détecté",
       "other": "Autre"
     },
     "severity": {
@@ -601,6 +604,7 @@
     "vehicle": "Véhicule (facultatif)",
     "changePhoto": "Choisir une photo",
     "photoSelected": "Photo choisie · enregistrez ci-dessous",
+    "currentPhoto": "Photo actuelle",
     "medical": "Informations médicales",
     "medicalHint": "Facultatif. Le partage avec les secours reste désactivé jusqu’à votre accord dans les réglages. Les modifications non synchronisées ne sont pas encore sur le serveur.",
     "bloodType": "Groupe sanguin",
@@ -614,14 +618,22 @@
     "synced": "À jour",
     "demo": "Compte de démonstration local",
     "syncError": "Actualisation ou synchronisation impossible. Les données enregistrées restent disponibles ; réessayez avec une connexion.",
+    "attentionTitle": "Modifications refusées",
+    "attentionHint": "Le serveur a refusé vos dernières modifications : elles ne sont que sur ce téléphone. Corrigez-les puis enregistrez à nouveau, ou annulez-les pour garder les informations de votre compte.",
+    "fieldTaken": "{{field}} : déjà utilisé par un autre compte.",
+    "fieldRejected": "{{field}} : refusé. Vérifiez puis enregistrez à nouveau.",
+    "discard": "Annuler mes modifications",
     "sync": "Synchroniser et actualiser",
     "webPreview": "Aperçu web : le cache hors ligne est limité à cette session. Les modifications connectées sont synchronisées au compte. Utilisez un appareil pour le stockage durable.",
     "authError": "Action du compte impossible. Réessayez.",
+    "signOutTitle": "Se déconnecter d’OSY ?",
+    "signOutHint": "Votre profil, vos informations médicales et vos contacts d’urgence seront supprimés de ce téléphone, ainsi que les trajets pas encore envoyés. Reconnectez-vous pour retrouver votre profil.",
+    "signOutUnsynced": "Vos dernières modifications ne sont pas synchronisées et seront perdues. Votre profil, vos informations médicales, vos contacts d’urgence et les trajets pas encore envoyés seront aussi supprimés de ce téléphone.",
     "signInTitle": "Votre espace",
     "signInHint": "Connectez-vous pour modifier votre profil et séparer les données des comptes.",
     "openDemo": "Ouvrir le profil de démonstration",
     "stats": "Activité de conduite",
-    "statsHint": "Totaux du compte fournis par le serveur. Aucun trajet ni avertissement n’est inventé.",
+    "statsHint": "Totaux du compte pour les trajets enregistrés pendant la surveillance, y compris ceux de ce téléphone en attente d’envoi.",
     "trips": "Trajets",
     "distance": "Distance",
     "warnings": "Avertissements",
@@ -632,7 +644,8 @@
     "reportStatus": {
       "received": "Reçu",
       "reviewing": "En cours d’examen",
-      "resolved": "Résolu"
+      "resolved": "Résolu",
+      "queued": "En attente d’envoi"
     },
     "editContact": "Modifier",
     "relationship": "Relation (facultatif)",

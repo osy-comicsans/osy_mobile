@@ -399,11 +399,13 @@
   "contacts": {
     "description": "OSY alerts these people if you need help after a crash.",
     "add": "Add a contact",
+    "edit": "Edit contact",
     "name": "Name",
     "save": "Save contact",
     "remove": "Remove",
+    "removeConfirm": "Remove {{name}} from your emergency contacts?",
     "invalid": "Enter a name and a valid mobile number.",
-    "failed": "That did not work. Check your connection and try again."
+    "failed": "Could not save this change on your phone. Try again."
   },
   "crashModel": {
     "title": "Crash model check",
@@ -455,6 +457,7 @@
       "pedestrian": "Pedestrian hit",
       "rollover": "Rollover",
       "fire": "Vehicle fire",
+      "crash": "Detected crash",
       "other": "Other"
     },
     "severity": {
@@ -601,6 +604,7 @@
     "vehicle": "Vehicle (optional)",
     "changePhoto": "Choose profile photo",
     "photoSelected": "Photo selected · save below",
+    "currentPhoto": "Current photo",
     "medical": "Medical information",
     "medicalHint": "Optional. Sharing with responders is off until you enable it in Settings. Unsynced changes are not yet available to the backend.",
     "bloodType": "Blood type",
@@ -614,14 +618,22 @@
     "synced": "Up to date",
     "demo": "Local demo account",
     "syncError": "Could not refresh or sync. Saved details remain available; retry when connected.",
+    "attentionTitle": "Changes not accepted",
+    "attentionHint": "The server refused your last changes, so they are only on this phone. Fix them and save again, or discard them to keep your account’s saved details.",
+    "fieldTaken": "{{field}}: already used by another account.",
+    "fieldRejected": "{{field}}: not accepted. Check it and save again.",
+    "discard": "Discard my changes",
     "sync": "Sync & refresh",
     "webPreview": "Web preview: the offline profile cache is session-only. Connected changes still sync to your account. Use a device for durable offline storage.",
     "authError": "Could not complete the account action. Try again.",
+    "signOutTitle": "Log out of OSY?",
+    "signOutHint": "Your profile, medical information and emergency contacts will be removed from this phone, along with any trips not yet uploaded. Sign in again to download your profile.",
+    "signOutUnsynced": "Your latest changes have not synced and will be lost. Your profile, medical information, emergency contacts and any trips not yet uploaded will also be removed from this phone.",
     "signInTitle": "Make it yours",
     "signInHint": "Sign in to edit your details and keep account data separate.",
     "openDemo": "Open local demo profile",
     "stats": "Driving activity",
-    "statsHint": "Account totals from the backend. No trips or warnings are invented.",
+    "statsHint": "Account totals from trips recorded while monitoring is on, including trips on this phone that are waiting to upload.",
     "trips": "Trips",
     "distance": "Distance",
     "warnings": "Warnings",
@@ -632,7 +644,8 @@
     "reportStatus": {
       "received": "Received",
       "reviewing": "Under review",
-      "resolved": "Resolved"
+      "resolved": "Resolved",
+      "queued": "Waiting to send"
     },
     "editContact": "Edit",
     "relationship": "Relationship (optional)",

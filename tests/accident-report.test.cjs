@@ -227,6 +227,25 @@ test('delivered reports are removed from the phone, and waiting ones stay', asyn
   assert.deepEqual(rows.map(({ status }) => status), ['pending']);
 });
 
+test('the profile lists reports still waiting to send, newest first, but not refused or delivered ones', async (t) => {
+  let refuse = false;
+  const f = await fixture(t, recordingTransport({
+    createIncident: async () => { if (refuse) throw new ApiError('validation', 'Bad report.', 422); },
+  }));
+  await f.reports.save(report(), null);
+  f.state.online = true;
+  await f.sync.requestSync();
+  refuse = true;
+  await f.reports.save(report(), null);
+  await f.sync.requestSync();
+  f.state.online = false;
+  const older = report(); const newer = report();
+  await f.reports.save(older, { photoName: 'p.jpg', mimeType: 'image/jpeg' });
+  await f.reports.save(newer, null);
+
+  assert.deepEqual((await f.reports.waiting()).map(({ id }) => id), [newer.id, older.id]);
+});
+
 test('the mock backend accepts a report and its photo', async () => {
   const storage = { value: null, getItem() { return this.value; }, setItem(_key, value) { this.value = value; } };
   const client = create({ adapter: createMockBackend(storage, 0), headers: { Authorization: 'Bearer mock-access.mock-demo' } });

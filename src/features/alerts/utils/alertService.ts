@@ -39,6 +39,7 @@ export function createAlertService({ driver, navigate, sendPushToken, onCheckInA
   const gate = createAlertGate();
   const alerts = new Map<string, AppAlert>();
   const raised = new Set<string>();
+  const warningListeners = new Set<(alert: AppAlert) => void>();
   let bannerTimer: ReturnType<typeof setTimeout> | undefined;
   let sentLanguage: Language | null = null;
   const enabled = (alert: AppAlert) => {
@@ -71,6 +72,8 @@ export function createAlertService({ driver, navigate, sendPushToken, onCheckInA
     }
     if (rule.fullScreen) navigate(alert);
     else showBanner(alert);
+    // A crash alert starts a check-in instead of warning the driver.
+    if (alert.type !== 'crash_detected') for (const listener of warningListeners) listener(alert);
   };
 
   // Tapping a notification always opens it, even if it was already shown.
@@ -100,6 +103,12 @@ export function createAlertService({ driver, navigate, sendPushToken, onCheckInA
     refreshPermission: () => applyPermission(driver.getPermission).catch(() => undefined),
     open,
     getAlert: (id: string) => alerts.get(id) ?? null,
+
+    // Told each warning the driver actually saw, after duplicates and disabled types are filtered out.
+    onWarning(listener: (alert: AppAlert) => void) {
+      warningListeners.add(listener);
+      return () => { warningListeners.delete(listener); };
+    },
 
     start(channels: AlertChannel[]) {
       const received = driver.onReceived(receive);

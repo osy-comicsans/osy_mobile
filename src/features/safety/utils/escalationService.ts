@@ -150,7 +150,8 @@ export function createEscalationService({
           source: event ? 'crash_detected' : 'user_report',
           location: coordinate,
           occurredAt: new Date(event?.detectedAt ?? now()).toISOString(),
-          type: 'crash',
+          // A user report only takes the report form's types, which have no crash.
+          type: event ? 'crash' : 'other',
           severity: 'serious',
           injuriesVisible: null,
           note: null,
