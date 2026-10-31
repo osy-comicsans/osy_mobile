@@ -1,11 +1,15 @@
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from '@tanstack/react-query';
 import { createContext, useEffect, useState, type PropsWithChildren } from 'react';
 
-import { authSession } from '@/common/lib/api/axios';
+import { api, authSession } from '@/common/lib/api/axios';
 import { createOfflineRuntime, type OfflineRuntime } from '@/common/lib/database/offlineRuntime';
+import { ACCIDENT_REPORT_ENTITY } from '@/common/lib/database/repositories/accidentReportRepository';
+import { createAccidentReportSyncAdapter } from '@/common/lib/database/sync/createAccidentReportSyncAdapter';
 import { refreshDeviceLanguage } from '@/common/lib/i18n/i18n';
 import { subscribeToForeground } from '@/common/lib/native/appLifecycle';
 import { subscribeToConnectivity } from '@/common/lib/network/connectivity';
+import { createSafetyApi } from '@/features/safety/api/safetyApi';
+import { reportPhotos } from '@/features/safety/native/reportPhotos';
 
 export const OfflineContext = createContext<OfflineRuntime | null>(null);
 
@@ -19,6 +23,7 @@ export function AppProviders({ children }: PropsWithChildren) {
     if (!runtime.status.getState().supported) return;
 
     // Register real backend adapters here when their endpoints exist.
+    runtime.registerSyncAdapter(ACCIDENT_REPORT_ENTITY, createAccidentReportSyncAdapter(createSafetyApi(api), reportPhotos));
     runtime.start(() => queryClient.invalidateQueries({ queryKey: ['local'] }));
     const unsubscribeNetwork = subscribeToConnectivity((online) => {
       onlineManager.setOnline(online);

@@ -4,6 +4,7 @@ import { config } from '../config';
 import { supportsLocalDatabase } from '../native/appLifecycle';
 import { createId } from '../native/uuid';
 import { LocalDatabase } from './localDatabase';
+import { AccidentReportRepository } from './repositories/accidentReportRepository';
 import { TodoRepository } from './repositories/todoRepository';
 import { WeatherRepository } from './repositories/weatherRepository';
 import { getDatabase } from './sqlite';
@@ -28,6 +29,7 @@ export function createOfflineRuntime() {
   const database = new LocalDatabase(getDatabase);
   const todos = new TodoRepository(database, createId);
   const weather = new WeatherRepository(database);
+  const reports = new AccidentReportRepository(database, createId);
   const queue = new SyncQueue(database);
   const status = createStore<OfflineStatus>(() => ({
     supported: supportsLocalDatabase, ready: false, online: null, foreground: true,
@@ -53,7 +55,7 @@ export function createOfflineRuntime() {
   const canSync = () => {
     const current = status.getState();
     return active && authenticated && current.ready && current.online === true && current.foreground
-      && config.syncEnabled && config.apiUrl.length > 0;
+      && config.hasBackend;
   };
 
   const sync = new SyncManager(queue, {
@@ -79,6 +81,7 @@ export function createOfflineRuntime() {
     if (!supportsLocalDatabase || status.getState().ready) return Promise.resolve();
     initialization ??= database.read(async () => undefined)
       .then(() => queue.recoverInterrupted())
+      .then(() => reports.clearDelivered())
       .then(async () => {
         status.setState({ ready: true, error: null });
         await changed();
@@ -93,7 +96,7 @@ export function createOfflineRuntime() {
   };
 
   return {
-    status, todos, weather, queue, sync, initialize, changed,
+    status, todos, weather, reports, queue, sync, initialize, changed,
     start(onChange: () => Promise<void>) {
       active = true;
       invalidate = onChange;

@@ -13,6 +13,15 @@ export function createSafetyApi(client: AxiosInstance) {
     createIncident: (request: IncidentRequest) => parseResponse(
       client.post('/incidents', incidentRequestSchema.parse(request)), incidentSchema,
     ),
+    uploadIncidentPhoto(id: string, { uri, mimeType }: { uri: string; mimeType: string }) {
+      const form = new FormData();
+      // React Native's FormData accepts a file descriptor in place of a Blob.
+      form.append('photo', { uri, name: 'photo', type: mimeType } as unknown as Blob);
+      return sendRequest(client.post(`/incidents/${id}/photo`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 60_000,
+      }));
+    },
     getNearbyIncidents: (query: NearbyIncidentsQuery) => parseResponse(
       client.get('/incidents/nearby', { params: nearbyIncidentsQuerySchema.parse(query) }),
       nearbyIncidentsResponseSchema,
