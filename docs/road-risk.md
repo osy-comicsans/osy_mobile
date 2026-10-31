@@ -43,6 +43,19 @@ The same request supplies marked speed limits, speed bumps, speed cameras, schoo
 
 This only shows what is mapped in OpenStreetMap. No listed hazard does not mean that the road has none, and a missing limit stays unknown. Hazards do not change risk scores yet.
 
+## Warnings
+
+`RiskWarningMonitor` checks the current road and the same road ahead, up to 12 seconds of travel (150 to 500 m), on every GPS fix while driving. It adds to the road's score:
+
+- **Too fast:** up to 0.35, against an advisory speed for the road class, lowered for curves, rain, ice, and poor visibility. It is capped by any marked limit, and it is never shown as a legal limit.
+- **Harsh driving:** 0.15 for 2 minutes after hard braking or cornering, measured from GPS.
+
+A warning needs a score of 0.7 or more, on two fixes in a row, with one of those two adding to it, at 30 km/h or more. A careful driver on a risky road is not warned.
+
+To limit alerts, there are at least 2 minutes between warnings and at most 6 an hour. A road piece warns once in 30 minutes, and the score must fall below 0.55 before the next warning. Warnings stop during a check-in.
+
+The banner and notification give the top two reasons, and the app reads them aloud unless sound is off in alert preferences. These warnings run only while the app is running, and iOS stays silent with the ringer off. All of these values are starting points to tune on real drives.
+
 ## Limits
 
 - **No accident history:** this needs the backend. The mock returns no nearby incidents, and a real server will add them through the same factor.
