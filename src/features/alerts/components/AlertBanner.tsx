@@ -40,7 +40,7 @@ export function AlertBanner() {
           onPress={() => service.open(banner)}
           style={styles.text}>
           <ThemedText type="headingS">{t(`alerts.${banner.type}.title`)}</ThemedText>
-          <ThemedText type="label" themeColor="textSecondary">{t(`alerts.${banner.type}.body`)}</ThemedText>
+          <ThemedText type="label" themeColor="textSecondary">{banner.detail ?? t(`alerts.${banner.type}.body`)}</ThemedText>
         </Pressable>
         <Button label={t('common.dismiss')} variant="text" size="small" onPress={service.dismissBanner} />
       </View>

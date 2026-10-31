@@ -9,6 +9,8 @@ export interface AppAlert {
   type: AlertType;
   roadName?: string;
   distanceMeters?: number;
+  // The reason for this alert, in place of the type's general text.
+  detail?: string;
 }
 
 export interface AlertPreferences {

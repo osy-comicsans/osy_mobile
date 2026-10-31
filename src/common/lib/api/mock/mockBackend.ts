@@ -201,6 +201,7 @@ export function createMockBackend(storage: MockStorage, latency = LATENCY_MS, op
     if (request.method?.toUpperCase() === 'POST' && /^\/incidents\/[^/]+\/photo$/.test(request.url ?? '')) {
       return { status: 204 };
     }
+    if (key === 'GET /incidents/nearby') return { status: 200, data: { incidents: [] } };
     if (key === 'POST /emergency/escalate') {
       return { status: 201, data: { id: body.id, status: 'escalating', liveLocationUrl: null } };
     }

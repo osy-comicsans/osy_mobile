@@ -20,7 +20,7 @@ export function AlertDetailScreen() {
   return (
     <PlaceholderScreen
       title={alert ? t(`alerts.${alert.type}.title`) : t('safety.alertTitle')}
-      description={alert ? t(`alerts.${alert.type}.body`) : t('safety.alertDescription')}>
+      description={alert ? alert.detail ?? t(`alerts.${alert.type}.body`) : t('safety.alertDescription')}>
       {alert?.roadName && <ThemedText type="bodyMedium">{alert.roadName}</ThemedText>}
       {distance && (
         <ThemedText type="body" themeColor="textSecondary">

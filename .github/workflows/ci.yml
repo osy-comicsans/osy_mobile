@@ -74,8 +74,20 @@ jobs:
       - name: Test Home dashboard and monitoring override
         run: pnpm test:home
 
+      - name: Escalation tests
+        run: pnpm test:escalation
+
+      - name: Crash model tests
+        run: pnpm test:crash-model
+
       - name: Accident report tests
         run: pnpm test:accident-report
+
+      - name: Road risk tests
+        run: pnpm test:road-risk
+
+      - name: Risk warning tests
+        run: pnpm test:risk-warnings
 
   build:
     name: Build ${{ matrix.platform }}

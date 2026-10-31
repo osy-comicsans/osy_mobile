@@ -31,6 +31,7 @@ const alertDataSchema = z.object({
   alertType: z.enum(ALERT_TYPES),
   roadName: z.string().min(1).optional(),
   distanceMeters: z.coerce.number().nonnegative().optional(),
+  detail: z.string().min(1).optional(),
 });
 
 // iOS delivers custom push values under `body`, and Android delivers them directly.
@@ -51,12 +52,13 @@ function safeJson(text: string): unknown {
 }
 
 export function toAlertData(alert: AppAlert): Record<string, string> {
-  const { id, type, roadName, distanceMeters } = alert;
+  const { id, type, roadName, distanceMeters, detail } = alert;
   return {
     alertId: id,
     alertType: type,
     ...(roadName ? { roadName } : {}),
     ...(distanceMeters === undefined ? {} : { distanceMeters: String(distanceMeters) }),
+    ...(detail ? { detail } : {}),
   };
 }
 

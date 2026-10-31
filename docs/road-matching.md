@@ -24,6 +24,5 @@ The OSRM client is separate from the API client, so the user's access token neve
 
 ## Not built yet
 
-- Road rules: speed limits, speed bumps, schools, and hazards need a separate data source, because OSRM does not return them. See #4.
 - Road names in the app language: OSRM can return French and Arabic together.
 - Keeping the last road across app restarts.

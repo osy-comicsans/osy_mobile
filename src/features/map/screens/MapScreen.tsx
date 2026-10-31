@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,9 +7,14 @@ import { Icon } from '@/common/components/ui/icon';
 import { BottomTabInset, Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 import { useCurrentLocation } from '@/features/location/hooks/useLocation';
 import { PlaceholderScreen } from '@/common/screens/PlaceholderScreen';
+import { useVisibleRoadRisk } from '@/features/road-risk/hooks/useVisibleRoadRisk';
+import type { Bounds } from '@/features/road-risk/types/roadRisk.types';
+import { riskAreasInView, type RiskArea } from '@/features/road-risk/utils/roadSegments';
 import { ReportAccidentButton } from '@/features/safety/components/ReportAccidentButton';
 
 import type { MapCanvas as MapCanvasType, MapCanvasHandle } from '../components/MapCanvas';
+import { RiskLegend } from '../components/RiskLegend';
+import { RiskRoadCard } from '../components/RiskRoadCard';
 import { RoadInfoCard } from '../components/RoadInfoCard';
 import { isMapAvailable } from '../utils/mapAvailability';
 import { EMPTY_OVERLAYS } from '../utils/mapOverlays';
@@ -22,6 +27,25 @@ export function MapScreen() {
   const fix = useCurrentLocation();
   const canvas = useRef<MapCanvasHandle>(null);
   const [following, setFollowing] = useState(true);
+  const [showRisk, setShowRisk] = useState(true);
+  const [areas, setAreas] = useState<RiskArea[] | null>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const settle = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const risk = useVisibleRoadRisk(showRisk ? areas ?? [] : []);
+  const overlays = useMemo<MapOverlays>(
+    () => (showRisk ? { ...EMPTY_OVERLAYS, 'risk-roads': risk.features, hazards: risk.hazardFeatures } : EMPTY_OVERLAYS),
+    [showRisk, risk.features, risk.hazardFeatures],
+  );
+
+  useEffect(() => () => clearTimeout(settle.current), []);
+
+  const onViewChange = useCallback((bounds: Bounds) => {
+    clearTimeout(settle.current);
+    settle.current = setTimeout(() => {
+      const next = riskAreasInView(bounds);
+      setAreas((current) => (sameAreas(current, next) ? current : next));
+    }, VIEW_SETTLE_MS);
+  }, []);
 
   if (!isMapAvailable()) {
     return (
@@ -35,6 +59,8 @@ export function MapScreen() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { MapCanvas } = require('../components/MapCanvas') as { MapCanvas: typeof MapCanvasType };
 
+  const selected = selectedId ? risk.risks.get(selectedId) ?? null : null;
+
   const recenter = () => {
     setFollowing(true);
     canvas.current?.recenter(fix ? [fix.longitude, fix.latitude] : null);
@@ -45,8 +71,16 @@ export function MapScreen() {
       <MapCanvas ref={canvas} following={following} overlays={EMPTY_OVERLAYS} onFollowingChange={setFollowing} />
       <View pointerEvents="box-none" style={[styles.top, { top: top + Space[3] }]}>
         <RoadInfoCard />
+        {showRisk && selected && (
+          <RiskRoadCard risk={selected} weatherKnown={risk.weatherKnown} onClose={() => setSelectedId(null)} />
+        )}
       </View>
       <View style={styles.report}>
+        <RiskLegend
+          visible={showRisk}
+          onToggle={setShowRisk}
+          status={areas === null ? 'zoomIn' : risk.status}
+        />
         <ReportAccidentButton />
       </View>
       {!following && (
@@ -64,8 +98,8 @@ export function MapScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.background },
-  top: { position: 'absolute', start: Space[4], end: Space[4] },
-  report: { position: 'absolute', start: Space[4], bottom: BottomTabInset + Space[6] },
+  top: { position: 'absolute', start: Space[4], end: Space[4], gap: Space[2] },
+  report: { position: 'absolute', start: Space[4], bottom: BottomTabInset + Space[6], alignItems: 'flex-start', gap: Space[2] },
   recenter: {
     position: 'absolute',
     end: Space[4],

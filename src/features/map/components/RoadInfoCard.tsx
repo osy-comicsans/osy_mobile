@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/common/components/themed-text';
 import { Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 import { useCurrentSpeed } from '@/features/location/hooks/useLocation';
+import { RoadHazardList } from '@/features/roads/components/RoadHazardList';
 import { useCurrentRoad } from '@/features/roads/hooks/useRoad';
 import { useSpeedDisplay } from '@/features/settings/hooks/useSpeedDisplay';
 import { useTheme } from '@/common/hooks/use-theme';
@@ -16,6 +17,8 @@ export function RoadInfoCard() {
   const theme = useTheme();
   const speedText = display.formatted;
   const spokenSpeed = display.spoken;
+
+  const limitText = speedLimit.valueKmh === null ? '' : `, ${t('dashboard.speed.limit')} ${t('units.speed', { value: speedLimit.valueKmh })}`;
 
   return (
     <View accessible accessibilityLabel={`${road?.name ?? t('map.unknownRoad')}, ${spokenSpeed}`} style={[styles.card, { backgroundColor: theme.surface }]}>
@@ -36,23 +39,39 @@ export function RoadInfoCard() {
           {road?.name ?? (road ? '' : t('map.unknownRoad'))}
         </ThemedText>
       </View>
+      {speedLimit.valueKmh !== null && (
+        <View style={styles.limit}>
+          <ThemedText type="smallBold">{formatNumber(getLanguage(), speedLimit.valueKmh)}</ThemedText>
+        </View>
+      )}
       <View style={styles.speed}>
         <ThemedText type="heading">{speedText}</ThemedText>
         <ThemedText type="label" themeColor="textSecondary">{display.unit}</ThemedText>
       </View>
+      </View>
+      <RoadHazardList hazards={hazards} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Space[4],
+    gap: Space[2],
     padding: Space[4],
     borderRadius: Radius.lg,
     backgroundColor: Colors.surface,
     boxShadow: Shadow.soft,
+  },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Space[3] },
+  limit: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.full,
+    borderWidth: 4,
+    borderColor: Colors.error,
+    backgroundColor: Colors.surface,
   },
   road: { flex: 1, gap: Space[1] },
   plates: { flexDirection: 'row', flexWrap: 'wrap', gap: Space[1] },
