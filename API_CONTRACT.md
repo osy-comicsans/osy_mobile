@@ -71,12 +71,17 @@ Field keys are defined in #28. A document marked `rejected` must include a `reje
 | Method | Path | Body or query | Success |
 | --- | --- | --- | --- |
 | `POST` | `/incidents` | Incident | `201` incident |
+| `POST` | `/incidents/{id}/photo` | Multipart `photo`: a JPEG or PNG of up to 10 MB | `204` |
 | `GET` | `/incidents/nearby` | `latitude`, `longitude`, `radiusKm` | `200` `incidents` |
 | `POST` | `/emergency/escalate` | Escalation | `201` escalation status |
 | `POST` | `/emergency/escalate/{id}/location` | `latitude`, `longitude` | `204` |
 | `POST` | `/emergency/escalate/{id}/cancel` | None | `200` escalation status |
 
 Incident: `id`, `source` (`user_report`, `crash_detected`), `location`, `occurredAt`, `type`, `severity` (`minor`, `serious`, `critical`), `injuriesVisible`, `note`.
+
+For a `user_report`, `type` is `collision`, `pedestrian`, `rollover`, `fire`, or `other`. A queued report can arrive long after `occurredAt`.
+
+The backend must merge duplicate reports of one accident and protect against abuse, for example with per-user rate limits. A merged report still returns `201`, and a `429` is retried by the app. Any other `4xx` is treated as final, and the app stops retrying.
 
 Escalation: `id`, `incidentId`, `trigger` (`user_requested`, `check_in_timeout`), `location`, `speedBeforeImpactKmh`, `roadName`, `roadNumber`, `shareMedicalInfo`. The response contains `id`, `status` (`escalating`, `resolved`, `canceled`), and `liveLocationUrl`.
 
@@ -126,4 +131,4 @@ Invalid coordinates return `422`; the standalone per-client rate limit returns `
 
 ## Offline sync
 
-Offline sync requires a signed-in user and stays disabled until `EXPO_PUBLIC_SYNC_ENABLED` is `true`, an adapter is registered, and the endpoints exist. No sync endpoints are defined yet. The backend must deduplicate `clientOperationId`, keep client-generated IDs, and return `409` for conflicts.
+Offline sync requires a signed-in user, a backend, and a registered adapter. Accident reports use it through `POST /incidents`. Task sync stays off until `EXPO_PUBLIC_SYNC_ENABLED` is `true` and its endpoints exist, which are not defined yet. The backend must deduplicate `clientOperationId`, keep client-generated IDs, and return `409` for conflicts.

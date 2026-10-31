@@ -4,6 +4,7 @@ import { config } from '../config';
 import { supportsLocalDatabase } from '../native/appLifecycle';
 import { createId } from '../native/uuid';
 import { LocalDatabase } from './localDatabase';
+import { AccidentReportRepository } from './repositories/accidentReportRepository';
 import { TodoRepository } from './repositories/todoRepository';
 import { WeatherRepository } from './repositories/weatherRepository';
 import { AreaRepository } from './repositories/areaRepository';
@@ -55,7 +56,7 @@ export function createOfflineRuntime() {
   const canSync = () => {
     const current = status.getState();
     return active && authenticated && current.ready && current.online === true && current.foreground
-      && config.syncEnabled && config.apiUrl.length > 0;
+      && config.hasBackend;
   };
 
   const sync = new SyncManager(queue, {
@@ -81,6 +82,7 @@ export function createOfflineRuntime() {
     if (!supportsLocalDatabase || status.getState().ready) return Promise.resolve();
     initialization ??= database.read(async () => undefined)
       .then(() => queue.recoverInterrupted())
+      .then(() => reports.clearDelivered())
       .then(async () => {
         status.setState({ ready: true, error: null });
         await changed();

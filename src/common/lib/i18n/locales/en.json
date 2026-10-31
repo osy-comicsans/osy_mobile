@@ -58,8 +58,7 @@
   "safety": {
     "alertTitle": "Alert",
     "alertDescription": "Alert details will appear here.",
-    "reportTitle": "Report an accident",
-    "reportDescription": "The accident report form will appear here."
+    "reportTitle": "Report an accident"
   },
   "location": {
     "driving": {
@@ -384,5 +383,57 @@
     "noRuntime": "ONNX Runtime is not available. This needs a development build.",
     "noSensors": "No sensor data arrived.",
     "failed": "The model check failed."
+  },
+  "report": {
+    "button": "Report accident",
+    "passengerTitle": "Are you a passenger?",
+    "passengerBody": "Don’t report while driving. Stop somewhere safe first.",
+    "passenger": "I’m a passenger",
+    "notNow": "Not now",
+    "description": "Tell other drivers what you saw. It only takes a few taps.",
+    "locationLabel": "Location",
+    "locationAuto": "Using your current location",
+    "locationPinned": "Pin placed on the map",
+    "locationMissing": "We need a location before you can send this.",
+    "adjust": "Adjust on map",
+    "setOnMap": "Set on map",
+    "mapHint": "Move the map to put the pin on the accident.",
+    "useLocation": "Use this location",
+    "mapUnavailable": "The map needs a development build, so wait for a GPS location.",
+    "typeLabel": "What happened?",
+    "severityLabel": "How serious is it?",
+    "injuriesLabel": "Are there visible injuries?",
+    "noteLabel": "Note (optional)",
+    "photoLabel": "Photo (optional)",
+    "takePhoto": "Take photo",
+    "choosePhoto": "Choose photo",
+    "removePhoto": "Remove photo",
+    "photoAdded": "Photo added",
+    "photoTooLarge": "This photo is over 10 MB. Choose a smaller one.",
+    "cameraDenied": "Camera access is off. Turn it on in your phone settings, or choose a photo.",
+    "send": "Send report",
+    "failed": "Your report could not be saved. Try again.",
+    "sendingTitle": "Report sent",
+    "sendingBody": "Thanks for looking out for other drivers.",
+    "queuedTitle": "Report saved",
+    "queuedBody": "You’re offline. OSY will send it when the connection returns.",
+    "done": "Done",
+    "type": {
+      "collision": "Collision",
+      "pedestrian": "Pedestrian hit",
+      "rollover": "Rollover",
+      "fire": "Vehicle fire",
+      "other": "Other"
+    },
+    "severity": {
+      "minor": "Minor",
+      "serious": "Serious",
+      "critical": "Critical"
+    },
+    "injuries": {
+      "yes": "Yes",
+      "no": "No",
+      "unsure": "Not sure"
+    }
   }
 }

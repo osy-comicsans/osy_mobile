@@ -58,8 +58,7 @@
   "safety": {
     "alertTitle": "Alerte",
     "alertDescription": "Les détails de l’alerte s’afficheront ici.",
-    "reportTitle": "Signaler un accident",
-    "reportDescription": "Le formulaire de signalement d’accident s’affichera ici."
+    "reportTitle": "Signaler un accident"
   },
   "location": {
     "driving": {
@@ -384,5 +383,57 @@
     "noRuntime": "ONNX Runtime n’est pas disponible. Une version de développement est nécessaire.",
     "noSensors": "Aucune donnée de capteur reçue.",
     "failed": "La vérification du modèle a échoué."
+  },
+  "report": {
+    "button": "Signaler un accident",
+    "passengerTitle": "Êtes-vous passager ?",
+    "passengerBody": "Ne signalez rien en conduisant. Arrêtez-vous d’abord dans un endroit sûr.",
+    "passenger": "Je suis passager",
+    "notNow": "Plus tard",
+    "description": "Dites aux autres conducteurs ce que vous avez vu. Quelques gestes suffisent.",
+    "locationLabel": "Lieu",
+    "locationAuto": "Votre position actuelle est utilisée",
+    "locationPinned": "Repère placé sur la carte",
+    "locationMissing": "Un lieu est nécessaire pour envoyer ce signalement.",
+    "adjust": "Ajuster sur la carte",
+    "setOnMap": "Placer sur la carte",
+    "mapHint": "Déplacez la carte pour placer le repère sur l’accident.",
+    "useLocation": "Utiliser ce lieu",
+    "mapUnavailable": "La carte nécessite une version de développement. Attendez une position GPS.",
+    "typeLabel": "Que s’est-il passé ?",
+    "severityLabel": "Quelle est la gravité ?",
+    "injuriesLabel": "Y a-t-il des blessés visibles ?",
+    "noteLabel": "Note (facultatif)",
+    "photoLabel": "Photo (facultatif)",
+    "takePhoto": "Prendre une photo",
+    "choosePhoto": "Choisir une photo",
+    "removePhoto": "Retirer la photo",
+    "photoAdded": "Photo ajoutée",
+    "photoTooLarge": "Cette photo dépasse 10 Mo. Choisissez-en une plus petite.",
+    "cameraDenied": "L’accès à l’appareil photo est désactivé. Activez-le dans les réglages ou choisissez une photo.",
+    "send": "Envoyer le signalement",
+    "failed": "Votre signalement n’a pas pu être enregistré. Réessayez.",
+    "sendingTitle": "Signalement envoyé",
+    "sendingBody": "Merci de veiller sur les autres conducteurs.",
+    "queuedTitle": "Signalement enregistré",
+    "queuedBody": "Vous êtes hors ligne. OSY l’enverra dès le retour de la connexion.",
+    "done": "Terminé",
+    "type": {
+      "collision": "Collision",
+      "pedestrian": "Piéton renversé",
+      "rollover": "Tonneau",
+      "fire": "Véhicule en feu",
+      "other": "Autre"
+    },
+    "severity": {
+      "minor": "Légère",
+      "serious": "Grave",
+      "critical": "Critique"
+    },
+    "injuries": {
+      "yes": "Oui",
+      "no": "Non",
+      "unsure": "Je ne sais pas"
+    }
   }
 }
