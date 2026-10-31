@@ -289,8 +289,7 @@
       "unit": "km/h",
       "limit": "Road speed limit",
       "limitUnknown": "Not available",
-      "signed": "Signed limit · OpenStreetMap",
-      "default": "Default limit · not a signed limit"
+      "signed": "Signed limit · OpenStreetMap"
     },
     "location": {
       "title": "Where you are",
@@ -312,17 +311,13 @@
     },
     "risk": {
       "title": "Accident risk",
-      "preview": "EXAMPLE DATA",
+      "loading": "Assessing accident risk",
       "scale": "out of 100",
       "low": "Low",
-      "moderate": "Moderate",
+      "medium": "Medium",
       "high": "High",
       "unknown": "Not assessed",
-      "exampleDescription": "Example assessment only. This is not a live risk estimate.",
-      "factors": "Example factors",
-      "liveFactors": "Top factors",
-      "factorWet": "Wet road surface",
-      "factorVisibility": "Reduced visibility"
+      "factors": "Top factors"
     },
     "actions": {
       "title": "Quick actions",
@@ -499,6 +494,7 @@
     "credit": "Road data © OpenStreetMap contributors",
     "estimate": "An estimate, not a guarantee that a road is safe.",
     "noWeather": "Weather is unavailable, so this may be too low.",
+    "noIncidents": "Nearby accident data is unavailable, so this may be too low.",
     "close": "Close",
     "hazard": {
       "bump": "Speed bump",

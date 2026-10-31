@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import type { WeatherRiskInputs } from '@/features/weather/types/weather.types';
+
 export const overpassResponseSchema = z.object({
   elements: z.array(z.object({
     type: z.string(),
@@ -63,4 +65,15 @@ export interface SegmentRisk {
   level: RiskLevel;
   // The largest contributors first, so a warning can give its reason.
   factors: RiskFactor[];
+}
+
+export interface RoadRisk {
+  segments: RoadSegment[];
+  hazards: (RoadHazard & { distanceMeters: number })[];
+  risks: SegmentRisk[];
+  current: SegmentRisk | null;
+  currentSegment: RoadSegment | null;
+  weather: WeatherRiskInputs | null;
+  loading: boolean;
+  sources: { roads: boolean; weather: boolean; incidents: boolean };
 }

@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Card } from '@/common/components/ui/card';
-import { ContentSkeleton } from '@/common/components/ui/loading';
+import { ContentSkeleton, LoadingIndicator } from '@/common/components/ui/loading';
 import { Radius, Space } from '@/common/lib/theme';
 import { useTheme } from '@/common/hooks/use-theme';
+import { useRoadRisk } from '@/features/road-risk/hooks/useRoadRisk';
 import { useRoadRules } from '@/features/roads/hooks/useRoadRules';
 import { useHomeLocation } from '../hooks/useHomeLocation';
+import { homeSpeedLimitStatus } from '../utils/homePresentation';
 import { Speedometer } from './Speedometer';
 import { useSpeedDisplay } from '@/features/settings/hooks/useSpeedDisplay';
 
@@ -17,7 +19,9 @@ export function SpeedCard() {
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const location = useHomeLocation();
+  const { loading } = useRoadRisk();
   const { speedLimit } = useRoadRules();
+  const limit = homeSpeedLimitStatus(location, loading, speedLimit.valueKmh);
   const limitDisplay = useSpeedDisplay(speedLimit.valueKmh);
   return (
     <Card glass style={styles.card}>
@@ -31,9 +35,10 @@ export function SpeedCard() {
         : <Speedometer speedKmh={location.speedKmh} />}
       <View style={styles.limit}>
         <ThemedText type="label" themeColor="textSecondary">{t('dashboard.speed.limit')}</ThemedText>
-        <ThemedText type="bodyMedium">{speedLimit.valueKmh === null ? t('dashboard.speed.limitUnknown')
-          : `${limitDisplay.formatted} ${limitDisplay.unit}`}</ThemedText>
-        {speedLimit.source !== 'unknown' ? <ThemedText type="small" themeColor="textSecondary">{t(`dashboard.speed.${speedLimit.source}`)}</ThemedText> : null}
+        {limit === 'loading' ? <LoadingIndicator label={t('roadRisk.loading')} color={Colors.accent} />
+          : <ThemedText type="bodyMedium">{limit === 'unknown' ? t('dashboard.speed.limitUnknown')
+            : `${limitDisplay.formatted} ${limitDisplay.unit}`}</ThemedText>}
+        {limit === 'current' && speedLimit.source !== 'unknown' ? <ThemedText type="small" themeColor="textSecondary">{t(`dashboard.speed.${speedLimit.source}`)}</ThemedText> : null}
       </View>
       {!location.fresh ? <ThemedText type="label" themeColor="textSecondary">{t(`dashboard.location.${location.status}`)}</ThemedText> : null}
     </Card>

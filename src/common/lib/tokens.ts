@@ -79,11 +79,12 @@ export const DarkColors: Record<ThemeColor, string> = {
   onAccent: '#171F25', accentActive: '#D8C2FF', accentHover: '#D8C2FF',
 };
 
+/** DESIGN §1.6, as theme keys so each level follows the light or dark theme. */
 export const Priority = {
-  low: Colors.success,
-  medium: Colors.warning,
-  high: Colors.error,
-} as const;
+  low: 'success',
+  medium: 'warning',
+  high: 'error',
+} as const satisfies Record<string, ThemeColor>;
 
 export const Radius = {
   sm: 8,

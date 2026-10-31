@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Card } from '@/common/components/ui/card';
-import { Colors, Radius, Space } from '@/common/lib/theme';
+import { Radius, Space } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 import { useDrivingMode } from '@/features/driving/hooks/useDrivingMode';
 import { useMonitoringStatus } from '../hooks/useMonitoringStatus';
 import { useSettings } from '@/features/settings/hooks/useSettings';
 
 export function MonitoringCard() {
+  const Colors = useTheme();
   const { t } = useTranslation();
   const status = useMonitoringStatus();
   const mode = useDrivingMode();
