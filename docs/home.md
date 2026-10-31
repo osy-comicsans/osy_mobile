@@ -14,7 +14,7 @@ Cards use the shared OSY purple, lavender, charcoal, spacing, Gabarito/Arabic ty
 - Area names use native reverse geocoding, coalesced into approximately 1 km cells, at most once a minute. SQLite caches up to 60 coarse area labels for seven days, refreshing labels after one day. No raw GPS trace is stored or added to cloud sync. The device's platform geocoder may require a network connection; cached labels and coordinates remain usable without one. Web shows coordinates and the unavailable-area text.
 - Weather reuses the existing cached query and offline repository. The compact card expands for astronomy, icing guidance, and the next hours. See [weather configuration](weather.md).
 - Speed limits and nearby hazards come from OpenStreetMap, through `useRoadRules()`. A road with no marked limit stays **unknown**, and OSRM travel speeds are never presented as legal limits.
-- Risk is a clearly labelled **static example**, including its sample factors. It neither consumes live readings nor triggers alerts. `useRiskAssessment()` is the replacement point for the future model.
+- Risk is the [road risk](road-risk.md) of the current road: its level, its score out of 100, and its top factors. Without a fix or a matched road it reads "Not assessed". It notes an old position, and missing weather or accident data, because either can make the score too low.
 
 ## Automatic monitoring and manual override
 
@@ -24,12 +24,12 @@ Providers stay mounted when pausing, so an active check-in, its countdown, notif
 
 ## Verification
 
-Run `pnpm test:home`, `pnpm lint`, and `pnpm typecheck`. Home tests cover preference persistence and failures, subscription cleanup, an active emergency during Pause, stale/unknown speed, the static risk boundary, geocoding throttling and offline cache, SQLite migration, and native-glass guards.
+Run `pnpm test:home`, `pnpm lint`, and `pnpm typecheck`. Home tests cover preference persistence and failures, subscription cleanup, an active emergency during Pause, stale/unknown speed, the risk card's states and labels, geocoding throttling and offline cache, SQLite migration, and native-glass guards.
 
 On an existing iOS/Android development build:
 
 1. Sign in, open Home, grant location/motion access, and check stationary/walking states and real speed. Refuse access or disable location services and verify clear states and accessible actions.
-2. Have a passenger inspect Home during a drive: speed and current road should update; weather should refresh according to its existing policy. Legal speed limits must remain unknown and risk must remain labelled as an example.
+2. Have a passenger inspect Home during a drive: speed, current road, and risk should update; weather should refresh according to its existing policy. A road with no marked limit must show it as unknown.
 3. Pause, relaunch, and confirm it remains paused while GPS/weather still work. Resume and check monitoring returns automatically when driving.
 4. Open a check-in from a deep link, pause monitoring, and verify the existing countdown continues. Report accident and Map navigation should remain reachable.
 5. Revisit a cached area offline. Verify the retained locality/weather and stale labels. Visit an uncached area and check coordinate/unknown fallbacks.

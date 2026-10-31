@@ -312,17 +312,13 @@
     },
     "risk": {
       "title": "Risque d’accident",
-      "preview": "DONNÉES D’EXEMPLE",
+      "loading": "Évaluation du risque d’accident",
       "scale": "sur 100",
       "low": "Faible",
-      "moderate": "Modéré",
+      "medium": "Moyen",
       "high": "Élevé",
       "unknown": "Non évalué",
-      "exampleDescription": "Évaluation d’exemple uniquement. Ce n’est pas une estimation du risque en direct.",
-      "factors": "Facteurs d’exemple",
-      "liveFactors": "Principaux facteurs",
-      "factorWet": "Chaussée mouillée",
-      "factorVisibility": "Visibilité réduite"
+      "factors": "Principaux facteurs"
     },
     "actions": {
       "title": "Actions rapides",
@@ -499,6 +495,7 @@
     "credit": "Données routières © contributeurs OpenStreetMap",
     "estimate": "Une estimation, pas une garantie que la route est sûre.",
     "noWeather": "Météo indisponible : ce risque peut être sous-estimé.",
+    "noIncidents": "Données d’accidents à proximité indisponibles : ce risque peut être sous-estimé.",
     "close": "Fermer",
     "hazard": {
       "bump": "Dos-d’âne",

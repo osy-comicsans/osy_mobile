@@ -13,7 +13,9 @@ Module._resolveFilename = function (request, ...rest) {
 
 const { createDrivingModeService, monitoringEnabled } = require('../src/features/driving/utils/drivingModeService.ts');
 const { bindMonitoring } = require('../src/features/driving/utils/bindMonitoring.ts');
-const { homeLocationPresentation, homeMonitoringStatus } = require('../src/features/home/utils/homePresentation.ts');
+const {
+  homeLocationPresentation, homeMonitoringStatus, homeRiskPresentation,
+} = require('../src/features/home/utils/homePresentation.ts');
 const { createAreaService, areaCell, areaLabel } = require('../src/features/location/utils/areaService.ts');
 const { areaPolicy } = require('../src/features/location/utils/areaPolicy.ts');
 const { AreaRepository } = require('../src/common/lib/database/repositories/areaRepository.ts');
@@ -22,7 +24,7 @@ const { migrateDatabase } = require('../src/common/lib/database/migrations/index
 const { createRoadService } = require('../src/features/roads/utils/roadService.ts');
 const { createCrashDetectionService } = require('../src/features/crash-detection/utils/crashDetectionService.ts');
 const { createCheckInService } = require('../src/features/safety/utils/checkInService.ts');
-const { demoRiskAssessment } = require('../src/features/risk/fixtures/demoRisk.ts');
+const locales = ['en', 'fr', 'ar'].map((language) => require(`../src/common/lib/i18n/locales/${language}.json`));
 
 const at = Date.parse('2026-10-31T10:00:00Z');
 const flush = () => new Promise(setImmediate);
@@ -30,6 +32,13 @@ const deferred = () => { let resolve; let reject; const promise = new Promise((a
 const fix = (timestamp = at, latitude = 36.75) => ({ timestamp, latitude, longitude: 3.06, accuracy: 5, heading: 90, speedMs: 10, speedKmh: 36 });
 const state = (overrides = {}) => ({ status: 'watching', location: 'granted', canAskAgain: true, motion: 'granted', requesting: false,
   fix: fix(), drivingState: 'driving', error: null, ...overrides });
+const home = (overrides) => homeLocationPresentation(state(overrides), at);
+const sources = { roads: true, weather: true, incidents: true };
+const segmentRisk = (level, score, ids = ['roadClass']) => ({
+  segmentId: 'way-1', level, score, factors: ids.map((id) => ({ id, contribution: 0.1 })),
+});
+const roadRisk = (overrides = {}) => ({ loading: false, current: segmentRisk('medium', 0.42), sources, ...overrides });
+const translated = (key) => locales.every((locale) => typeof key.split('.').reduce((node, part) => node?.[part], locale) === 'string');
 const preference = (initial = null) => {
   let value = initial;
   return { getItem: async () => value, setItem: async (_key, next) => { value = next; } };
@@ -155,12 +164,38 @@ test('speed distinguishes real zero from unknown, denied, old and stopped readin
   assert.equal(homeMonitoringStatus({ ready: true, paused: false }, state(), 'monitoring', at), 'monitoring');
 });
 
-test('risk preview is immutable example data, separate from current GPS and weather', () => {
-  assert.equal(demoRiskAssessment.source, 'placeholder');
-  assert.equal(demoRiskAssessment.updatedAt, null);
-  assert.ok(Object.isFrozen(demoRiskAssessment));
-  assert.ok(Object.isFrozen(demoRiskAssessment.factors));
-  assert.ok(demoRiskAssessment.factors.every(Object.isFrozen));
+test('live risk shows the level, a score out of 100, and translated top factors', () => {
+  for (const [level, score, shown] of [['low', 0.08, 8], ['low', 0.29, 29], ['medium', 0.42, 42], ['high', 1, 100]]) {
+    const risk = homeRiskPresentation(home(), roadRisk({ current: segmentRisk(level, score) }));
+    assert.deepEqual(risk, { status: 'live', level, score: shown, factors: ['roadRisk.factor.roadClass'], notes: [] });
+    assert.ok(translated(`dashboard.risk.${level}`), level);
+  }
+  const ids = ['roadClass', 'curves', 'junctions', 'wet', 'icing', 'visibility', 'wind', 'darkness', 'speeding',
+    'incidents', 'tooFast', 'harshDriving'];
+  const { factors } = homeRiskPresentation(home(), roadRisk({ current: segmentRisk('high', 0.9, ids) }));
+  assert.deepEqual(factors, ids.map((id) => `roadRisk.factor.${id}`));
+  for (const key of factors) assert.ok(translated(key), key);
+});
+
+test('the risk card waits for GPS and road data, and says when the road cannot be assessed', () => {
+  assert.deepEqual(homeRiskPresentation(home({ location: 'denied' }), roadRisk()), { status: 'permission' });
+  assert.deepEqual(homeRiskPresentation(home({ fix: null }), roadRisk({ current: null })), { status: 'loading' });
+  assert.deepEqual(homeRiskPresentation(home(), roadRisk({ loading: true, current: null })), { status: 'loading' });
+  const none = { roads: false, weather: false, incidents: false };
+  assert.deepEqual(homeRiskPresentation(home({ fix: null, status: 'error' }), roadRisk({ current: null, sources: none })),
+    { status: 'unassessed', notes: [] });
+  assert.deepEqual(homeRiskPresentation(home(), roadRisk({ current: null })), { status: 'unassessed', notes: [] });
+  assert.deepEqual(homeRiskPresentation(home(), roadRisk({ current: null, sources: { ...sources, roads: false } })),
+    { status: 'unassessed', notes: ['roadRisk.failed'] });
+});
+
+test('an old position or missing weather and accident data is noted beside the score', () => {
+  const risk = homeRiskPresentation(home({ fix: fix(at - 31_000) }),
+    roadRisk({ sources: { roads: true, weather: false, incidents: false } }));
+  assert.equal(risk.status, 'stale');
+  assert.equal(risk.score, 42);
+  assert.deepEqual(risk.notes, ['dashboard.location.stale', 'roadRisk.noWeather', 'roadRisk.noIncidents']);
+  for (const key of [...risk.notes, 'roadRisk.failed']) assert.ok(translated(key), key);
 });
 
 test('locality lookup is shared per cell, cached, and throttled across movements', async (t) => {
