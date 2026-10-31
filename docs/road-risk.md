@@ -6,10 +6,11 @@ Version 1 (`road-risk-heuristic-v1`) scores road segments on the phone, from 0 t
 
 ## Using it
 
-`useRoadRisk()` returns:
+`RoadRiskProvider`, mounted with the tabs, computes it once. `useRoadRisk()` reads it and returns:
 
 - `segments` and `risks`: the roads around the driver, in an area about 2 km across, and their scores.
 - `current` and `currentSegment`: the road being driven, including the speed factor.
+- `loading`: true while the roads around the driver are loading.
 - `sources`: whether road, weather, and incident data were available. A missing source lowers a score, so never read a low score as "safe".
 
 Reasons are factor ids, with text under `roadRisk.factor.<id>`. Levels are `low` below 0.3, `medium` from 0.3, and `high` from 0.6. The Map tab shows these scores, as described in [Map](map.md). `useVisibleRoadRisk()` gives it the same scores for the areas on screen, without the speed factor.
