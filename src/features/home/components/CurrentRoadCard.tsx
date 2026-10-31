@@ -1,5 +1,6 @@
 import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ThemedText } from '@/common/components/themed-text';
@@ -8,7 +9,8 @@ import { Card } from '@/common/components/ui/card';
 import { ContentSkeleton } from '@/common/components/ui/loading';
 import { formatDateTime, formatNumber } from '@/common/lib/i18n/format';
 import { getLanguage } from '@/common/lib/i18n/i18n';
-import { Colors, Radius, Space } from '@/common/lib/theme';
+import { Radius, Space } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 import { useCurrentArea } from '@/features/location/hooks/useCurrentArea';
 import { RoadHazardList } from '@/features/roads/components/RoadHazardList';
 import { useCurrentRoad } from '@/features/roads/hooks/useRoad';
@@ -16,6 +18,8 @@ import { useRoadRules } from '@/features/roads/hooks/useRoadRules';
 import { useHomeLocation } from '../hooks/useHomeLocation';
 
 export function CurrentRoadCard() {
+  const Colors = useTheme();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const location = useHomeLocation();
   const { road, stale } = useCurrentRoad();
@@ -62,7 +66,7 @@ export function CurrentRoadCard() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (Colors: ReturnType<typeof useTheme>) => StyleSheet.create({
   card: { gap: Space[3] },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: Space[2] },
   plates: { flexDirection: 'row', flexWrap: 'wrap', gap: Space[2] },
