@@ -7,6 +7,7 @@ import { Icon } from '@/common/components/ui/icon';
 import { BottomTabInset, Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 import { useCurrentLocation } from '@/features/location/hooks/useLocation';
 import { PlaceholderScreen } from '@/common/screens/PlaceholderScreen';
+import { ReportAccidentButton } from '@/features/safety/components/ReportAccidentButton';
 
 import type { MapCanvas as MapCanvasType, MapCanvasHandle } from '../components/MapCanvas';
 import { RoadInfoCard } from '../components/RoadInfoCard';
@@ -21,7 +22,11 @@ export function MapScreen() {
   const [following, setFollowing] = useState(true);
 
   if (!isMapAvailable()) {
-    return <PlaceholderScreen title={t('map.title')} description={t('map.unavailable')} />;
+    return (
+      <PlaceholderScreen title={t('map.title')} description={t('map.unavailable')}>
+        <ReportAccidentButton />
+      </PlaceholderScreen>
+    );
   }
 
   // Loaded here, because Expo Go has no MapLibre and must still open this tab.
@@ -39,6 +44,9 @@ export function MapScreen() {
       <View pointerEvents="box-none" style={[styles.top, { top: top + Space[3] }]}>
         <RoadInfoCard />
       </View>
+      <View style={styles.report}>
+        <ReportAccidentButton />
+      </View>
       {!following && (
         <Pressable
           accessibilityRole="button"
@@ -55,6 +63,7 @@ export function MapScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.background },
   top: { position: 'absolute', start: Space[4], end: Space[4] },
+  report: { position: 'absolute', start: Space[4], bottom: BottomTabInset + Space[6] },
   recenter: {
     position: 'absolute',
     end: Space[4],
