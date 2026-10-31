@@ -63,7 +63,7 @@ export function levelFor(score: number): RiskLevel {
 export function scoreSegment(segment: RoadSegment, context: RiskContext): SegmentRisk {
   const { weather, now, speedKmh } = context;
   const live = weather?.available ? weather : null;
-  const contributions: Record<RiskFactorId, number> = {
+  const contributions: Partial<Record<RiskFactorId, number>> = {
     roadClass: roadClassRisk(segment.roadClass),
     curves: ramp(segment.curvatureDegreesPerKm, 100, 400, 0.25),
     junctions: ramp((segment.junctionCount / Math.max(segment.lengthMeters, 100)) * 1000, 2, 10, 0.15),

@@ -32,7 +32,7 @@ The model was trained on 10,000 of the 137,954 training events. On 5,000 validat
 
 ## Prediction limits
 
-The warning follows a near miss that has already happened: it signals raised risk, and it does not forecast a specific crash. The model scores a window around an event, about 8 seconds after it, so it cannot warn before a first impact.
+This warning follows a near miss that has already happened: it signals raised risk, and it does not forecast a specific crash. Warnings about the road ahead are described in [Road risk](road-risk.md). The model scores a window around an event, about 8 seconds after it, so it cannot warn before a first impact.
 
 ## Checking on a phone
 

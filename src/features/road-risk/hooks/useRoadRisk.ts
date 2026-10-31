@@ -59,6 +59,7 @@ export function useRoadRisk() {
     risks,
     current,
     currentSegment,
+    weather: riskInputs ?? null,
     loading: roads.isLoading,
     sources: {
       roads: segments !== undefined,

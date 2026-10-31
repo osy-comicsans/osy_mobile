@@ -50,7 +50,7 @@ export type RiskLevel = 'low' | 'medium' | 'high';
 
 export type RiskFactorId =
   | 'roadClass' | 'curves' | 'junctions' | 'wet' | 'icing' | 'visibility'
-  | 'wind' | 'darkness' | 'speeding' | 'incidents';
+  | 'wind' | 'darkness' | 'speeding' | 'incidents' | 'tooFast' | 'harshDriving';
 
 export interface RiskFactor {
   id: RiskFactorId;

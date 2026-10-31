@@ -83,6 +83,9 @@ jobs:
       - name: Road risk tests
         run: pnpm test:road-risk
 
+      - name: Risk warning tests
+        run: pnpm test:risk-warnings
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks
