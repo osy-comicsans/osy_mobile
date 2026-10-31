@@ -138,6 +138,45 @@ test('uses the chosen radius', async () => {
   assert.deepEqual(f.shown(), []);
 });
 
+test('the app checks only with nearby alerts on, within the radius chosen in Settings', async () => {
+  const requests = [];
+  const client = create({
+    baseURL: 'https://api.test',
+    adapter: async (config) => {
+      requests.push(config.params);
+      return { status: 200, statusText: 'OK', headers: {}, config, data: { incidents: [] } };
+    },
+  });
+  const stubs = {
+    '@/common/lib/api/axios': { api: client },
+    '@/common/lib/storage/preferenceStorage': { preferenceStorage: memoryStorage() },
+  };
+  const load = Module._load;
+  Module._load = function (request, ...rest) {
+    return stubs[request] ?? load.call(this, request, ...rest);
+  };
+  let services;
+  try {
+    services = {
+      ...require('../src/features/safety/nearbyServices.ts'),
+      ...require('../src/features/settings/settingsService.ts'),
+    };
+  } finally {
+    Module._load = load;
+  }
+  const { nearbyIncidents, settingsService } = services;
+  await settingsService.start();
+
+  await settingsService.update({ notifications: { accident_nearby: false } });
+  assert.equal(await nearbyIncidents.update(fix(), false), null);
+  await nearbyIncidents.refresh(fix());
+  assert.deepEqual(requests, []);
+
+  await settingsService.update({ notifications: { accident_nearby: true }, nearbyRadiusKm: 10 });
+  await nearbyIncidents.update(fix(), false);
+  assert.deepEqual(requests, [{ latitude: 36.75, longitude: 3.05, radiusKm: 10 }]);
+});
+
 test('remembers own and alerted incidents after a restart', async () => {
   const storage = memoryStorage();
   const before = fixture({ incidents: [incident('mine', 100), incident('seen', 300)], storage });
