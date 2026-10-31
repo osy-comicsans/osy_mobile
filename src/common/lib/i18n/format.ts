@@ -25,3 +25,7 @@ export function distanceParts(language: Language, meters: number) {
       value: formatNumber(language, meters / 1000, { maximumFractionDigits: 1 }),
     } as const;
 }
+
+// Keeps a phone number in left-to-right order inside Arabic text, where its
+// leading + would otherwise move to the end.
+export const leftToRight = (text: string) => `⁦${text}⁩`;

@@ -402,11 +402,13 @@
   "contacts": {
     "description": "OSY alerts these people if you need help after a crash.",
     "add": "Add a contact",
+    "edit": "Edit contact",
     "name": "Name",
     "save": "Save contact",
     "remove": "Remove",
+    "removeConfirm": "Remove {{name}} from your emergency contacts?",
     "invalid": "Enter a name and a valid mobile number.",
-    "failed": "That did not work. Check your connection and try again."
+    "failed": "Could not save this change on your phone. Try again."
   },
   "crashModel": {
     "title": "Crash model check",

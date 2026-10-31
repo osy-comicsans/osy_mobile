@@ -402,11 +402,13 @@
   "contacts": {
     "description": "OSY prévient ces personnes si vous avez besoin d’aide après un accident.",
     "add": "Ajouter un contact",
+    "edit": "Modifier le contact",
     "name": "Nom",
     "save": "Enregistrer le contact",
     "remove": "Retirer",
+    "removeConfirm": "Retirer {{name}} de vos contacts d’urgence ?",
     "invalid": "Saisissez un nom et un numéro de mobile valide.",
-    "failed": "Cela n’a pas fonctionné. Vérifiez votre connexion et réessayez."
+    "failed": "Impossible d’enregistrer cette modification sur votre téléphone. Réessayez."
   },
   "crashModel": {
     "title": "Vérification du modèle d’accident",

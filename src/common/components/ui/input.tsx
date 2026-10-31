@@ -95,7 +95,7 @@ export function Input({
             setFocused(false);
             onBlur?.(event);
           }}
-          style={[styles.input, { color: theme.textPrimary }, disabled && styles.inputDisabled, style]}
+          style={[styles.input, { color: theme.textPrimary }, disabled && styles.inputDisabled, rest.keyboardType === 'phone-pad' && styles.phone, style]}
         />
         {trailing && <View style={styles.trailing}>{trailing}</View>}
         {label ? (
@@ -152,6 +152,8 @@ const styles = StyleSheet.create({
     ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : null),
   },
   inputDisabled: { color: Colors.textTertiary },
+  // Phone numbers stay left to right in Arabic. Android already does this for phone fields.
+  phone: { writingDirection: 'ltr' },
   label: {
     ...Typography.body,
     position: 'absolute',
