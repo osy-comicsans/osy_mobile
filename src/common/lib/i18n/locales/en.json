@@ -479,7 +479,9 @@
       "wind": "Strong wind",
       "darkness": "Dark, poorly lit road",
       "speeding": "Speed above the limit",
-      "incidents": "Recent accidents nearby"
+      "incidents": "Recent accidents nearby",
+      "tooFast": "Too fast for this road",
+      "harshDriving": "Harsh braking or cornering"
     },
     "legendTitle": "Road risk",
     "show": "Show road risk",
@@ -498,6 +500,8 @@
       "hazard": "Road hazard"
     },
     "hazardDistance": "{{name}} in {{distance}} m",
-    "hazardsNearby": "Road hazards ahead"
+    "hazardsNearby": "Road hazards ahead",
+    "warningOne": "{{first}}. Slow down.",
+    "warningTwo": "{{first}}, {{second}}. Slow down."
   }
 }

@@ -479,7 +479,9 @@
       "wind": "رياح قوية",
       "darkness": "طريق مظلم وضعيف الإنارة",
       "speeding": "السرعة فوق الحد المسموح",
-      "incidents": "حوادث حديثة بالقرب من هنا"
+      "incidents": "حوادث حديثة بالقرب من هنا",
+      "tooFast": "سرعة عالية على هذا الطريق",
+      "harshDriving": "فرملة أو انعطاف حاد"
     },
     "legendTitle": "خطر الطريق",
     "show": "إظهار خطر الطريق",
@@ -498,6 +500,8 @@
       "hazard": "خطر على الطريق"
     },
     "hazardDistance": "{{name}} بعد {{distance}} م",
-    "hazardsNearby": "مخاطر على الطريق أمامك"
+    "hazardsNearby": "مخاطر على الطريق أمامك",
+    "warningOne": "{{first}}. خفف السرعة.",
+    "warningTwo": "{{first}}، {{second}}. خفف السرعة."
   }
 }

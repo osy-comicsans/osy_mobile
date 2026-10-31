@@ -479,7 +479,9 @@
       "wind": "Vent fort",
       "darkness": "Route sombre et mal éclairée",
       "speeding": "Vitesse au-dessus de la limite",
-      "incidents": "Accidents récents à proximité"
+      "incidents": "Accidents récents à proximité",
+      "tooFast": "Trop rapide pour cette route",
+      "harshDriving": "Freinage ou virage brusque"
     },
     "legendTitle": "Risque routier",
     "show": "Afficher le risque routier",
@@ -498,6 +500,8 @@
       "hazard": "Danger"
     },
     "hazardDistance": "{{name}} dans {{distance}} m",
-    "hazardsNearby": "Dangers à venir"
+    "hazardsNearby": "Dangers à venir",
+    "warningOne": "{{first}}. Ralentissez.",
+    "warningTwo": "{{first}}, {{second}}. Ralentissez."
   }
 }
