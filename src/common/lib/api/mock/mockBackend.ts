@@ -7,7 +7,7 @@ import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRe
 // taken@osy.test    needs documents, also shows the "already registered" error
 // offline@osy.test  fails like a lost connection
 // Password `Wrong123`, or any document field containing REJECT, shows that failure.
-// Every area has one test accident about 1.5 km north, for nearby alerts.
+// Every area has four sample accidents within about 4 km, for nearby alerts.
 
 const STORAGE_KEY = 'osy.mock.backend';
 const LATENCY_MS = 400;
@@ -66,23 +66,27 @@ const seedUsers: MockUser[] = [
   },
 ];
 
-// Fixed to the asker's ~1 km grid cell, so each area has one stable accident
-// instead of a new one on every check.
-function mockNearbyIncident(latitude: number, longitude: number) {
+const SAMPLE_INCIDENTS = [
+  { north: 0.0135, east: 0, minutes: 6, source: 'user_report', type: 'collision', severity: 'serious', injuriesVisible: true, roadName: 'RN 5', involved: { firstName: 'Yacine', vehicle: 'Renault Symbol' } },
+  { north: -0.012, east: 0.018, minutes: 14, source: 'user_report', type: 'collision', severity: 'minor', injuriesVisible: false, roadName: 'RN 11', involved: { firstName: 'Amina', vehicle: 'Dacia Logan' } },
+  { north: 0.02, east: -0.025, minutes: 22, source: 'crash_detected', type: 'collision', severity: 'critical', injuriesVisible: null, roadName: 'A1', involved: { firstName: 'Karim', vehicle: 'Hyundai Accent' } },
+  // No consent to share, so the app has to manage without these details.
+  { north: -0.03, east: -0.01, minutes: 35, source: 'user_report', type: 'collision', severity: 'minor', injuriesVisible: false, roadName: 'RN 1', involved: null },
+];
+
+// Fixed to the asker's ~1 km grid cell, so each area keeps stable accidents
+// instead of new ones on every check.
+function mockNearbyIncidents(latitude: number, longitude: number) {
   const cellLatitude = Math.round(latitude * 100) / 100;
   const cellLongitude = Math.round(longitude * 100) / 100;
   const cell = `${Math.abs(Math.round(latitude * 100))}${Math.abs(Math.round(longitude * 100))}`;
-  return {
-    id: `00000000-0000-4000-8000-${cell.padStart(12, '0').slice(-12)}`,
-    source: 'user_report',
-    location: { latitude: cellLatitude + 0.0135, longitude: cellLongitude },
-    occurredAt: new Date(Date.now() - 6 * 60_000).toISOString(),
-    type: 'collision',
-    severity: 'serious',
-    injuriesVisible: true,
-    roadName: 'RN 5',
-    distanceMeters: 1500,
-  };
+  return SAMPLE_INCIDENTS.map(({ north, east, minutes, ...incident }, index) => ({
+    ...incident,
+    id: `0000000${index}-0000-4000-8000-${cell.padStart(12, '0').slice(-12)}`,
+    location: { latitude: cellLatitude + north, longitude: cellLongitude + east },
+    occurredAt: new Date(Date.now() - minutes * 60_000).toISOString(),
+    distanceMeters: Math.round(Math.hypot(north, east) * 111_000),
+  }));
 }
 
 function fail(status: number, code: string, message: string, fields?: Record<string, string>): MockReply {
@@ -240,7 +244,7 @@ export function createMockBackend(storage: MockStorage, latency = LATENCY_MS, op
     }
     if (key === 'GET /incidents/nearby') {
       const { latitude, longitude } = request.params as { latitude: number; longitude: number };
-      return { status: 200, data: { incidents: [mockNearbyIncident(latitude, longitude)] } };
+      return { status: 200, data: { incidents: mockNearbyIncidents(latitude, longitude) } };
     }
     if (key === 'POST /emergency/escalate') {
       return { status: 201, data: { id: body.id, status: 'escalating', liveLocationUrl: null } };

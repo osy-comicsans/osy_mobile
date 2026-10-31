@@ -17,6 +17,8 @@ import { checkInReminder } from '@/features/safety/providers/CheckInProvider';
 
 import { AlertBanner } from '../components/AlertBanner';
 import { alertDriver } from '../native/alertDriver';
+import { nearbyIncidents } from '@/features/safety/nearbyServices';
+
 import type { AppAlert } from '../types/alert.types';
 import { ALERT_RULES, ALERT_TYPES, CHECK_IN_ACTIONS } from '../utils/alertRules';
 import { createAlertService } from '../utils/alertService';
@@ -26,6 +28,8 @@ const profileApi = createProfileApi(api);
 
 function navigate(alert: AppAlert) {
   if (alert.type === 'crash_detected') router.navigate('/check-in');
+  // The map needs the incident's location, which a push can arrive ahead of.
+  else if (alert.type === 'accident_nearby' && nearbyIncidents.find(alert.id)) router.navigate({ pathname: '/map', params: { incident: alert.id } });
   else router.navigate({ pathname: '/alert/[id]', params: { id: alert.id } });
 }
 
