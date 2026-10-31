@@ -97,8 +97,8 @@ export function ProfileScreen() {
             <ThemedText type="label" themeColor="accent">{t(`account.reportStatus.${report.status}`)}</ThemedText>
           </View>)}
         </SettingsGroup>
-        <Button label={t('profile.logout')} variant="logout" loading={signingOut} onPress={logOut} />
       </> : null}
+      {authenticated ? <Button label={t('profile.logout')} variant="logout" loading={signingOut} onPress={logOut} /> : null}
     </AccountPage>
   );
 }

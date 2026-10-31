@@ -29,7 +29,7 @@ export interface OfflineStatus extends QueueSummary {
   privacyBlocked: boolean;
 }
 
-export function createOfflineRuntime() {
+export function createOfflineRuntime(options: { finishPrivacyReset?: (owner: string) => Promise<void> } = {}) {
   const database = new LocalDatabase(getDatabase);
   const todos = new TodoRepository(database, createId);
   const reports = new AccidentReportRepository(database, createId);
@@ -90,7 +90,11 @@ export function createOfflineRuntime() {
       .then(() => reports.clearDelivered())
       .then(async () => {
         const owner = await privacyReset.read();
-        if (owner) { await profiles.purgePersonalData(owner); await privacyReset.complete(); }
+        if (owner) {
+          await profiles.purgePersonalData(owner);
+          await options.finishPrivacyReset?.(owner);
+          await privacyReset.complete();
+        }
       })
       .then(async () => {
         status.setState({ ready: true, error: null });

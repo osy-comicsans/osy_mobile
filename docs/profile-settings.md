@@ -6,7 +6,7 @@ Profile lives in the existing Profile tab. Settings, emergency contacts, and lic
 
 Names, phone, optional vehicle, avatar, medical notes, and emergency contacts use the typed Profile API. Medical sharing is off by default. Profile/contacts/photo edits first commit an account-scoped snapshot and local revision to the `profile_cache` SQLite repository (migration 4). A confirmed save works without internet. Selected photos are resized to 512 pixels and staged in an account-specific private folder until upload succeeds. The avatar URL comes from the backend; the mock retains a private device image.
 
-The service restores the signed-in user's cache before requesting fresh data. It retries while online in the foreground, on reconnection, at startup, on saved edits, and through Sync & refresh. Profile PUT and contact replacement must both acknowledge an edit before its revision is marked clean. New edits made during upload stay pending. Stale GET responses cannot overwrite dirty rows. An account change immediately hides the old cache and cancels owner-mismatched HTTP dispatch/retries. User ID is restored alongside tokens from SecureStore; old sessions without one need a successful `/me` request once.
+React Query reads the signed-in user's SQLite cache through `features/profile/hooks/useProfileCache.ts`. SQLite remains the durable source of truth; Zustand holds only workflow flags and an invalidation revision. `common/lib/database/sync/profileSyncManager.ts` retries while online in the foreground, on reconnection, at startup, on saved edits, and through Sync & refresh. Profile PUT and contact replacement must both acknowledge an edit before its revision is marked clean. New edits made during upload stay pending. Stale GET responses cannot overwrite dirty rows. An account change immediately hides the old cache and cancels owner-mismatched HTTP dispatch/retries. User ID is restored alongside tokens from SecureStore; old sessions without one need a successful `/me` request once.
 
 Driving statistics are read-only backend aggregates. No fake trips, distance, or warnings are derived from a UI preview. The local mock returns zero totals and tracks reports actually submitted to it. The newest 100 reports and latest stats are cached with the profile; unsupported endpoints show unavailable states. Medical info and contacts become available to the backend after synchronization, and the backend uses them for escalation. Unsynced changes are labelled as pending.
 
@@ -32,7 +32,7 @@ The web preview uses a session-only profile cache and does not persist medical/c
 
 The dial range is 240 km/h or 160 mph, independent of the legal road limit. Sensitivity is a user-adjustable heuristic/model parameter, not a claim of validated crash-detection accuracy. Physical-device tuning remains necessary.
 
-Backend preferences are serialized and retried without racing old writes over new choices. Settings distinguishes saved device values from account notification changes awaiting sync. The backend must filter push notifications while the app is closed; local JavaScript cannot retroactively prevent their display.
+`common/lib/database/sync/preferencesSync.ts` serializes and retries backend preference writes without racing old writes over new choices. Settings distinguishes saved device values from account notification changes awaiting sync. The backend must filter push notifications while the app is closed; local JavaScript cannot retroactively prevent their display.
 
 ## Privacy and permissions
 

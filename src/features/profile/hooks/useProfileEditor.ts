@@ -23,7 +23,7 @@ export function useProfileEditor(bundle: ProfileBundle) {
       try {
         const next = await profilePhotos.choose(bundle.profile.id); if (!next) return;
         if (!active.current) { profilePhotos.remove(next); return; }
-        if (photo) profilePhotos.remove(photo);
+        if (photo) await service.releasePhoto(bundle.profile.id, photo);
         staged.current.add(next); setPhoto(next);
       } catch { if (active.current) setFailed(true); }
     },

@@ -16,6 +16,7 @@ const { ProfileRepository } = require('../src/common/lib/database/repositories/p
 const { createProfileService, profileForAccount } = require('../src/features/profile/utils/profileService.ts');
 const { profileBundleSchema } = require('../src/features/profile/types/profile.schemas.ts');
 const { createSettingsService } = require('../src/features/settings/utils/settingsService.ts');
+const { createPreferencesSync } = require('../src/common/lib/database/sync/preferencesSync.ts');
 const { defaultSettings } = require('../src/features/settings/types/settings.types.ts');
 const { createAuthSession } = require('../src/common/lib/api/authSession.ts');
 const { createCheckInService } = require('../src/features/safety/utils/checkInService.ts');
@@ -50,6 +51,54 @@ const transport = (initial = bundle()) => {
   };
   return { api, remote: () => remote };
 };
+
+test('preference synchronization serializes writes and coalesces edits made during upload', async (t) => {
+  const settings = createSettingsService(storage()); await settings.start(); await settings.setAccount('alice');
+  const first = gate(); const sent = []; let concurrent = 0; let maximum = 0;
+  const sync = createPreferencesSync(settings.store, 'alice', async (value) => {
+    concurrent++; maximum = Math.max(maximum, concurrent); sent.push(structuredClone(value));
+    if (sent.length === 1) await first.promise;
+    concurrent--;
+  }, () => true);
+  t.after(() => sync.stop()); sync.start();
+  await settings.update({ units: 'mph' }); await settings.update({ nearbyRadiusKm: 10 });
+  assert.equal(sent.length, 1);
+  first.resolve(); await flush(); await flush();
+  assert.equal(maximum, 1); assert.equal(sent.length, 2);
+  assert.equal(sent[1].units, 'mph'); assert.equal(sent[1].nearbyRadiusKm, 10);
+  assert.equal(settings.store.getState().accountSync, 'synced');
+});
+
+test('stopping account preference sync prevents a late response from acknowledging another account', async () => {
+  const settings = createSettingsService(storage()); await settings.start(); await settings.setAccount('alice');
+  const response = gate(); let calls = 0;
+  const sync = createPreferencesSync(settings.store, 'alice', async () => { calls++; await response.promise; }, () => true);
+  sync.start(); sync.stop(); await settings.setAccount('bob');
+  response.resolve(); await flush();
+  assert.equal(calls, 1); assert.equal(settings.store.getState().accountSync, 'waiting');
+  assert.equal(settings.store.getState().consentOwner, 'bob');
+});
+
+test('failed preference sync preserves device settings and retries the latest saved values', async (t) => {
+  const settings = createSettingsService(storage()); await settings.start(); await settings.setAccount('alice');
+  let failing = true; const sent = [];
+  const sync = createPreferencesSync(settings.store, 'alice', async (value) => {
+    if (failing) throw new Error('offline'); sent.push(structuredClone(value));
+  }, () => true);
+  t.after(() => sync.stop()); sync.start(); await flush();
+  assert.equal(settings.store.getState().accountSync, 'failed');
+  await settings.update({ voice: true }); await flush();
+  failing = false; await sync.flush();
+  assert.equal(sent.at(-1).voice, true); assert.equal(settings.store.getState().accountSync, 'synced');
+});
+
+test('staged photo cleanup retains files when the repository is unavailable', async () => {
+  const removed = [];
+  const service = createProfileService({ read: async () => { throw new Error('storage unavailable'); } }, transport().api,
+    { uriOf: () => null, remove: (name) => removed.push(name) });
+  await service.releasePhoto('alice', 'pending.jpg');
+  assert.deepEqual(removed, []);
+});
 
 test('settings persist, concurrent toggles merge, and failed writes do not pretend to succeed', async () => {
   const memory = storage(); const service = createSettingsService(memory); await service.start();

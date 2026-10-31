@@ -26,7 +26,7 @@ import type { SettingsPatch } from '../types/settings.types';
 import { distanceValue } from '../utils/units';
 
 export function SettingsScreen() {
-  const { t } = useTranslation(); const { settings, ready, saving, error, accountSync } = useSettings();
+  const { t } = useTranslation(); const { settings, ready, saving, error, accountSync, consentOwner } = useSettings();
   const location = useLocationState(); const alerts = useAlertState(); const checkIn = useCheckInState();
   const { online } = useOfflineStatus(); const profile = useProfile(); const privacy = usePrivacyActions();
   const { state: escalation } = useEscalation();
@@ -34,6 +34,7 @@ export function SettingsScreen() {
   const [systemError, setSystemError] = useState(false);
   const [voiceAvailable] = useState(isVoiceAvailable);
   const disabled = !ready || saving;
+  const consentDisabled = disabled || !profile.cache || consentOwner !== profile.cache.bundle.profile.id;
   const update = (patch: SettingsPatch) => { void settingsService.update(patch).catch(() => undefined); };
   const activeEmergency = checkIn.status === 'waiting' || checkIn.status === 'escalated'
     || ['sending', 'sent', 'waitingForSignal'].includes(escalation.status);
@@ -88,8 +89,8 @@ export function SettingsScreen() {
       {systemError ? <ThemedText themeColor="errorText">{t('preferences.systemError')}</ThemedText> : null}
     </SettingsGroup>
     <SettingsGroup title={t('preferences.privacy')}>
-      <ToggleRow label={t('preferences.dataSharing')} detail={t('preferences.dataSharingHint')} value={settings.dataSharing} disabled={disabled || !profile.cache} onChange={(dataSharing) => update({ dataSharing })} />
-      <ToggleRow label={t('preferences.medicalSharing')} detail={t('preferences.medicalSharingHint')} value={settings.shareMedicalInfo} disabled={disabled || !profile.cache} onChange={(shareMedicalInfo) => update({ shareMedicalInfo })} />
+      <ToggleRow label={t('preferences.dataSharing')} detail={t('preferences.dataSharingHint')} value={settings.dataSharing} disabled={consentDisabled} onChange={(dataSharing) => update({ dataSharing })} />
+      <ToggleRow label={t('preferences.medicalSharing')} detail={t('preferences.medicalSharingHint')} value={settings.shareMedicalInfo} disabled={consentDisabled} onChange={(shareMedicalInfo) => update({ shareMedicalInfo })} />
       <ThemedText type="small" themeColor="textSecondary">{t('preferences.deleteHint')}</ThemedText>
       {activeEmergency ? <ThemedText themeColor="errorText">{t('preferences.emergencyActive')}</ThemedText> : null}
       {!deleting ? <>

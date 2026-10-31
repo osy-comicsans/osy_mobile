@@ -79,8 +79,10 @@ export function createProfileSyncManager(repository: Pick<ProfileRepository, 're
       return valid(id, expectedOwner) ? cache : null;
     },
     async releasePhoto(userId: string, name: string) {
-      const cache = await repository.read(userId).catch(() => null);
-      if (cache?.bundle.pendingPhoto !== name && !cache?.bundle.profile.photoUrl?.endsWith(name)) photos?.remove(name);
+      try {
+        const cache = await repository.read(userId);
+        if (cache?.bundle.pendingPhoto !== name && !cache?.bundle.profile.photoUrl?.endsWith(name)) photos?.remove(name);
+      } catch { /* Keep the file when storage cannot confirm that it is unreferenced. */ }
     },
     async connect(userId: string | null) {
       const id = ++generation; owner = userId; busy = false;
