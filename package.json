@@ -82,7 +82,8 @@
     "test:ocr": "node --test tests/ocr.test.cjs",
     "test:roads": "node --test tests/roads.test.cjs",
     "test:map": "node --test tests/map.test.cjs",
-    "test:escalation": "node --test tests/escalation.test.cjs"
+    "test:escalation": "node --test tests/escalation.test.cjs",
+    "test:crash-model": "node --test tests/crash-model.test.cjs"
   },
   "private": true
 }

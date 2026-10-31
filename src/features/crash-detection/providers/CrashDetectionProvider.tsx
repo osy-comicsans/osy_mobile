@@ -2,6 +2,7 @@ import { createContext, useEffect, useState, type PropsWithChildren } from 'reac
 
 import { useLocationService } from '@/features/location/hooks/useLocation';
 
+import { classifyCrash } from '../native/crashModelRuntime';
 import { crashSensorDriver } from '../native/crashSensorDriver';
 import { createCrashDetectionService, type CrashDetectionService } from '../utils/crashDetectionService';
 
@@ -9,7 +10,7 @@ export const CrashDetectionContext = createContext<CrashDetectionService | null>
 
 export function CrashDetectionProvider({ children }: PropsWithChildren) {
   const location = useLocationService();
-  const [service] = useState(() => createCrashDetectionService(crashSensorDriver, location.store));
+  const [service] = useState(() => createCrashDetectionService(crashSensorDriver, location.store, Date.now, classifyCrash));
 
   useEffect(() => {
     service.start();

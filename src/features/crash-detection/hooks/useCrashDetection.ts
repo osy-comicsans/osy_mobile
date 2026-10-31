@@ -1,7 +1,7 @@
 import { useContext, useEffect } from 'react';
 
 import { CrashDetectionContext } from '../providers/CrashDetectionProvider';
-import type { CrashEvent } from '../types/crash.types';
+import type { CrashEvent, NearMissEvent } from '../types/crash.types';
 
 export function useCrashDetectionService() {
   const service = useContext(CrashDetectionContext);
@@ -13,4 +13,10 @@ export function useCrashDetectionService() {
 export function useCrashDetected(listener: (event: CrashEvent) => void) {
   const service = useCrashDetectionService();
   useEffect(() => service.onCrashDetected(listener), [service, listener]);
+}
+
+// Calls the listener when the model scores a jolt as a near miss.
+export function useNearMiss(listener: (event: NearMissEvent) => void) {
+  const service = useCrashDetectionService();
+  useEffect(() => service.onNearMiss(listener), [service, listener]);
 }

@@ -6,6 +6,7 @@ import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
 import { Card } from '@/common/components/ui/card';
 import { Space } from '@/common/lib/theme';
+import { CrashModelCheck } from '@/features/crash-detection/components/CrashModelCheck';
 import { useCrashDetectionService } from '@/features/crash-detection/hooks/useCrashDetection';
 import { crashTrace } from '@/features/crash-detection/utils/crashTraces';
 
@@ -49,6 +50,7 @@ export function AlertDevMenu() {
         size="small"
         onPress={() => { setTimeout(() => crashDetection.simulate(crashTrace()), LOCKED_CRASH_DELAY_MS); }}
       />
+      <CrashModelCheck />
     </Card>
   );
 }

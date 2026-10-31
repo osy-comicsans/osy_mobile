@@ -291,9 +291,16 @@
     "refreshFailed": "Could not refresh weather. The last saved values remain visible.",
     "attribution": "Weather by Open-Meteo · data adapted by OSY",
     "conditions": {
-      "clear": "Clear", "partly_cloudy": "Partly cloudy", "cloudy": "Cloudy", "fog": "Fog",
-      "drizzle": "Drizzle", "rain": "Rain", "freezing_precipitation": "Freezing precipitation",
-      "snow": "Snow", "thunderstorm": "Thunderstorm", "unknown": "Conditions unavailable"
+      "clear": "Clear",
+      "partly_cloudy": "Partly cloudy",
+      "cloudy": "Cloudy",
+      "fog": "Fog",
+      "drizzle": "Drizzle",
+      "rain": "Rain",
+      "freezing_precipitation": "Freezing precipitation",
+      "snow": "Snow",
+      "thunderstorm": "Thunderstorm",
+      "unknown": "Conditions unavailable"
     }
   },
   "loading": {
@@ -324,5 +331,16 @@
     "remove": "Remove",
     "invalid": "Enter a name and a valid mobile number.",
     "failed": "That did not work. Check your connection and try again."
+  },
+  "crashModel": {
+    "title": "Crash model check",
+    "hint": "Uses real sensors for 16 seconds. Shake the phone to see the scores change. No alert is raised.",
+    "run": "Run a 16-second check",
+    "running": "Reading sensors…",
+    "result": "Crash {{crash}} · Near miss {{nearMiss}} · Normal {{normal}}",
+    "stats": "Accelerometer {{accelerometer}} Hz · Gyroscope {{gyroscope}} Hz · Peak {{peak}} g",
+    "noRuntime": "ONNX Runtime is not available. This needs a development build.",
+    "noSensors": "No sensor data arrived.",
+    "failed": "The model check failed."
   }
 }
