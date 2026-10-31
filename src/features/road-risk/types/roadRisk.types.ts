@@ -2,9 +2,12 @@ import { z } from 'zod';
 
 export const overpassResponseSchema = z.object({
   elements: z.array(z.object({
+    type: z.string(),
     id: z.number(),
-    nodes: z.array(z.number()),
-    geometry: z.array(z.object({ lat: z.number(), lon: z.number() })),
+    lat: z.number().optional(),
+    lon: z.number().optional(),
+    nodes: z.array(z.number()).default([]),
+    geometry: z.array(z.object({ lat: z.number(), lon: z.number() })).default([]),
     tags: z.record(z.string(), z.string()).default({}),
   })),
 });
@@ -33,6 +36,14 @@ export interface RoadSegment {
   junctionCount: number;
   maxSpeedKmh: number | null;
   lit: boolean | null;
+}
+
+export type RoadHazardKind = 'bump' | 'camera' | 'school' | 'animals' | 'hazard';
+
+export interface RoadHazard {
+  id: string;
+  kind: RoadHazardKind;
+  location: RiskPoint;
 }
 
 export type RiskLevel = 'low' | 'medium' | 'high';

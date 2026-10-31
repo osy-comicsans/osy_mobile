@@ -9,6 +9,8 @@ const MIN_EDGE_METERS = 2;
 const CURRENT_ROAD_RADIUS_METERS = 40;
 // Roughly 2 km across. Overpass asks for few requests, and driving fills this slowly.
 const AREA_CELL_DEGREES = 0.02;
+// Beyond this the map is too far out to be worth the public server's time.
+export const MAX_VISIBLE_AREAS = 6;
 
 const MILES_TO_KM = 1.609344;
 
@@ -27,7 +29,7 @@ const pathLength = (points: RiskPoint[]) => points.slice(1).reduce(
   (total, point, index) => total + distanceMeters(points[index], point), 0,
 );
 
-function bearing(from: RiskPoint, to: RiskPoint) {
+export function bearing(from: RiskPoint, to: RiskPoint) {
   const scale = Math.cos((from.latitude * Math.PI) / 180);
   return (Math.atan2((to.longitude - from.longitude) * scale, to.latitude - from.latitude) * 180) / Math.PI;
 }
@@ -46,10 +48,11 @@ function curvature(points: RiskPoint[], lengthMeters: number) {
 }
 
 export function toRoadSegments({ elements }: OverpassResponse): RoadSegment[] {
+  const roads = elements.filter(({ type, tags }) => type === 'way' && tags.highway);
   const nodeUse = new Map<number, number>();
-  for (const { nodes } of elements) for (const node of nodes) nodeUse.set(node, (nodeUse.get(node) ?? 0) + 1);
+  for (const { nodes } of roads) for (const node of nodes) nodeUse.set(node, (nodeUse.get(node) ?? 0) + 1);
 
-  return elements.flatMap(({ id, nodes, geometry, tags }) => {
+  return roads.flatMap(({ id, nodes, geometry, tags }) => {
     const points = geometry.map(({ lat, lon }) => ({ latitude: lat, longitude: lon }));
     if (points.length < 2) return [];
 
@@ -113,7 +116,13 @@ export function findCurrentSegment(segments: RoadSegment[], point: RiskPoint, ro
   return (nearby.find(({ segment }) => roadName !== null && segment.name === roadName) ?? nearby[0])?.segment ?? null;
 }
 
-export function riskAreaAround({ latitude, longitude }: RiskPoint): { id: string; bounds: Bounds; center: RiskPoint } {
+export interface RiskArea {
+  id: string;
+  bounds: Bounds;
+  center: RiskPoint;
+}
+
+export function riskAreaAround({ latitude, longitude }: RiskPoint): RiskArea {
   const row = Math.floor(latitude / AREA_CELL_DEGREES);
   const column = Math.floor(longitude / AREA_CELL_DEGREES);
   const south = row * AREA_CELL_DEGREES;
@@ -123,4 +132,23 @@ export function riskAreaAround({ latitude, longitude }: RiskPoint): { id: string
     bounds: { south, west, north: south + AREA_CELL_DEGREES, east: west + AREA_CELL_DEGREES },
     center: { latitude: south + AREA_CELL_DEGREES / 2, longitude: west + AREA_CELL_DEGREES / 2 },
   };
+}
+
+// The areas on screen, or null when there are too many to load.
+export function riskAreasInView({ south, west, north, east }: Bounds): RiskArea[] | null {
+  const firstRow = Math.floor(south / AREA_CELL_DEGREES);
+  const lastRow = Math.floor(north / AREA_CELL_DEGREES);
+  const firstColumn = Math.floor(west / AREA_CELL_DEGREES);
+  const lastColumn = Math.floor(east / AREA_CELL_DEGREES);
+  if ((lastRow - firstRow + 1) * (lastColumn - firstColumn + 1) > MAX_VISIBLE_AREAS) return null;
+
+  const areas: RiskArea[] = [];
+  for (let row = firstRow; row <= lastRow; row += 1) {
+    for (let column = firstColumn; column <= lastColumn; column += 1) {
+      areas.push(riskAreaAround({
+        latitude: (row + 0.5) * AREA_CELL_DEGREES, longitude: (column + 0.5) * AREA_CELL_DEGREES,
+      }));
+    }
+  }
+  return areas;
 }

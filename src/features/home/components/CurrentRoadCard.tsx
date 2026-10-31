@@ -10,7 +10,9 @@ import { formatDateTime, formatNumber } from '@/common/lib/i18n/format';
 import { getLanguage } from '@/common/lib/i18n/i18n';
 import { Colors, Radius, Space } from '@/common/lib/theme';
 import { useCurrentArea } from '@/features/location/hooks/useCurrentArea';
+import { RoadHazardList } from '@/features/roads/components/RoadHazardList';
 import { useCurrentRoad } from '@/features/roads/hooks/useRoad';
+import { useRoadRules } from '@/features/roads/hooks/useRoadRules';
 import { useHomeLocation } from '../hooks/useHomeLocation';
 
 export function CurrentRoadCard() {
@@ -18,6 +20,7 @@ export function CurrentRoadCard() {
   const location = useHomeLocation();
   const { road, stale } = useCurrentRoad();
   const area = useCurrentArea();
+  const { hazards } = useRoadRules();
   const language = getLanguage();
   const number = (value: number) => formatNumber(language, value, { maximumFractionDigits: 4 });
   const roadStale = stale || !location.fresh;
@@ -38,6 +41,7 @@ export function CurrentRoadCard() {
           <ThemedText type="body" themeColor="textSecondary">{area.area?.label ?? t(area.loading ? 'dashboard.location.areaLoading' : 'dashboard.location.areaUnknown')}</ThemedText>
           {(area.stale || !location.fresh) && area.area ? <ThemedText type="small" themeColor="textSecondary">{t('dashboard.location.lastArea')}</ThemedText> : null}
           {road && roadStale ? <ThemedText type="small" themeColor="textSecondary">{t('dashboard.location.lastRoad')}</ThemedText> : null}
+          <RoadHazardList hazards={hazards} />
           {location.fix ? (
             <>
               <ThemedText type="label" themeColor="textSecondary">{t('dashboard.location.coordinates', {

@@ -12,7 +12,7 @@ Version 1 (`road-risk-heuristic-v1`) scores road segments on the phone, from 0 t
 - `current` and `currentSegment`: the road being driven, including the speed factor.
 - `sources`: whether road, weather, and incident data were available. A missing source lowers a score, so never read a low score as "safe".
 
-Reasons are factor ids, with text under `roadRisk.factor.<id>`. Levels are `low` below 0.3, `medium` from 0.3, and `high` from 0.6. Nothing in the app shows scores yet: #16 and #17 add that, and the first use starts the requests.
+Reasons are factor ids, with text under `roadRisk.factor.<id>`. Levels are `low` below 0.3, `medium` from 0.3, and `high` from 0.6. The Map tab shows these scores, as described in [Map](map.md). `useVisibleRoadRisk()` gives it the same scores for the areas on screen, without the speed factor.
 
 ## Factors
 
@@ -36,6 +36,12 @@ Contributions add up, and the score stops at 1.
 Roads come from the public [Overpass API](https://overpass-api.de), which also fills in what OSRM lacks, such as road class and speed limits. They are cut into pieces of up to 500 m and kept in memory for 24 hours. Set `EXPO_PUBLIC_OVERPASS_URL` to use another server.
 
 With the app identifying itself, the public server was busy or timed out on 2 of 3 test requests, and a successful 2 km area took 36 seconds. A failure is normal and leaves the score unavailable. It also learns the area around each user, and its limits suit light use only. Run your own server before real users rely on it. The data is under the ODbL, so the app must credit OpenStreetMap where scores are shown.
+
+## Speed limits and hazards
+
+The same request supplies marked speed limits, speed bumps, speed cameras, schools, and hazards. `useRoadRules()` gives Home and the Map tab the limit for the current road and up to 3 hazards within 300 m ahead. Without a reliable heading, it lists everything within 300 m. A hazard on a nearby road can also appear.
+
+This only shows what is mapped in OpenStreetMap. No listed hazard does not mean that the road has none, and a missing limit stays unknown. Hazards do not change risk scores yet.
 
 ## Limits
 

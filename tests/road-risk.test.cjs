@@ -22,8 +22,13 @@ const { createOverpassApi, roadQuery } = require('../src/features/road-risk/api/
 const { overpassResponseSchema } = require('../src/features/road-risk/types/roadRisk.types.ts');
 const { levelFor, scoreArea, scoreSegment } = require('../src/features/road-risk/utils/roadRiskModel.ts');
 const {
-  distanceToSegment, findCurrentSegment, riskAreaAround, toRoadSegments,
+  distanceToSegment, findCurrentSegment, MAX_VISIBLE_AREAS, riskAreaAround, riskAreasInView, toRoadSegments,
 } = require('../src/features/road-risk/utils/roadSegments.ts');
+const {
+  RISK_LEVEL_COLORS, riskMapStatus, toHazardFeatures, toRiskFeatures, uniqueById,
+} = require('../src/features/road-risk/utils/riskOverlay.ts');
+const { hazardsAhead, toRoadHazards } = require('../src/features/road-risk/utils/roadHazards.ts');
+const { toFeatureCollection } = require('../src/features/map/utils/mapOverlays.ts');
 const { createMockBackend } = require('../src/common/lib/api/mock/mockBackend.ts');
 const { createSafetyApi } = require('../src/features/safety/api/safetyApi.ts');
 const fixture = require('./fixtures/overpass-algiers.json');
@@ -32,7 +37,7 @@ const NOON = new Date(2026, 9, 31, 12).getTime();
 const MIDNIGHT = new Date(2026, 9, 31, 0).getTime();
 const calm = { now: NOON, weather: null, incidents: [] };
 const way = (id, coordinates, tags = { highway: 'primary' }, nodes) => ({
-  id, tags, nodes: nodes ?? coordinates.map((_, index) => id * 100 + index),
+  type: 'way', id, tags, nodes: nodes ?? coordinates.map((_, index) => id * 100 + index),
   geometry: coordinates.map(([lat, lon]) => ({ lat, lon })),
 });
 const straight = way(1, [[36.75, 3.05], [36.751, 3.05], [36.752, 3.05]]);
@@ -210,6 +215,125 @@ test('the Overpass client identifies the app and carries no user token', () => {
   const source = fs.readFileSync(path.join(__dirname, '../src/features/road-risk/api/overpassClient.ts'), 'utf8');
   assert.match(source, /'User-Agent'/);
   assert.doesNotMatch(source, /common\/lib\/api\/axios/);
+});
+
+test('hazards are read from mapped features, and roads are not mistaken for them', () => {
+  const response = overpassResponseSchema.parse({
+    elements: [
+      { type: 'node', id: 1, lat: 36.75, lon: 3.05, tags: { traffic_calming: 'hump' } },
+      { type: 'node', id: 2, lat: 36.75, lon: 3.05, tags: { highway: 'speed_camera' } },
+      { type: 'node', id: 3, lat: 36.75, lon: 3.05, tags: { hazard: 'animal_crossing' } },
+      { type: 'node', id: 4, lat: 36.75, lon: 3.05, tags: { hazard: 'falling_rocks' } },
+      { type: 'way', id: 5, nodes: [7, 8], geometry: [{ lat: 36.76, lon: 3.06 }, { lat: 36.77, lon: 3.06 }], tags: { amenity: 'school' } },
+      { type: 'node', id: 6, lat: 36.75, lon: 3.05, tags: { amenity: 'cafe' } },
+      straight,
+    ].map((element) => ({ type: 'way', ...element })),
+  });
+  const hazards = toRoadHazards(response);
+  assert.deepEqual(hazards.map(({ kind }) => kind), ['bump', 'camera', 'animals', 'hazard', 'school']);
+  assert.deepEqual(hazards[4].location, { latitude: 36.76, longitude: 3.06 });
+  assert.equal(toRoadSegments(response).length, 1);
+});
+
+test('the request asks for bumps, cameras, schools, and hazards', () => {
+  const query = roadQuery({ south: 1, west: 2, north: 3, east: 4 });
+  for (const filter of ['traffic_calming', 'speed_camera', 'node["hazard"]', 'way["amenity"="school"]']) assert.ok(query.includes(filter), filter);
+});
+
+test('only hazards ahead are listed, nearest first', () => {
+  const hazard = (id, latitude) => ({ id, kind: 'bump', location: { latitude, longitude: 3.05 } });
+  const hazards = [hazard('far ahead', 36.754), hazard('ahead', 36.7515), hazard('behind', 36.7485), hazard('next', 36.7502)];
+  const viewer = { latitude: 36.75, longitude: 3.05, heading: 0, speedKmh: 50 };
+  assert.deepEqual(hazardsAhead(hazards, viewer).map(({ id }) => id), ['next', 'ahead']);
+  assert.deepEqual(hazardsAhead(hazards, { ...viewer, heading: 180 }).map(({ id }) => id), ['next', 'behind']);
+  assert.equal(hazardsAhead(hazards, { ...viewer, heading: null }).length, 3);
+  assert.equal(hazardsAhead(hazards, { ...viewer, speedKmh: 0 }).length, 3);
+  assert.deepEqual(hazardsAhead([hazard('at the car', 36.7501)], { ...viewer, heading: 180 }).map(({ id }) => id), ['at the car']);
+});
+
+test('hazards reach the map as points, longitude first', () => {
+  const [feature] = toHazardFeatures([{ id: 'node:1', kind: 'school', location: { latitude: 36.75, longitude: 3.05 } }]);
+  assert.deepEqual(feature.geometry, { type: 'Point', coordinates: [3.05, 36.75] });
+  assert.deepEqual(feature.properties, { kind: 'school' });
+});
+
+test('map colours match the scores', () => {
+  const segments = toRoadSegments(overpassResponseSchema.parse(fixture));
+  const risks = new Map(scoreArea(segments, { ...calm, now: MIDNIGHT }).map((risk) => [risk.segmentId, risk]));
+  const features = toRiskFeatures(segments, risks);
+  assert.equal(features.length, segments.length);
+  for (const { id, properties, geometry } of features) {
+    assert.equal(properties.level, risks.get(id).level);
+    assert.equal(geometry.type, 'LineString');
+  }
+  assert.ok(new Set(features.map(({ properties }) => properties.level)).size > 1);
+  assert.equal(new Set(Object.values(RISK_LEVEL_COLORS)).size, 3);
+});
+
+test('map roads are longitude first, as GeoJSON needs, and keep their ids for taps', () => {
+  const road = segment(straight);
+  const [feature] = toRiskFeatures([road], new Map([[road.id, scoreSegment(road, calm)]]));
+  assert.deepEqual(feature.geometry.coordinates[0], [3.05, 36.75]);
+  assert.equal(toFeatureCollection([feature]).features[0].id, road.id);
+});
+
+test('a road with no score is not drawn', () => {
+  assert.deepEqual(toRiskFeatures([segment(straight)], new Map()), []);
+});
+
+test('a road in two areas is kept once', () => {
+  const items = [{ id: 'a' }, { id: 'b' }, { id: 'a' }];
+  assert.deepEqual(uniqueById(items, ({ id }) => id).map(({ id }) => id), ['a', 'b']);
+});
+
+test('the map loads the areas on screen, and stops when zoomed far out', () => {
+  const view = { south: 36.745, west: 3.05, north: 36.775, east: 3.065 };
+  const areas = riskAreasInView(view);
+  assert.ok(areas.length >= 2 && areas.length <= MAX_VISIBLE_AREAS);
+  assert.equal(new Set(areas.map(({ id }) => id)).size, areas.length);
+  assert.ok(areas.some(({ id }) => id === riskAreaAround({ latitude: 36.75, longitude: 3.055 }).id));
+  assert.ok(areas.some(({ id }) => id === riskAreaAround({ latitude: 36.77, longitude: 3.06 }).id));
+  assert.equal(riskAreasInView({ south: 36.5, west: 2.8, north: 37, east: 3.4 }), null);
+});
+
+test('a small pan inside one area asks for nothing new', () => {
+  const ids = (view) => riskAreasInView(view).map(({ id }) => id).join();
+  assert.equal(
+    ids({ south: 36.742, west: 3.042, north: 36.748, east: 3.048 }),
+    ids({ south: 36.743, west: 3.043, north: 36.749, east: 3.049 }),
+  );
+});
+
+test('road requests run one at a time, and a failure does not block the next', async () => {
+  let running = 0;
+  let peak = 0;
+  let calls = 0;
+  const client = create({
+    adapter: async (request) => {
+      running += 1;
+      peak = Math.max(peak, running);
+      calls += 1;
+      const failing = calls === 1;
+      await new Promise((resolve) => { setTimeout(resolve, 5); });
+      running -= 1;
+      if (failing) throw new Error('busy');
+      return { status: 200, statusText: '', headers: {}, config: request, data: { elements: [] } };
+    },
+  });
+  const overpass = createOverpassApi(client);
+  const box = { south: 1, west: 2, north: 3, east: 4 };
+  const results = await Promise.allSettled([overpass.roads(box), overpass.roads(box), overpass.roads(box)]);
+  assert.deepEqual(results.map(({ status }) => status), ['rejected', 'fulfilled', 'fulfilled']);
+  assert.equal(peak, 1);
+});
+
+test('the map status shows loading, then any failure', () => {
+  const done = { isLoading: false, isError: false };
+  const failed = { isLoading: false, isError: true };
+  assert.equal(riskMapStatus([done]), 'ready');
+  assert.equal(riskMapStatus([]), 'ready');
+  assert.equal(riskMapStatus([done, failed]), 'failed');
+  assert.equal(riskMapStatus([failed, { isLoading: true, isError: false }]), 'loading');
 });
 
 test('the mock backend answers nearby incidents', async () => {

@@ -84,6 +84,8 @@
     "test:accident-report": "node --test tests/accident-report.test.cjs",
     "test:road-risk": "node --test tests/road-risk.test.cjs",
     "test:map": "node --test tests/map.test.cjs",
+    "test:escalation": "node --test tests/escalation.test.cjs",
+    "test:crash-model": "node --test tests/crash-model.test.cjs",
     "test:home": "node --test tests/home.test.cjs"
   },
   "private": true
