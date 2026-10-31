@@ -10,7 +10,7 @@ import { AccountPage } from '@/common/components/ui/account-page';
 import { ContentSkeleton } from '@/common/components/ui/loading';
 import { ThemedText } from '@/common/components/themed-text';
 import { useTheme } from '@/common/hooks/use-theme';
-import { useOfflineStatus } from '@/common/hooks/use-offline';
+import { useOfflineRuntime, useOfflineStatus } from '@/common/hooks/use-offline';
 import { authSession } from '@/common/lib/api/axios';
 import { config } from '@/common/lib/config';
 import { profilePhotos } from '@/common/lib/native/profilePhoto';
@@ -24,6 +24,7 @@ import { distanceValue } from '@/features/settings/utils/units';
 import { SettingsGroup } from '@/features/settings/components/SettingsControls';
 import { ProfileEditor } from '../components/ProfileEditor';
 import { ReportHistory } from '../components/ReportHistory';
+import { useWaitingTrips } from '../hooks/useProfileCache';
 import { useProfile, useProfileService } from '../providers/ProfileDataProvider';
 import { rejectedFieldLabels, rejectedFields } from '../utils/profileService';
 
@@ -31,6 +32,7 @@ export function ProfileScreen() {
   const { t } = useTranslation();
   const theme = useTheme(); const { settings } = useSettings(); const { supported, online } = useOfflineStatus();
   const { cache, loading, syncing, error, authenticated, rejection } = useProfile(); const service = useProfileService();
+  const runtime = useOfflineRuntime();
   const [signingOut, setSigningOut] = useState(false);
   const [confirmingSignOut, setConfirmingSignOut] = useState(false);
   const [authError, setAuthError] = useState(false);
@@ -40,16 +42,23 @@ export function ProfileScreen() {
   const photo = (bundle?.pendingPhoto && profilePhotos.uriOf(bundle.pendingPhoto)) || user?.photoUrl;
   const numbers = (value: number) => formatNumber(getLanguage(), value, { maximumFractionDigits: 1 });
   const rejected = rejectedFields(rejection);
+  const { data: waiting } = useWaitingTrips(user?.id ?? null);
+  // Uploaded trips are in the server totals and leave the queue, so none is counted twice.
+  const stats = bundle?.stats && {
+    trips: bundle.stats.trips + (waiting?.trips ?? 0),
+    distanceMeters: bundle.stats.distanceMeters + (waiting?.distanceMeters ?? 0),
+    warnings: bundle.stats.warnings + (waiting?.warnings ?? 0),
+  };
 
   // Ending the session moves the account to signed out, and the route guards go to Login.
-  // The session ends in memory even if the keychain fails, so the profile cache goes regardless:
-  // medical details and contacts must not stay on the phone.
+  // The session ends in memory even if the keychain fails, so the account's data goes regardless:
+  // medical details, contacts and trips must not stay on the phone.
   const logOut = async () => {
     const userId = authSession.status.getState().userId;
     setSigningOut(true);
     endHomePreview();
     await authApi.signOut().catch(() => setAuthError(true));
-    if (userId) await service.forget(userId).catch(() => setAuthError(true));
+    if (userId) await Promise.all([service.forget(userId), supported ? runtime.trips.discard(userId) : undefined]).catch(() => setAuthError(true));
     setSigningOut(false);
   };
 
@@ -105,15 +114,15 @@ export function ProfileScreen() {
         <SettingsGroup title={t('account.stats')} description={t('account.statsHint')}>
           <View style={styles.stats}>
             {([
-              ['trips', bundle.stats ? numbers(bundle.stats.trips) : '—'],
-              ['distance', bundle.stats ? t('preferences.radiusValue', { value: numbers(distanceValue(bundle.stats.distanceMeters, settings.units)), unit: t(settings.units === 'mph' ? 'preferences.miles' : 'preferences.kilometers') }) : '—'],
-              ['warnings', bundle.stats ? numbers(bundle.stats.warnings) : '—'],
+              ['trips', stats ? numbers(stats.trips) : '—'],
+              ['distance', stats ? t('preferences.radiusValue', { value: numbers(distanceValue(stats.distanceMeters, settings.units)), unit: t(settings.units === 'mph' ? 'preferences.miles' : 'preferences.kilometers') }) : '—'],
+              ['warnings', stats ? numbers(stats.warnings) : '—'],
             ] as const).map(([label, value]) => <View key={label} style={styles.stat}>
               <ThemedText type="heading" themeColor="accent">{value}</ThemedText>
               <ThemedText type="label" themeColor="textSecondary">{t(`account.${label}`)}</ThemedText>
             </View>)}
           </View>
-          {!bundle.stats ? <ThemedText themeColor="textSecondary">{t('account.statsUnavailable')}</ThemedText> : null}
+          {!stats ? <ThemedText themeColor="textSecondary">{t('account.statsUnavailable')}</ThemedText> : null}
         </SettingsGroup>
         <ProfileEditor key={bundle.profile.id} bundle={bundle} rejection={rejection} />
         <ReportHistory bundle={bundle} />

@@ -27,3 +27,10 @@ export function useWaitingReports() {
   return useQuery({ queryKey: ['local', 'reports', 'waiting'], queryFn: () => runtime.reports.waiting(), enabled: ready,
     networkMode: 'always', retry: false, staleTime: Infinity });
 }
+
+// Finished trips the server has not counted yet, so the totals include them once.
+export function useWaitingTrips(userId: string | null) {
+  const runtime = useOfflineRuntime(); const { ready } = useOfflineStatus();
+  return useQuery({ queryKey: ['local', 'trips', userId], queryFn: () => (userId ? runtime.trips.waiting(userId) : null), enabled: ready && userId !== null,
+    networkMode: 'always', retry: false, staleTime: Infinity });
+}

@@ -38,7 +38,7 @@ export function ProfileDataProvider({ children }: PropsWithChildren) {
       (id) => authSession.status.getState().status === 'signedIn' && authSession.status.getState().userId === id);
   });
   useProfileCacheInvalidation(service);
-  // A delivered report changes the history the server returns.
+  // A delivered report or trip changes the history and totals the server returns.
   useEffect(() => runtime.status.subscribe((state, previous) => {
     if (state.lastSyncAt !== previous.lastSyncAt) void service.refresh();
   }), [runtime, service]);
