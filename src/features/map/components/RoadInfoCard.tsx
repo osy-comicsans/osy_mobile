@@ -2,21 +2,23 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/common/components/themed-text';
-import { formatNumber } from '@/common/lib/i18n/format';
-import { getLanguage } from '@/common/lib/i18n/i18n';
 import { Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 import { useCurrentSpeed } from '@/features/location/hooks/useLocation';
 import { useCurrentRoad } from '@/features/roads/hooks/useRoad';
+import { useSpeedDisplay } from '@/features/settings/hooks/useSpeedDisplay';
+import { useTheme } from '@/common/hooks/use-theme';
 
 export function RoadInfoCard() {
   const { t } = useTranslation();
   const { road, stale } = useCurrentRoad();
   const speed = useCurrentSpeed();
-  const speedText = speed === null ? '--' : formatNumber(getLanguage(), Math.round(speed));
-  const spokenSpeed = speed === null ? t('units.speedUnknown') : t('units.speedSpoken', { value: speedText });
+  const display = useSpeedDisplay(speed);
+  const theme = useTheme();
+  const speedText = display.formatted;
+  const spokenSpeed = display.spoken;
 
   return (
-    <View accessible accessibilityLabel={`${road?.name ?? t('map.unknownRoad')}, ${spokenSpeed}`} style={styles.card}>
+    <View accessible accessibilityLabel={`${road?.name ?? t('map.unknownRoad')}, ${spokenSpeed}`} style={[styles.card, { backgroundColor: theme.surface }]}>
       <View style={styles.road}>
         {road && road.refs.length > 0 && (
           <View style={styles.plates}>
@@ -36,7 +38,7 @@ export function RoadInfoCard() {
       </View>
       <View style={styles.speed}>
         <ThemedText type="heading">{speedText}</ThemedText>
-        <ThemedText type="label" themeColor="textSecondary">{t('units.kmh')}</ThemedText>
+        <ThemedText type="label" themeColor="textSecondary">{display.unit}</ThemedText>
       </View>
     </View>
   );

@@ -5,7 +5,10 @@ import { useTranslation } from 'react-i18next';
 
 import { api, authSession } from '@/common/lib/api/axios';
 import { config } from '@/common/lib/config';
-import { getLanguage } from '@/common/lib/i18n/i18n';
+import { getLanguage, i18n as translations } from '@/common/lib/i18n/i18n';
+import { subscribeToForeground } from '@/common/lib/native/appLifecycle';
+import { speakGuidance, stopGuidance } from '@/common/lib/native/voice';
+import { settingsService } from '@/features/settings/settingsService';
 import { useCrashDetected, useNearMiss } from '@/features/crash-detection/hooks/useCrashDetection';
 import type { CrashEvent } from '@/features/crash-detection/types/crash.types';
 import { createProfileApi } from '@/features/profile/api/profileApi';
@@ -33,11 +36,19 @@ export function AlertProvider({ children }: PropsWithChildren) {
     driver: alertDriver,
     navigate,
     sendPushToken: profileApi.registerPushToken,
+    getSettings: () => settingsService.store.getState().settings,
+    speak: (alert) => {
+      const settings = settingsService.store.getState().settings;
+      const language = settings.voiceLanguage === 'app' ? getLanguage() : settings.voiceLanguage;
+      if (settings.voice) void speakGuidance(translations.t(`alerts.${alert.type}.body`, { lng: language }), language);
+    },
     onCheckInAnswer: (action) => {
       if (action === CHECK_IN_ACTIONS.ok) checkIn.confirmOk();
       else checkIn.needHelp();
     },
   }));
+  useEffect(() => settingsService.store.subscribe(({ settings }) => { if (!settings.voice) stopGuidance(); }), []);
+  useEffect(() => subscribeToForeground((active) => { if (active) void service.refreshPermission(); }), [service]);
 
   const raiseCrashAlert = () => service.raise(
     { id: randomUUID(), type: 'crash_detected' },

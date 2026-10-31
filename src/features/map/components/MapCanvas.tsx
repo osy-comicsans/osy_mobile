@@ -2,9 +2,10 @@ import {
   Camera, GeoJSONSource, Layer, Map, UserLocation, type CameraRef,
 } from '@maplibre/maplibre-react-native';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
-import { StyleSheet, useColorScheme } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { Colors } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 
 import { DEFAULT_CENTER, DEFAULT_ZOOM, FOLLOW_ZOOM, mapStyleUrl } from '../utils/mapStyle';
 import { toFeatureCollection, type MapOverlays } from '../utils/mapOverlays';
@@ -24,7 +25,8 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
   ref,
 ) {
   const camera = useRef<CameraRef>(null);
-  const scheme = useColorScheme();
+  const theme = useTheme();
+  const scheme = theme.background === Colors.background ? 'light' : 'dark';
 
   useImperativeHandle(ref, () => ({
     recenter(center) {

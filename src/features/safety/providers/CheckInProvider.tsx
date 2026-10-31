@@ -1,11 +1,12 @@
 import { randomUUID } from 'expo-crypto';
 import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 
-import { api } from '@/common/lib/api/axios';
+import { api, authSession } from '@/common/lib/api/axios';
 import { subscribeToForeground } from '@/common/lib/native/appLifecycle';
 import { secureStorage } from '@/common/lib/storage/secureStorage';
 import { useLocationService } from '@/features/location/hooks/useLocation';
 import { RoadContext } from '@/features/roads/providers/RoadProvider';
+import { settingsService } from '@/features/settings/settingsService';
 
 import { createSafetyApi } from '../api/safetyApi';
 import { createCheckInService, type CheckInService } from '../utils/checkInService';
@@ -28,11 +29,16 @@ export function CheckInProvider({ children }: PropsWithChildren) {
     currentRoad: () => road?.store.getState().road ?? null,
     storage: secureStorage,
     createId: randomUUID,
+    shareMedicalInfo: () => {
+      const state = settingsService.store.getState();
+      return state.ready && state.consentOwner !== null && state.consentOwner === authSession.status.getState().userId && state.settings.shareMedicalInfo;
+    },
   }));
   const [service] = useState(() => createCheckInService({
     escalate: (trigger, event) => void escalation.start(trigger, event),
     remind: () => checkInReminder.send(),
     cancelEscalation: () => void escalation.cancel(),
+    getCountdownSeconds: () => settingsService.store.getState().settings.countdownSeconds,
   }));
 
   useEffect(() => {

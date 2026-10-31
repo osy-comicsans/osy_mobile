@@ -26,6 +26,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Test profile persistence and settings integration
+        run: pnpm test:profile-settings
+
       - name: Test offline storage
         run: pnpm test:offline
 

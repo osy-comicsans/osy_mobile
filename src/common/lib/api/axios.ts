@@ -11,7 +11,7 @@ import { installAuthInterceptors } from './authInterceptors';
 import { authTokensSchema, createAuthSession } from './authSession';
 import { createMockBackend } from './mock/mockBackend';
 
-const mockAdapter = config.useMockApi ? createMockBackend(languageStorage) : undefined;
+const mockAdapter = config.useMockApi ? createMockBackend(languageStorage, undefined, { persistSensitive: Platform.OS !== 'web' }) : undefined;
 
 function createClient(): AxiosInstance {
   const client = create({

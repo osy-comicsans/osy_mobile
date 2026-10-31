@@ -22,13 +22,15 @@ interface CheckInOptions {
   // "I'm OK" after escalating, which takes the request for help back.
   cancelEscalation?: () => void;
   now?: () => number;
+  getCountdownSeconds?: () => number;
 }
 
 const idle: CheckInState = { status: 'idle', round: 0, endsAt: null, event: null };
 
-export function createCheckInService({ escalate, remind, cancelEscalation, now = Date.now }: CheckInOptions) {
+export function createCheckInService({ escalate, remind, cancelEscalation, getCountdownSeconds, now = Date.now }: CheckInOptions) {
   const store = createStore<CheckInState>(() => idle);
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let rounds = [...CHECK_IN_ROUNDS_SECONDS];
 
   const schedule = () => {
     clearTimeout(timer);
@@ -52,11 +54,11 @@ export function createCheckInService({ escalate, remind, cancelEscalation, now =
     let { round, endsAt } = state;
     while (endsAt <= now()) {
       round += 1;
-      if (round >= CHECK_IN_ROUNDS_SECONDS.length) {
+      if (round >= rounds.length) {
         finish('check_in_timeout');
         return;
       }
-      endsAt += CHECK_IN_ROUNDS_SECONDS[round] * 1000;
+      endsAt += rounds[round] * 1000;
     }
     store.setState({ round, endsAt });
     schedule();
@@ -66,15 +68,19 @@ export function createCheckInService({ escalate, remind, cancelEscalation, now =
   return {
     store,
     sync,
+    roundDuration: () => rounds[store.getState().round],
 
     // A second crash during a check-in must not hand the driver more time.
     begin(event: CrashEvent | null = null) {
       const { status } = store.getState();
       if (status === 'waiting' || status === 'escalated') return;
+      const total = getCountdownSeconds?.() ?? 180;
+      const safeTotal = [60, 120, 180].includes(total) ? total : 180;
+      rounds = [safeTotal / 6, safeTotal / 3, safeTotal / 2];
       store.setState({
         status: 'waiting',
         round: 0,
-        endsAt: now() + CHECK_IN_ROUNDS_SECONDS[0] * 1000,
+        endsAt: now() + rounds[0] * 1000,
         event,
       });
       schedule();

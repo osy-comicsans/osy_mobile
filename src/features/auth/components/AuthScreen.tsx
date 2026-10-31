@@ -10,6 +10,7 @@ import { useOnline } from '@/common/hooks/use-online';
 import { Colors, MaxContentWidth, Palette, Radius, Shadow, Space } from '@/common/lib/theme';
 
 import { FormNotice } from './FormNotice';
+import { useTheme } from '@/common/hooks/use-theme';
 
 // DESIGN.md §2: the primary brand gradient, for heroes and banners only. The hero
 // also has a solid accent fill, so its white text stays readable if this is not drawn.
@@ -39,12 +40,13 @@ function BrandMark() {
 }
 
 export function AuthScreen({ title, description, overline, showBack, onBack, footer, children }: AuthScreenProps) {
+  const theme = useTheme();
   const { t } = useTranslation();
   const online = useOnline();
   const { top, bottom } = useSafeAreaInsets();
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.root}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[styles.root, { backgroundColor: theme.background }]}>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -69,7 +71,7 @@ export function AuthScreen({ title, description, overline, showBack, onBack, foo
           </View>
         </View>
 
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, { backgroundColor: theme.surface }]}>
           {!online && <FormNotice tone="warning" message={t('auth.offline')} />}
           {children}
         </View>

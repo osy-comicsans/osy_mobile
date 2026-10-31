@@ -1,10 +1,11 @@
 import { NativeTabs } from 'expo-router/native-tabs';
 import { useTranslation } from 'react-i18next';
 
-import { Colors } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 
 export default function AppTabs() {
   const { t } = useTranslation();
+  const Colors = useTheme();
 
   return (
     <NativeTabs

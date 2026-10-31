@@ -3,11 +3,13 @@ import { createStore } from 'zustand/vanilla';
 import { config } from '../config';
 import { supportsLocalDatabase } from '../native/appLifecycle';
 import { createId } from '../native/uuid';
+import { privacyReset } from '../storage/privacyReset';
 import { LocalDatabase } from './localDatabase';
 import { AccidentReportRepository } from './repositories/accidentReportRepository';
 import { TodoRepository } from './repositories/todoRepository';
 import { WeatherRepository } from './repositories/weatherRepository';
 import { AreaRepository } from './repositories/areaRepository';
+import { ProfileRepository } from './repositories/profileRepository';
 import { getDatabase } from './sqlite';
 import { SyncManager } from './sync/syncManager';
 import { syncPolicy } from './sync/syncPolicy';
@@ -24,6 +26,7 @@ export interface OfflineStatus extends QueueSummary {
   error: string | null;
   syncError: string | null;
   lastSyncAt: number | null;
+  privacyBlocked: boolean;
 }
 
 export function createOfflineRuntime() {
@@ -32,11 +35,12 @@ export function createOfflineRuntime() {
   const reports = new AccidentReportRepository(database, createId);
   const weather = new WeatherRepository(database);
   const areas = new AreaRepository(database);
+  const profiles = new ProfileRepository(database);
   const queue = new SyncQueue(database);
   const status = createStore<OfflineStatus>(() => ({
     supported: supportsLocalDatabase, ready: false, online: null, foreground: true,
     syncing: false, backendConnected: false, error: null, syncError: null,
-    lastSyncAt: null, pending: 0, failed: 0, conflicts: 0,
+    lastSyncAt: null, pending: 0, failed: 0, conflicts: 0, privacyBlocked: false,
   }));
   let invalidate: (() => Promise<void>) | undefined;
   let initialization: Promise<void> | undefined;
@@ -57,7 +61,7 @@ export function createOfflineRuntime() {
   const canSync = () => {
     const current = status.getState();
     return active && authenticated && current.ready && current.online === true && current.foreground
-      && config.hasBackend;
+      && !current.privacyBlocked && config.hasBackend;
   };
 
   const sync = new SyncManager(queue, {
@@ -85,6 +89,10 @@ export function createOfflineRuntime() {
       .then(() => queue.recoverInterrupted())
       .then(() => reports.clearDelivered())
       .then(async () => {
+        const owner = await privacyReset.read();
+        if (owner) { await profiles.purgePersonalData(owner); await privacyReset.complete(); }
+      })
+      .then(async () => {
         status.setState({ ready: true, error: null });
         await changed();
         updateSchedule();
@@ -98,7 +106,7 @@ export function createOfflineRuntime() {
   };
 
   return {
-    status, todos, reports, weather, areas, queue, sync, initialize, changed,
+    status, todos, reports, weather, areas, profiles, queue, sync, initialize, changed,
     start(onChange: () => Promise<void>) {
       active = true;
       invalidate = onChange;
@@ -125,6 +133,7 @@ export function createOfflineRuntime() {
       authenticated = signedIn;
       updateSchedule();
     },
+    setPrivacyBlocked(blocked: boolean) { status.setState({ privacyBlocked: blocked }); updateSchedule(); },
     registerSyncAdapter(entity: string, adapter: SyncAdapter) {
       sync.register(entity, adapter);
       updateSchedule();

@@ -47,13 +47,14 @@ interface EscalationOptions {
   };
   createId: () => string;
   now?: () => number;
+  shareMedicalInfo?: () => boolean;
 }
 
 const STORAGE_KEY = 'osy.escalation.pending';
 const RETRY_MS = 15_000;
 const SHARE_LOCATION_MS = 30_000;
 
-export function createEscalationService({ api, location, currentRoad, storage, createId, now = Date.now }: EscalationOptions) {
+export function createEscalationService({ api, location, currentRoad, storage, createId, shareMedicalInfo, now = Date.now }: EscalationOptions) {
   const store = createStore<EscalationState>(() => ({ status: 'idle', liveLocationUrl: null, audit: [] }));
   let pending: PendingEscalation | null = null;
   let retryTimer: ReturnType<typeof setTimeout> | undefined;
@@ -91,6 +92,7 @@ export function createEscalationService({ api, location, currentRoad, storage, c
     const current = pending;
     try {
       await api.createIncident(current.incident);
+      if (shareMedicalInfo) current.escalation.shareMedicalInfo = shareMedicalInfo();
       const { liveLocationUrl } = await api.escalate(current.escalation);
       if (pending !== current) return;
       current.sent = true;
@@ -156,7 +158,7 @@ export function createEscalationService({ api, location, currentRoad, storage, c
           speedBeforeImpactKmh: event?.snapshot.speedBeforeKmh ?? null,
           roadName: road?.name ?? null,
           roadNumber: road?.refs[0] ?? null,
-          shareMedicalInfo: false,
+          shareMedicalInfo: shareMedicalInfo?.() ?? false,
         },
       };
       store.setState({ status: 'sending', liveLocationUrl: null, audit: [] });

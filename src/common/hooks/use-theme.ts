@@ -1,6 +1,9 @@
-import { Colors } from '@/common/lib/theme';
+import { useColorScheme } from 'react-native';
+import { Colors, DarkColors } from '@/common/lib/tokens';
+import { useSettings } from '@/features/settings/hooks/useSettings';
 
-// OSY is light-only; the palette is a single flat token set.
 export function useTheme() {
-  return Colors;
+  const system = useColorScheme();
+  const { settings } = useSettings();
+  return (settings.theme === 'dark' || (settings.theme === 'system' && system === 'dark')) ? DarkColors : Colors;
 }

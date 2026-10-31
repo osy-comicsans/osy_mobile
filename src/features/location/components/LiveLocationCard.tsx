@@ -9,17 +9,19 @@ import { Space } from '@/common/lib/theme';
 import { useCurrentRoad } from '@/features/roads/hooks/useRoad';
 
 import { useCurrentLocation, useCurrentSpeed, useDrivingState } from '../hooks/useLocation';
+import { useSpeedDisplay } from '@/features/settings/hooks/useSpeedDisplay';
 
 export function LiveLocationCard() {
   const { t } = useTranslation();
   const fix = useCurrentLocation();
   const speed = useCurrentSpeed();
+  const display = useSpeedDisplay(speed);
   const drivingState = useDrivingState();
   const { road, stale } = useCurrentRoad();
   if (!fix) return null;
 
   const language = getLanguage();
-  const speedText = speed === null ? '--' : formatNumber(language, Math.round(speed));
+  const speedText = display.formatted;
   const coordinate = (value: number) => formatNumber(language, value, {
     minimumFractionDigits: 5,
     maximumFractionDigits: 5,
@@ -28,9 +30,9 @@ export function LiveLocationCard() {
 
   return (
     <Card style={styles.card}>
-      <View accessible accessibilityLabel={speed === null ? t('units.speedUnknown') : t('units.speedSpoken', { value: speedText })}>
+      <View accessible accessibilityLabel={display.spoken}>
         <ThemedText type="display">{speedText}</ThemedText>
-        <ThemedText type="label" themeColor="textSecondary">{t('units.kmh')}</ThemedText>
+        <ThemedText type="label" themeColor="textSecondary">{display.unit}</ThemedText>
       </View>
       <ThemedText type="bodyMedium">{t(`location.driving.${drivingState}`)}</ThemedText>
       {road && (

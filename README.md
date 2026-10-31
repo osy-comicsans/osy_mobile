@@ -107,6 +107,8 @@ The `todos` and `device-playground` features no longer have routes. Their code s
 
 ## Home dashboard
 
+Profile and Settings now use the shared glass design, with offline profile edits, emergency contacts, medical information, account history, and persistent feature preferences. See [Profile and Settings](docs/profile-settings.md) for the API additions, sync behavior, privacy actions, and device checks.
+
 The Home dashboard shows live speed, current road/locality, cached weather, and a labelled risk example, with automatic monitoring and a persistent Pause/Resume override. Glass cards follow the shared design system. Behavior, configuration links, and device checks are documented in [docs/home.md](docs/home.md).
 
 ## Offline use

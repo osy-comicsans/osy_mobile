@@ -1,4 +1,4 @@
-import { isAxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
+import { CanceledError, isAxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 
 import { ApiError } from './apiError';
 import type { AuthSession, AuthTokens } from './authSession';
@@ -41,6 +41,8 @@ export function installAuthInterceptors(
 
   client.interceptors.request.use(async (request) => {
     await session.restore();
+    const owner = request.headers.get('X-OSY-Owner');
+    if (owner && owner !== session.status.getState().userId) throw new CanceledError('Account changed.');
     const accessToken = session.getTokens()?.accessToken;
     if (accessToken) request.headers.set('Authorization', `Bearer ${accessToken}`);
     return request;
@@ -50,6 +52,8 @@ export function installAuthInterceptors(
     if (!isAxiosError(error) || error.response?.status !== 401) throw error;
     const request = error.config as RetriableConfig | undefined;
     if (!request || request.retriedAfterRefresh) throw error;
+    const owner = request.headers.get('X-OSY-Owner');
+    if (owner && owner !== session.status.getState().userId) throw new CanceledError('Account changed.');
 
     // A request that was sent with an older token only needs a retry.
     const current = session.getTokens()?.accessToken;

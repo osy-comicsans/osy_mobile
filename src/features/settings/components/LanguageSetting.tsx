@@ -23,7 +23,7 @@ export function LanguageSetting() {
   ];
 
   return (
-    <Card style={styles.card}>
+    <Card glass style={styles.card}>
       <ThemedText type="headingS" accessibilityRole="header">{t('settings.language')}</ThemedText>
       <View accessibilityRole="radiogroup" accessibilityLabel={t('settings.language')}>
         {options.map(({ value, label }) => (

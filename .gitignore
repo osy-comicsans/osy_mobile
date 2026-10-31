@@ -47,3 +47,4 @@ example
 docs/*
 !docs/weather.md
 !docs/home.md
+!docs/profile-settings.md

@@ -34,15 +34,17 @@ interface MonitorOptions {
   classify: CrashClassifier;
   onCrash: (event: CrashEvent) => void;
   onNearMiss: (at: number, probability: number) => void;
+  getThreshold?: () => number;
 }
 
-export function createCrashModelMonitor({ classify, onCrash, onNearMiss }: MonitorOptions) {
+export function createCrashModelMonitor({ classify, onCrash, onNearMiss, getThreshold = () => CRASH_THRESHOLD }: MonitorOptions) {
   let acceleration: MotionSample[] = [];
   let rotation: MotionSample[] = [];
   let speeds: SpeedSample[] = [];
   let lastFix: LocationFix | null = null;
   let candidate: Candidate | null = null;
   let quietUntil = 0;
+  let generation = 0;
 
   const prune = (t: number) => {
     const from = t - KEEP_MS;
@@ -52,11 +54,12 @@ export function createCrashModelMonitor({ classify, onCrash, onNearMiss }: Monit
   };
 
   const evaluate = async ({ impactAt, peak, speedBeforeKmh, location }: Candidate) => {
+    const id = generation;
     const window = buildModelWindow(acceleration, rotation, speeds, impactAt);
     const result = await classify(extractFeatures(window));
-    if (!result) return;
+    if (!result || id !== generation) return;
 
-    if (result.crash >= CRASH_THRESHOLD) {
+    if (result.crash >= getThreshold()) {
       onCrash({
         detectedAt: impactAt + IMPACT_OFFSET_SECONDS * 1000,
         confidence: result.crash,
@@ -111,6 +114,7 @@ export function createCrashModelMonitor({ classify, onCrash, onNearMiss }: Monit
     },
 
     reset() {
+      generation++;
       acceleration = [];
       rotation = [];
       speeds = [];

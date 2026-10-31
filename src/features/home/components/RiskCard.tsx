@@ -1,14 +1,18 @@
 import { StyleSheet, View } from 'react-native';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Card } from '@/common/components/ui/card';
 import { formatNumber } from '@/common/lib/i18n/format';
 import { getLanguage } from '@/common/lib/i18n/i18n';
-import { Colors, Radius, Space, Typography } from '@/common/lib/theme';
+import { Radius, Space, Typography } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 import { useRiskAssessment } from '@/features/risk/hooks/useRiskAssessment';
 
 export function RiskCard() {
+  const Colors = useTheme();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const risk = useRiskAssessment();
   return (
@@ -34,7 +38,7 @@ export function RiskCard() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (Colors: ReturnType<typeof useTheme>) => StyleSheet.create({
   card: { gap: Space[3] },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: Space[2] },
   badge: { borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Space[3], paddingVertical: Space[1], borderRadius: Radius.full },

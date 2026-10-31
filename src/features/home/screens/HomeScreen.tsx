@@ -6,6 +6,7 @@ import { AmbientBackground } from '@/common/components/ui/ambient-background';
 import { ThemedText } from '@/common/components/themed-text';
 import { Colors, MaxContentWidth, Space } from '@/common/lib/theme';
 import { GlassAppearanceProvider } from '@/common/providers/GlassAppearanceProvider';
+import { useTheme } from '@/common/hooks/use-theme';
 import { AlertPermissionCard } from '@/features/alerts/components/AlertPermissionCard';
 import { LocationPermissionCard } from '@/features/location/components/LocationPermissionCard';
 import { WeatherWidget } from '@/features/weather/components/WeatherWidget';
@@ -18,9 +19,10 @@ import { QuickActions } from '../components/QuickActions';
 export function HomeScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
   return (
     <GlassAppearanceProvider>
-      <View style={styles.root}>
+      <View style={[styles.root, { backgroundColor: theme.background }]}>
         <AmbientBackground />
         <ScrollView contentContainerStyle={[styles.scroll, { paddingTop: insets.top + Space[6], paddingBottom: insets.bottom + Space[8] }]}
           contentInsetAdjustmentBehavior="never">

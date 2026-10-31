@@ -963,6 +963,11 @@ export default config;
 
 ### Mobile glass surfaces
 
+Appearance supports device, light, and dark preferences. The dark palette uses
+OSY charcoal surfaces and lavender accents, with the same typography, radii,
+spacing and pill controls. Use the shared theme hook for live appearance
+changes; avoid placing theme-dependent text over a fixed light surface.
+
 Home may use the shared `Card glass` variant. Keep the existing 16px card
 radius, pill actions, Gabarito/Arabic typography, and OSY palette. Glass
 tokens in `src/common/lib/tokens.ts` define translucent white/lavender

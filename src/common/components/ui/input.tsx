@@ -12,6 +12,7 @@ import {
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { Colors, Palette, Radius, Space, Typography } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 
 export type InputHandle = ComponentRef<typeof TextInput>;
 
@@ -48,6 +49,7 @@ export function Input({
   ...rest
 }: InputProps) {
   const [focused, setFocused] = useState(false);
+  const theme = useTheme();
   const disabled = editable === false;
   const floating = focused || !!value;
   const progress = useSharedValue(floating ? 1 : 0);
@@ -69,6 +71,7 @@ export function Input({
       <View
         style={[
           styles.field,
+          { backgroundColor: theme.surface, borderColor: theme.border },
           !!value && styles.filled,
           disabled && styles.disabled,
           focused && styles.focused,
@@ -80,7 +83,7 @@ export function Input({
           accessibilityLabel={label}
           value={value}
           placeholder={floating ? placeholder : undefined}
-          placeholderTextColor={Colors.textTertiary}
+          placeholderTextColor={theme.textTertiary}
           selectionColor={Colors.accent}
           editable={editable}
           {...rest}
@@ -92,7 +95,7 @@ export function Input({
             setFocused(false);
             onBlur?.(event);
           }}
-          style={[styles.input, disabled && styles.inputDisabled, style]}
+          style={[styles.input, { color: theme.textPrimary }, disabled && styles.inputDisabled, style]}
         />
         {trailing && <View style={styles.trailing}>{trailing}</View>}
         {label ? (
@@ -103,6 +106,7 @@ export function Input({
               styles.label,
               leadingIcon && !floating ? styles.labelAfterIcon : undefined,
               floating && styles.labelFloating,
+              floating && { backgroundColor: theme.surface },
               { color: labelColor },
               labelMotion,
             ]}>

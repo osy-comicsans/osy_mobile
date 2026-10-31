@@ -13,8 +13,10 @@ import type { MapCanvas as MapCanvasType, MapCanvasHandle } from '../components/
 import { RoadInfoCard } from '../components/RoadInfoCard';
 import { isMapAvailable } from '../utils/mapAvailability';
 import { EMPTY_OVERLAYS } from '../utils/mapOverlays';
+import { useTheme } from '@/common/hooks/use-theme';
 
 export function MapScreen() {
+  const theme = useTheme();
   const { t } = useTranslation();
   const { top } = useSafeAreaInsets();
   const fix = useCurrentLocation();
@@ -39,7 +41,7 @@ export function MapScreen() {
   };
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { backgroundColor: theme.background }]}>
       <MapCanvas ref={canvas} following={following} overlays={EMPTY_OVERLAYS} onFollowingChange={setFollowing} />
       <View pointerEvents="box-none" style={[styles.top, { top: top + Space[3] }]}>
         <RoadInfoCard />
@@ -52,7 +54,7 @@ export function MapScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('map.recenter')}
           onPress={recenter}
-          style={({ pressed }) => [styles.recenter, pressed && styles.pressed]}>
+          style={({ pressed }) => [styles.recenter, { backgroundColor: pressed ? theme.accentSoft : theme.surface }]}>
           <Icon name="location" size={22} color={Colors.accent} />
         </Pressable>
       )}
