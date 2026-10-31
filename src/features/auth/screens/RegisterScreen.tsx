@@ -9,7 +9,7 @@ import { Icon, type IconName } from '@/common/components/ui/icon';
 import { Input, type InputHandle } from '@/common/components/ui/input';
 import { Space } from '@/common/lib/theme';
 
-import { authApi } from '../authServices';
+import { accountService, authApi } from '../authServices';
 import { AuthScreen, sheetCard } from '../components/AuthScreen';
 import { FormNotice } from '../components/FormNotice';
 import { PasswordInput } from '../components/PasswordInput';
@@ -63,8 +63,10 @@ export function RegisterScreen() {
     setFormError(null);
     try {
       const { confirmPassword: _confirmPassword, ...request } = registerFormSchema.parse(values);
+      accountService.beginSignUp();
       await authApi.register(request);
     } catch (error) {
+      accountService.cancelSignUp();
       const { fieldKeys, fieldText, formKey } = mapRegisterError(error);
       const translated = Object.fromEntries(Object.entries(fieldKeys).map(([field, key]) => [field, text(key)]));
       setServerErrors({ ...translated, ...fieldText });
