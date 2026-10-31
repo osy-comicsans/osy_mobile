@@ -88,7 +88,8 @@
     "test:escalation": "node --test tests/escalation.test.cjs",
     "test:crash-model": "node --test tests/crash-model.test.cjs",
     "test:risk-warnings": "node --test tests/risk-warnings.test.cjs",
-    "test:home": "node --test tests/home.test.cjs"
+    "test:home": "node --test tests/home.test.cjs",
+    "test:nearby": "node --test tests/nearby-incidents.test.cjs"
   },
   "private": true
 }
