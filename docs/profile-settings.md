@@ -24,7 +24,7 @@ The web preview uses a session-only profile cache and does not persist medical/c
 
 ## Settings consumers
 
-`features/settings/utils/settingsService.ts` validates and serializes durable preference writes. Failed writes do not show false success. Account-scoped analytics and medical-sharing consent survive a restart for the same account and reset on sign-out/account change.
+`features/settings/utils/settingsService.ts` validates and serializes durable preference writes. Failed writes do not show false success. Saved values are restored over the defaults, so a setting added or renamed in a later version starts at its default without resetting the others; a file that cannot be read or validated leaves crash detection paused and shows the save error. Account-scoped analytics and medical-sharing consent survive a restart for the same account and reset on sign-out/account change.
 
 | Setting | Consumer |
 | --- | --- |
@@ -33,9 +33,9 @@ The web preview uses a session-only profile cache and does not persist medical/c
 | Crash detection | Starts/stops crash sensor monitoring independently of GPS/roads; Home Pause/Resume still applies |
 | Sensitivity | Actual rule impact/confidence thresholds and model crash probability threshold; the standard values preserve the existing thresholds |
 | Countdown | 60/120/180 seconds total, split into three stages; an active countdown freezes its original duration |
-| Voice and voice language | `common/lib/native/voice.ts` / Expo Speech; disabling voice cancels speech, and missing native support leaves visual controls usable |
+| Voice and voice language | Spoken alerts, including road-risk reasons, and the check-in question, through `common/lib/native/voice.ts` / Expo Speech; the check-in listens for an answer either way. Disabling voice cancels speech, and missing native support leaves visual controls usable |
 | App language | Existing persisted language preference, API language headers, and RTL restart behavior |
-| Units | Home dial, current speed, road speed limits, Map, weather wind, radius labels and profile distance; stored/risk inputs remain SI |
+| Units | Every speed and distance shown: the Home dial and speed limit, current speed, the Map road card speed and limit, weather wind and visibility, hazards ahead, the distance to a nearby accident, the route to it, radius labels and profile distance. Kilometres switch to metres, and miles to feet, below 1 km or 0.1 mi. Stored values, API data and risk inputs remain SI, and temperature and rainfall stay metric |
 | Appearance | Shared text, cards, inputs, buttons, glass, navigation, Home/Map and account surfaces; device/light/dark |
 | Optional analytics | Saved consent sent to the backend; this change adds no analytics uploader |
 | Medical-sharing consent | Account-checked `shareMedicalInfo` on escalation; revocation applies before a queued escalation is sent |
@@ -46,9 +46,9 @@ The dial range is 240 km/h or 160 mph, independent of the legal road limit. Sens
 
 ## Privacy and permissions
 
-Settings shows foreground/background location, motion and notification status, and a system-settings shortcut. Existing permission onboarding remains in place. The app does not grant permissions by toggling a preference.
+Settings shows foreground/background location, motion, notification and microphone/speech-recognition status, refreshed when the app returns to the foreground, and a system-settings shortcut. A permission that has not been asked for yet gets an Allow access button, which reuses the existing request flows; motion and background location are offered once location is allowed. Existing permission onboarding remains in place. The app does not grant permissions by toggling a preference.
 
-Data/account erasure requires typing `DELETE`, a connection, and no active check-in/escalation. Server failures do not report deletion as successful. Sync is paused during erasure. A durable local intent finishes device-cache/outbox cleanup before sync after a restart; the current user's staged avatar folder and device report-photo cache are cleared. Account deletion signs out and ends the temporary Home login bypass. Log out asks for confirmation, warns when edits have not synced, and removes that account's profile cache and staged photos from the phone; signing in again downloads them. Local offline preferences reset; data deletion alone retains account identity. An interrupted HTTP request still requires a backend acknowledgement to establish whether server deletion completed.
+Data/account erasure requires typing the confirmation word in the app language (`DELETE`, `SUPPRIMER` or `حذف`, ignoring case and surrounding spaces), a connection, and no active check-in/escalation. Server failures do not report deletion as successful. Sync is paused during erasure. A durable local intent finishes device-cache/outbox cleanup before sync after a restart; the current user's staged avatar folder and device report-photo cache are cleared. Account deletion signs out and ends the temporary Home login bypass. Log out asks for confirmation, warns when edits have not synced, and removes that account's profile cache, staged photos and trips from the phone; signing in again downloads the profile. Local offline preferences reset; data deletion alone retains account identity. An interrupted HTTP request still requires a backend acknowledgement to establish whether server deletion completed.
 
 The About section shows app/SDK versions. Licenses are bundled for offline reading from installed package notices, fonts and model notices. Run `pnpm licenses:generate` after dependency changes. The Gabarito OFL is copied from the Google Fonts source; road attribution remains OpenStreetMap/ODbL.
 

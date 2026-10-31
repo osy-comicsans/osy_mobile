@@ -3,8 +3,6 @@ import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { useTheme } from '@/common/hooks/use-theme';
-import { formatNumber } from '@/common/lib/i18n/format';
-import { getLanguage } from '@/common/lib/i18n/i18n';
 import { Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 import { useCurrentSpeed } from '@/features/location/hooks/useLocation';
 import { RoadHazardList } from '@/features/roads/components/RoadHazardList';
@@ -18,9 +16,10 @@ export function RoadInfoCard() {
   const speed = useCurrentSpeed();
   const { speedLimit, hazards } = useRoadRules();
   const display = useSpeedDisplay(speed);
+  const limit = useSpeedDisplay(speedLimit.valueKmh);
   const theme = useTheme();
 
-  const limitText = speedLimit.valueKmh === null ? '' : `, ${t('dashboard.speed.limit')} ${t('units.speed', { value: speedLimit.valueKmh })}`;
+  const limitText = speedLimit.valueKmh === null ? '' : `, ${t('dashboard.speed.limit')} ${limit.formatted} ${limit.unit}`;
 
   return (
     <View style={[styles.card, { backgroundColor: theme.surface }]}>
@@ -44,7 +43,7 @@ export function RoadInfoCard() {
       </View>
       {speedLimit.valueKmh !== null && (
         <View style={styles.limit}>
-          <ThemedText type="smallBold">{formatNumber(getLanguage(), speedLimit.valueKmh)}</ThemedText>
+          <ThemedText type="smallBold">{limit.formatted}</ThemedText>
         </View>
       )}
       <View style={styles.speed}>

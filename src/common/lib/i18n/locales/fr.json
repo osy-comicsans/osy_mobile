@@ -29,7 +29,9 @@
     "speedSpoken": "Vitesse {{value}} kilomètres par heure",
     "speedUnknown": "Vitesse inconnue",
     "distanceMeters": "{{value}} m",
-    "distanceKilometers": "{{value}} km"
+    "distanceKilometers": "{{value}} km",
+    "distanceFeet": "{{value}} ft",
+    "distanceMiles": "{{value}} mi"
   },
   "home": {
     "title": "Accueil",
@@ -88,6 +90,7 @@
     "background": {
       "serviceTitle": "OSY surveille votre trajet",
       "serviceBody": "La détection d’accident est activée.",
+      "serviceBodyDetectionOff": "Utilise votre position pendant que vous conduisez.",
       "title": "Gardez la détection d’accident active",
       "body": "OSY a besoin de votre position en permanence pour détecter un accident lorsque votre téléphone est verrouillé ou qu’une autre application est ouverte. Il ne fonctionne à pleine puissance que pendant la conduite, et votre position n’est pas enregistrée."
     }
@@ -289,8 +292,7 @@
       "unit": "km/h",
       "limit": "Limitation de vitesse",
       "limitUnknown": "Indisponible",
-      "signed": "Limite signalée · OpenStreetMap",
-      "default": "Limite par défaut · non signalée"
+      "signed": "Limite signalée · OpenStreetMap"
     },
     "location": {
       "title": "Votre position",
@@ -312,17 +314,13 @@
     },
     "risk": {
       "title": "Risque d’accident",
-      "preview": "DONNÉES D’EXEMPLE",
+      "loading": "Évaluation du risque d’accident",
       "scale": "sur 100",
       "low": "Faible",
-      "moderate": "Modéré",
+      "medium": "Moyen",
       "high": "Élevé",
       "unknown": "Non évalué",
-      "exampleDescription": "Évaluation d’exemple uniquement. Ce n’est pas une estimation du risque en direct.",
-      "factors": "Facteurs d’exemple",
-      "liveFactors": "Principaux facteurs",
-      "factorWet": "Chaussée mouillée",
-      "factorVisibility": "Visibilité réduite"
+      "factors": "Principaux facteurs"
     },
     "actions": {
       "title": "Actions rapides",
@@ -355,7 +353,6 @@
     "sunrise": "Lever du soleil",
     "sunset": "Coucher du soleil",
     "celsius": "{{value}} °C",
-    "metres": "{{value}} m",
     "millimetres": "{{value}} mm",
     "windValue": "{{value}} m/s",
     "precipitationValue": "{{value}} mm / {{minutes}} min",
@@ -502,6 +499,7 @@
     "credit": "Données routières © contributeurs OpenStreetMap",
     "estimate": "Une estimation, pas une garantie que la route est sûre.",
     "noWeather": "Météo indisponible : ce risque peut être sous-estimé.",
+    "noIncidents": "Données d’accidents à proximité indisponibles : ce risque peut être sous-estimé.",
     "close": "Fermer",
     "hazard": {
       "bump": "Dos-d’âne",
@@ -510,7 +508,7 @@
       "animals": "Animaux",
       "hazard": "Danger"
     },
-    "hazardDistance": "{{name}} dans {{distance}} m",
+    "hazardDistance": "{{name}} dans {{distance}}",
     "hazardsNearby": "Dangers à venir",
     "warningOne": "{{first}}. Ralentissez.",
     "warningTwo": "{{first}}, {{second}}. Ralentissez."
@@ -561,6 +559,7 @@
     "motion": "Capteurs de mouvement",
     "background": "Localisation en arrière-plan",
     "notifications": "Notifications",
+    "microphone": "Micro et reconnaissance vocale",
     "permissionValue": "{{value}}",
     "permission": {
       "undetermined": "Non demandée",
@@ -579,7 +578,8 @@
     "deleteData": "Supprimer mes données",
     "deleteAccount": "Supprimer le compte",
     "deleteHint": "Une connexion est nécessaire. Les signalements, infos médicales, contacts, données locales en attente et caches sont supprimés. La suppression du compte efface aussi votre identité.",
-    "confirmation": "Saisissez DELETE pour confirmer",
+    "confirmation": "Saisissez {{word}} pour confirmer",
+    "confirmationWord": "SUPPRIMER",
     "confirmDelete": "Confirmer la suppression",
     "cancel": "Annuler",
     "deleteOnline": "Connectez-vous à Internet pour confirmer la suppression.",

@@ -12,12 +12,13 @@ require.extensions['.ts'] = (module, filename) => {
 
 const { ALERT_RULES, parseAlert, toAlertData, usesHaptics, usesSound } = require('../src/features/alerts/utils/alertRules.ts');
 const { createAlertService } = require('../src/features/alerts/utils/alertService.ts');
+const { defaultSettings } = require('../src/features/settings/types/settings.types.ts');
 
 const crash = { alertId: 'c1', alertType: 'crash_detected' };
 const risk = { alertId: 'r1', alertType: 'potential_accident' };
 const nearby = { alertId: 'n1', alertType: 'accident_nearby', roadName: 'RN 5', distanceMeters: '850' };
 
-function fixture(overrides = {}) {
+function fixture(overrides = {}, options = {}) {
   const f = {
     time: 1_000_000, navigated: [], haptics: [], tokens: [], answers: [], handler: null,
     listeners: {}, removed: 0, presented: [], permission: 'granted', token: { token: 't1', platform: 'android' },
@@ -43,6 +44,7 @@ function fixture(overrides = {}) {
       f.tokens.push(token);
     },
     now: () => f.time,
+    ...options,
   });
   f.stop = f.service.start([]);
   f.banner = () => f.service.store.getState().banner;
@@ -150,6 +152,21 @@ test('muted haptics and sound apply to live alerts', async () => {
   assert.equal(f.shouldPlaySound({ other: true }), false);
   f.listeners.received(risk);
   assert.deepEqual(f.haptics, []);
+  f.service.dismissBanner();
+});
+
+test('a road warning is spoken once, with its reason, and only with voice on', () => {
+  const settings = { ...defaultSettings, voice: true };
+  const spoken = [];
+  const f = fixture({}, { getSettings: () => settings, speak: (alert) => spoken.push(alert.detail) });
+  const warning = { id: 'w1', type: 'potential_accident', detail: 'Sharp curves. Slow down.' };
+  f.service.raise(warning, { title: '', body: '' });
+  f.service.raise(warning, { title: '', body: '' });
+  f.time += ALERT_RULES.potential_accident.minInterval;
+  settings.voice = false;
+  f.service.raise({ ...warning, id: 'w2' }, { title: '', body: '' });
+  assert.deepEqual(spoken, ['Sharp curves. Slow down.']);
+  assert.equal(f.banner().id, 'w2');
   f.service.dismissBanner();
 });
 

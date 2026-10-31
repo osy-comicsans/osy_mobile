@@ -5,6 +5,7 @@ import type { Language } from '@/common/lib/i18n/languages';
 import { contextualPhrases, matchIntent, type VoiceIntent } from './voiceIntent';
 
 export type VoiceStatus = 'off' | 'speaking' | 'listening' | 'denied' | 'unavailable';
+export type VoicePermission = 'undetermined' | 'granted' | 'denied' | 'unavailable';
 
 export interface VoiceState {
   status: VoiceStatus;
@@ -23,6 +24,7 @@ export interface ListenHandlers {
 
 export interface VoiceDriver {
   available(): boolean;
+  getPermission(): Promise<VoicePermission>;
   requestPermission(): Promise<boolean>;
   speak(text: string, language: Language, onDone: () => void): void;
   stopSpeaking(): void;

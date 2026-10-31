@@ -2,7 +2,7 @@ import { useRoadRisk } from '@/features/road-risk/hooks/useRoadRisk';
 
 export interface SpeedLimit {
   valueKmh: number | null;
-  source: 'signed' | 'default' | 'unknown';
+  source: 'signed' | 'unknown';
   updatedAt: number | null;
 }
 

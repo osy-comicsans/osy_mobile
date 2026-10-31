@@ -29,7 +29,9 @@
     "speedSpoken": "Speed {{value}} kilometres per hour",
     "speedUnknown": "Speed unknown",
     "distanceMeters": "{{value}} m",
-    "distanceKilometers": "{{value}} km"
+    "distanceKilometers": "{{value}} km",
+    "distanceFeet": "{{value}} ft",
+    "distanceMiles": "{{value}} mi"
   },
   "home": {
     "title": "Home",
@@ -88,6 +90,7 @@
     "background": {
       "serviceTitle": "OSY is watching your drive",
       "serviceBody": "Crash detection is on.",
+      "serviceBodyDetectionOff": "Using your location while you drive.",
       "title": "Keep crash detection on",
       "body": "OSY needs your location all the time to notice a crash while your phone is locked or another app is open. It runs at full power only while you drive, and your location is not recorded."
     }
@@ -289,8 +292,7 @@
       "unit": "km/h",
       "limit": "Road speed limit",
       "limitUnknown": "Not available",
-      "signed": "Signed limit · OpenStreetMap",
-      "default": "Default limit · not a signed limit"
+      "signed": "Signed limit · OpenStreetMap"
     },
     "location": {
       "title": "Where you are",
@@ -312,17 +314,13 @@
     },
     "risk": {
       "title": "Accident risk",
-      "preview": "EXAMPLE DATA",
+      "loading": "Assessing accident risk",
       "scale": "out of 100",
       "low": "Low",
-      "moderate": "Moderate",
+      "medium": "Medium",
       "high": "High",
       "unknown": "Not assessed",
-      "exampleDescription": "Example assessment only. This is not a live risk estimate.",
-      "factors": "Example factors",
-      "liveFactors": "Top factors",
-      "factorWet": "Wet road surface",
-      "factorVisibility": "Reduced visibility"
+      "factors": "Top factors"
     },
     "actions": {
       "title": "Quick actions",
@@ -355,7 +353,6 @@
     "sunrise": "Sunrise",
     "sunset": "Sunset",
     "celsius": "{{value}} °C",
-    "metres": "{{value}} m",
     "millimetres": "{{value}} mm",
     "windValue": "{{value}} m/s",
     "precipitationValue": "{{value}} mm / {{minutes}} min",
@@ -502,6 +499,7 @@
     "credit": "Road data © OpenStreetMap contributors",
     "estimate": "An estimate, not a guarantee that a road is safe.",
     "noWeather": "Weather is unavailable, so this may be too low.",
+    "noIncidents": "Nearby accident data is unavailable, so this may be too low.",
     "close": "Close",
     "hazard": {
       "bump": "Speed bump",
@@ -510,7 +508,7 @@
       "animals": "Animals",
       "hazard": "Road hazard"
     },
-    "hazardDistance": "{{name}} in {{distance}} m",
+    "hazardDistance": "{{name}} in {{distance}}",
     "hazardsNearby": "Road hazards ahead",
     "warningOne": "{{first}}. Slow down.",
     "warningTwo": "{{first}}, {{second}}. Slow down."
@@ -561,6 +559,7 @@
     "motion": "Motion sensors",
     "background": "Background location",
     "notifications": "Notifications",
+    "microphone": "Microphone and speech recognition",
     "permissionValue": "{{value}}",
     "permission": {
       "undetermined": "Not requested",
@@ -579,7 +578,8 @@
     "deleteData": "Delete my saved data",
     "deleteAccount": "Delete account",
     "deleteHint": "Deletion requires a connection. Saved reports, medical info, contacts, local pending data and caches are removed. Deleting the account also removes your identity.",
-    "confirmation": "Type DELETE to confirm",
+    "confirmation": "Type {{word}} to confirm",
+    "confirmationWord": "DELETE",
     "confirmDelete": "Confirm deletion",
     "cancel": "Cancel",
     "deleteOnline": "Connect to the internet to confirm deletion.",

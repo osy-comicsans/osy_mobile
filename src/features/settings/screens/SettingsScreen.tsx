@@ -1,24 +1,27 @@
 import { Link } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ThemedText } from '@/common/components/themed-text';
 import { AccountPage } from '@/common/components/ui/account-page';
 import { Button } from '@/common/components/ui/button';
 import { Input } from '@/common/components/ui/input';
 import { appInfo } from '@/common/lib/native/appInfo';
+import { subscribeToForeground } from '@/common/lib/native/appLifecycle';
 import { canOpenSystemSettings, openSystemSettings } from '@/common/lib/native/systemSettings';
 import { isVoiceAvailable, speakGuidance } from '@/common/lib/native/voice';
 import { getLanguage } from '@/common/lib/i18n/i18n';
 import { formatNumber } from '@/common/lib/i18n/format';
 import { useOfflineStatus } from '@/common/hooks/use-offline';
-import { useAlertState } from '@/features/alerts/hooks/useAlerts';
-import { useLocationState } from '@/features/location/hooks/useLocation';
+import { useAlertService, useAlertState } from '@/features/alerts/hooks/useAlerts';
+import { useLocationService, useLocationState } from '@/features/location/hooks/useLocation';
 import { useCheckInState } from '@/features/safety/hooks/useCheckIn';
 import { useEscalation } from '@/features/safety/hooks/useEscalation';
+import { voiceDriver } from '@/features/safety/native/voiceDriver';
+import type { VoicePermission } from '@/features/safety/utils/voiceCheckIn';
 import { AlertDevMenu } from '@/features/alerts/components/AlertDevMenu';
 import { useProfile } from '@/features/profile/providers/ProfileDataProvider';
 import { LanguageSetting } from '../components/LanguageSetting';
-import { ChoiceRow, SettingsGroup, ToggleRow } from '../components/SettingsControls';
+import { ChoiceRow, PermissionRow, SettingsGroup, ToggleRow } from '../components/SettingsControls';
 import { useSettings } from '../hooks/useSettings';
 import { usePrivacyActions } from '../hooks/usePrivacyActions';
 import { settingsService } from '../settingsService';
@@ -28,11 +31,15 @@ import { distanceValue } from '../utils/units';
 export function SettingsScreen() {
   const { t } = useTranslation(); const { settings, ready, saving, error, accountSync, consentOwner } = useSettings();
   const location = useLocationState(); const alerts = useAlertState(); const checkIn = useCheckInState();
+  const locationService = useLocationService(); const alertService = useAlertService();
   const { online } = useOfflineStatus(); const profile = useProfile(); const privacy = usePrivacyActions();
   const { state: escalation } = useEscalation();
   const [deleting, setDeleting] = useState<'data' | 'account' | null>(null); const [confirmation, setConfirmation] = useState('');
   const [systemError, setSystemError] = useState(false);
   const [voiceAvailable] = useState(isVoiceAvailable);
+  const [microphone, setMicrophone] = useState<VoicePermission | null>(null);
+  const [requestingMicrophone, setRequestingMicrophone] = useState(false);
+  useEffect(() => subscribeToForeground((active) => { if (active) void voiceDriver.getPermission().then(setMicrophone); }), []);
   const disabled = !ready || saving;
   const consentDisabled = disabled || !profile.cache || consentOwner !== profile.cache.bundle.profile.id;
   const update = (patch: SettingsPatch) => { void settingsService.update(patch).catch(() => undefined); };
@@ -41,6 +48,22 @@ export function SettingsScreen() {
   const choices = <T extends string | number,>(values: readonly T[], labels: (value: T) => string) => values.map((value) => ({ value, label: labels(value) }));
   const permission = (value: string) => t('preferences.permissionValue', { value: t(`preferences.permission.${value}`, { defaultValue: t('preferences.permission.unavailable') }) });
   const voiceLanguage = settings.voiceLanguage === 'app' ? getLanguage() : settings.voiceLanguage;
+  const confirmationWord = t('preferences.confirmationWord');
+  const confirmed = confirmation.trim().toUpperCase() === confirmationWord.toUpperCase();
+  const requestMicrophone = async () => {
+    setRequestingMicrophone(true);
+    await voiceDriver.requestPermission();
+    setMicrophone(await voiceDriver.getPermission()); setRequestingMicrophone(false);
+  };
+  const hasLocation = location.location === 'granted' || location.location === 'limited';
+  // Motion is asked for with location, and background location only after it.
+  const permissions = [
+    { key: 'foreground', status: location.location, requesting: location.requesting, request: locationService.requestPermission },
+    { key: 'motion', status: location.motion, requesting: location.requesting, request: hasLocation ? locationService.requestPermission : undefined },
+    { key: 'background', status: location.background, requesting: location.requesting, request: hasLocation ? locationService.requestBackgroundPermission : undefined },
+    { key: 'notifications', status: alerts.permission, requesting: alerts.requesting, request: alertService.requestPermission },
+    { key: 'microphone', status: microphone, requesting: requestingMicrophone, request: requestMicrophone },
+  ] as const;
   return <AccountPage title={t('settings.title')} description={t('preferences.description')}>
     <ThemedText type="label" themeColor={error ? 'errorText' : 'textSecondary'} accessibilityLiveRegion="polite">
       {t(!ready ? 'loading.content' : error ? 'preferences.saveError' : saving ? 'preferences.saving' : 'preferences.saved')}
@@ -79,10 +102,9 @@ export function SettingsScreen() {
         options={choices(['system', 'light', 'dark'] as const, (value) => t(`preferences.${value}`))} onChange={(theme) => update({ theme })} />
     </SettingsGroup>
     <SettingsGroup title={t('preferences.permissions')}>
-      <ThemedText>{t('preferences.foreground')}: {permission(location.location)}</ThemedText>
-      <ThemedText>{t('preferences.motion')}: {permission(location.motion)}</ThemedText>
-      <ThemedText>{t('preferences.background')}: {permission(location.background)}</ThemedText>
-      <ThemedText>{t('preferences.notifications')}: {permission(alerts.permission)}</ThemedText>
+      {permissions.map(({ key, status, requesting, request }) => <PermissionRow key={key} label={t(`preferences.${key}`)}
+        status={status === null ? '—' : permission(status)} requesting={requesting}
+        onRequest={status === 'undetermined' && request ? () => { void request(); } : undefined} />)}
       {canOpenSystemSettings ? <Button label={t('common.openSettings')} variant="secondary"
         onPress={() => { void openSystemSettings().catch(() => setSystemError(true)); }} />
         : <ThemedText themeColor="textSecondary">{t('preferences.browserPermissions')}</ThemedText>}
@@ -97,9 +119,9 @@ export function SettingsScreen() {
         <Button variant="secondary" label={t('preferences.deleteData')} disabled={activeEmergency || !profile.cache} onPress={() => setDeleting('data')} />
         <Button variant="logout" label={t('preferences.deleteAccount')} disabled={activeEmergency || !profile.cache} onPress={() => setDeleting('account')} />
       </> : <>
-        <Input label={t('preferences.confirmation')} value={confirmation} onChangeText={setConfirmation} autoCapitalize="characters" autoCorrect={false} />
+        <Input label={t('preferences.confirmation', { word: confirmationWord })} value={confirmation} onChangeText={setConfirmation} autoCapitalize="characters" autoCorrect={false} />
         <Button variant="destructive" label={t('preferences.confirmDelete')} loading={privacy.busy}
-          disabled={confirmation !== 'DELETE' || online !== true || activeEmergency || profile.syncing}
+          disabled={!confirmed || online !== true || activeEmergency || profile.syncing}
           onPress={() => { void privacy.erase(deleting === 'account').then((done) => { if (done) { setDeleting(null); setConfirmation(''); } }); }} />
         <Button variant="text" label={t('preferences.cancel')} disabled={privacy.busy} onPress={() => { setDeleting(null); setConfirmation(''); }} />
       </>}

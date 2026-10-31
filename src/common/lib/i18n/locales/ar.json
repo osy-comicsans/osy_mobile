@@ -29,7 +29,9 @@
     "speedSpoken": "السرعة {{value}} كيلومتر في الساعة",
     "speedUnknown": "السرعة غير معروفة",
     "distanceMeters": "{{value}} م",
-    "distanceKilometers": "{{value}} كم"
+    "distanceKilometers": "{{value}} كم",
+    "distanceFeet": "{{value}} قدم",
+    "distanceMiles": "{{value}} ميل"
   },
   "home": {
     "title": "الرئيسية",
@@ -88,6 +90,7 @@
     "background": {
       "serviceTitle": "يتابع OSY رحلتك",
       "serviceBody": "رصد الحوادث مفعّل.",
+      "serviceBodyDetectionOff": "يستخدم موقعك أثناء القيادة.",
       "title": "أبقِ رصد الحوادث مفعّلًا",
       "body": "يحتاج OSY إلى موقعك طوال الوقت لرصد الحادث عندما يكون هاتفك مقفلًا أو عند فتح تطبيق آخر. ولا يعمل بكامل طاقته إلا أثناء القيادة، ولا يُسجَّل موقعك."
     }
@@ -289,8 +292,7 @@
       "unit": "كم/س",
       "limit": "حد سرعة الطريق",
       "limitUnknown": "غير متاح",
-      "signed": "حد موثّق بإشارة · OpenStreetMap",
-      "default": "حد افتراضي · غير موثّق بإشارة"
+      "signed": "حد موثّق بإشارة · OpenStreetMap"
     },
     "location": {
       "title": "موقعك الحالي",
@@ -312,17 +314,13 @@
     },
     "risk": {
       "title": "خطر الحوادث",
-      "preview": "بيانات توضيحية",
+      "loading": "جارٍ تقييم خطر الحوادث",
       "scale": "من مئة",
       "low": "منخفض",
-      "moderate": "متوسط",
+      "medium": "متوسط",
       "high": "مرتفع",
       "unknown": "لم يُقيّم",
-      "exampleDescription": "تقييم توضيحي فقط. هذا ليس تقديرًا مباشرًا للمخاطر.",
-      "factors": "عوامل توضيحية",
-      "liveFactors": "أهم العوامل",
-      "factorWet": "سطح طريق مبلّل",
-      "factorVisibility": "رؤية محدودة"
+      "factors": "أهم العوامل"
     },
     "actions": {
       "title": "إجراءات سريعة",
@@ -355,7 +353,6 @@
     "sunrise": "شروق الشمس",
     "sunset": "غروب الشمس",
     "celsius": "{{value}} °م",
-    "metres": "{{value}} م",
     "millimetres": "{{value}} مم",
     "windValue": "{{value}} م/ث",
     "precipitationValue": "{{value}} مم / {{minutes}} دقيقة",
@@ -502,6 +499,7 @@
     "credit": "بيانات الطرق © مساهمو OpenStreetMap",
     "estimate": "هذا تقدير وليس ضماناً لسلامة الطريق.",
     "noWeather": "الطقس غير متاح، لذا قد يكون هذا التقدير منخفضاً.",
+    "noIncidents": "بيانات الحوادث القريبة غير متاحة، لذا قد يكون هذا التقدير منخفضاً.",
     "close": "إغلاق",
     "hazard": {
       "bump": "مطب",
@@ -510,7 +508,7 @@
       "animals": "حيوانات",
       "hazard": "خطر على الطريق"
     },
-    "hazardDistance": "{{name}} بعد {{distance}} م",
+    "hazardDistance": "{{name}} بعد {{distance}}",
     "hazardsNearby": "مخاطر على الطريق أمامك",
     "warningOne": "{{first}}. خفف السرعة.",
     "warningTwo": "{{first}}، {{second}}. خفف السرعة."
@@ -561,6 +559,7 @@
     "motion": "مستشعرات الحركة",
     "background": "الموقع في الخلفية",
     "notifications": "الإشعارات",
+    "microphone": "الميكروفون والتعرّف على الكلام",
     "permissionValue": "الحالة: {{value}}",
     "permission": {
       "undetermined": "لم يُطلب بعد",
@@ -579,7 +578,8 @@
     "deleteData": "حذف بياناتي المحفوظة",
     "deleteAccount": "حذف الحساب",
     "deleteHint": "يتطلب الحذف اتصالاً. تُحذف البلاغات والمعلومات الطبية وجهات الاتصال والبيانات المحلية المعلقة والذاكرة المؤقتة. حذف الحساب يزيل هويتك أيضاً.",
-    "confirmation": "اكتب DELETE للتأكيد",
+    "confirmation": "اكتب «{{word}}» للتأكيد",
+    "confirmationWord": "حذف",
     "confirmDelete": "تأكيد الحذف",
     "cancel": "إلغاء",
     "deleteOnline": "اتصل بالإنترنت لتأكيد الحذف.",

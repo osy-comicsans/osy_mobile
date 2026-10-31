@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AmbientBackground } from '@/common/components/ui/ambient-background';
 import { ThemedText } from '@/common/components/themed-text';
-import { Colors, MaxContentWidth, Space } from '@/common/lib/theme';
+import { MaxContentWidth, Space } from '@/common/lib/theme';
 import { GlassAppearanceProvider } from '@/common/providers/GlassAppearanceProvider';
 import { useTheme } from '@/common/hooks/use-theme';
 import { AlertPermissionCard } from '@/features/alerts/components/AlertPermissionCard';
@@ -28,7 +28,7 @@ export function HomeScreen() {
           contentInsetAdjustmentBehavior="never">
           <View style={styles.content}>
             <View style={styles.header}>
-              <ThemedText type="overline" style={styles.accent}>{t('dashboard.eyebrow')}</ThemedText>
+              <ThemedText type="overline" themeColor="accent">{t('dashboard.eyebrow')}</ThemedText>
               <ThemedText type="display" accessibilityRole="header">{t('dashboard.title')}</ThemedText>
               <ThemedText type="body" themeColor="textSecondary">{t('dashboard.subtitle')}</ThemedText>
             </View>
@@ -54,11 +54,10 @@ export function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: Colors.background },
+  root: { flex: 1 },
   scroll: { alignItems: 'center', paddingHorizontal: Space[4] },
   content: { width: '100%', maxWidth: MaxContentWidth, gap: Space[4] },
   header: { gap: Space[2], paddingHorizontal: Space[2], paddingBottom: Space[2] },
-  accent: { color: Colors.accent },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Space[4] },
   column: { flexBasis: 300, flexGrow: 1, flexShrink: 1, minWidth: 0, gap: Space[4] },
 });
