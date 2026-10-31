@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/common/components/ui/icon';
+import { useTheme } from '@/common/hooks/use-theme';
 import { BottomTabInset, Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 import { useCurrentLocation } from '@/features/location/hooks/useLocation';
 import { PlaceholderScreen } from '@/common/screens/PlaceholderScreen';
@@ -17,8 +18,13 @@ import { RiskLegend } from '../components/RiskLegend';
 import { RiskRoadCard } from '../components/RiskRoadCard';
 import { RoadInfoCard } from '../components/RoadInfoCard';
 import { isMapAvailable } from '../utils/mapAvailability';
-import { EMPTY_OVERLAYS } from '../utils/mapOverlays';
-import { useTheme } from '@/common/hooks/use-theme';
+import { EMPTY_OVERLAYS, type MapOverlays } from '../utils/mapOverlays';
+
+// Waits for a pan to settle, so a drag sends no requests and moves no state.
+const VIEW_SETTLE_MS = 600;
+const sameAreas = (a: RiskArea[] | null, b: RiskArea[] | null) => (
+  a?.map(({ id }) => id).join() === b?.map(({ id }) => id).join()
+);
 
 export function MapScreen() {
   const theme = useTheme();
@@ -68,7 +74,14 @@ export function MapScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
-      <MapCanvas ref={canvas} following={following} overlays={EMPTY_OVERLAYS} onFollowingChange={setFollowing} />
+      <MapCanvas
+        ref={canvas}
+        following={following}
+        overlays={overlays}
+        onFollowingChange={setFollowing}
+        onViewChange={onViewChange}
+        onRoadPress={setSelectedId}
+      />
       <View pointerEvents="box-none" style={[styles.top, { top: top + Space[3] }]}>
         <RoadInfoCard />
         {showRisk && selected && (
@@ -112,5 +125,4 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     boxShadow: Shadow.md,
   },
-  pressed: { backgroundColor: Colors.accentSoft },
 });

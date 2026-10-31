@@ -2,26 +2,29 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/common/components/themed-text';
+import { useTheme } from '@/common/hooks/use-theme';
+import { formatNumber } from '@/common/lib/i18n/format';
+import { getLanguage } from '@/common/lib/i18n/i18n';
 import { Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 import { useCurrentSpeed } from '@/features/location/hooks/useLocation';
 import { RoadHazardList } from '@/features/roads/components/RoadHazardList';
 import { useCurrentRoad } from '@/features/roads/hooks/useRoad';
+import { useRoadRules } from '@/features/roads/hooks/useRoadRules';
 import { useSpeedDisplay } from '@/features/settings/hooks/useSpeedDisplay';
-import { useTheme } from '@/common/hooks/use-theme';
 
 export function RoadInfoCard() {
   const { t } = useTranslation();
   const { road, stale } = useCurrentRoad();
   const speed = useCurrentSpeed();
+  const { speedLimit, hazards } = useRoadRules();
   const display = useSpeedDisplay(speed);
   const theme = useTheme();
-  const speedText = display.formatted;
-  const spokenSpeed = display.spoken;
 
   const limitText = speedLimit.valueKmh === null ? '' : `, ${t('dashboard.speed.limit')} ${t('units.speed', { value: speedLimit.valueKmh })}`;
 
   return (
-    <View accessible accessibilityLabel={`${road?.name ?? t('map.unknownRoad')}, ${spokenSpeed}`} style={[styles.card, { backgroundColor: theme.surface }]}>
+    <View style={[styles.card, { backgroundColor: theme.surface }]}>
+      <View accessible accessibilityLabel={`${road?.name ?? t('map.unknownRoad')}, ${display.spoken}${limitText}`} style={styles.row}>
       <View style={styles.road}>
         {road && road.refs.length > 0 && (
           <View style={styles.plates}>
@@ -45,7 +48,7 @@ export function RoadInfoCard() {
         </View>
       )}
       <View style={styles.speed}>
-        <ThemedText type="heading">{speedText}</ThemedText>
+        <ThemedText type="heading">{display.formatted}</ThemedText>
         <ThemedText type="label" themeColor="textSecondary">{display.unit}</ThemedText>
       </View>
       </View>

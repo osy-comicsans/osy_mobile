@@ -463,6 +463,47 @@
       "unsure": "Je ne sais pas"
     }
   },
+  "roadRisk": {
+    "level": {
+      "low": "Risque faible",
+      "medium": "Risque moyen",
+      "high": "Risque élevé"
+    },
+    "factor": {
+      "roadClass": "Type de route rapide et fréquentée",
+      "curves": "Virages serrés",
+      "junctions": "Nombreux carrefours",
+      "wet": "Route mouillée",
+      "icing": "Verglas possible",
+      "visibility": "Visibilité réduite",
+      "wind": "Vent fort",
+      "darkness": "Route sombre et mal éclairée",
+      "speeding": "Vitesse au-dessus de la limite",
+      "incidents": "Accidents récents à proximité",
+      "tooFast": "Trop rapide pour cette route",
+      "harshDriving": "Freinage ou virage brusque"
+    },
+    "legendTitle": "Risque routier",
+    "show": "Afficher le risque routier",
+    "zoomIn": "Zoomez pour voir le risque routier.",
+    "loading": "Chargement des routes…",
+    "failed": "Certaines données routières n’ont pas pu être chargées.",
+    "credit": "Données routières © contributeurs OpenStreetMap",
+    "estimate": "Une estimation, pas une garantie que la route est sûre.",
+    "noWeather": "Météo indisponible : ce risque peut être sous-estimé.",
+    "close": "Fermer",
+    "hazard": {
+      "bump": "Dos-d’âne",
+      "camera": "Radar",
+      "school": "École",
+      "animals": "Animaux",
+      "hazard": "Danger"
+    },
+    "hazardDistance": "{{name}} dans {{distance}} m",
+    "hazardsNearby": "Dangers à venir",
+    "warningOne": "{{first}}. Ralentissez.",
+    "warningTwo": "{{first}}, {{second}}. Ralentissez."
+  },
   "preferences": {
     "description": "Adaptez OSY à votre conduite.",
     "saved": "Préférences enregistrées sur cet appareil",

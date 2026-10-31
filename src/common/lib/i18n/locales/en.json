@@ -463,6 +463,47 @@
       "unsure": "Not sure"
     }
   },
+  "roadRisk": {
+    "level": {
+      "low": "Low risk",
+      "medium": "Medium risk",
+      "high": "High risk"
+    },
+    "factor": {
+      "roadClass": "Busy, fast road type",
+      "curves": "Sharp curves",
+      "junctions": "Many junctions",
+      "wet": "Wet road",
+      "icing": "Possible ice",
+      "visibility": "Low visibility",
+      "wind": "Strong wind",
+      "darkness": "Dark, poorly lit road",
+      "speeding": "Speed above the limit",
+      "incidents": "Recent accidents nearby",
+      "tooFast": "Too fast for this road",
+      "harshDriving": "Harsh braking or cornering"
+    },
+    "legendTitle": "Road risk",
+    "show": "Show road risk",
+    "zoomIn": "Zoom in to see road risk.",
+    "loading": "Loading road data…",
+    "failed": "Some road data could not load.",
+    "credit": "Road data © OpenStreetMap contributors",
+    "estimate": "An estimate, not a guarantee that a road is safe.",
+    "noWeather": "Weather is unavailable, so this may be too low.",
+    "close": "Close",
+    "hazard": {
+      "bump": "Speed bump",
+      "camera": "Speed camera",
+      "school": "School",
+      "animals": "Animals",
+      "hazard": "Road hazard"
+    },
+    "hazardDistance": "{{name}} in {{distance}} m",
+    "hazardsNearby": "Road hazards ahead",
+    "warningOne": "{{first}}. Slow down.",
+    "warningTwo": "{{first}}, {{second}}. Slow down."
+  },
   "preferences": {
     "description": "Make OSY work for your drive.",
     "saved": "Preferences saved on this device",

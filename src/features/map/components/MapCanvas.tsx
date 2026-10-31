@@ -1,11 +1,13 @@
 import {
   Camera, GeoJSONSource, Layer, Map, UserLocation, type CameraRef,
 } from '@maplibre/maplibre-react-native';
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 
-import { Colors } from '@/common/lib/theme';
 import { useTheme } from '@/common/hooks/use-theme';
+import { Colors } from '@/common/lib/theme';
+import { HAZARD_COLORS, RISK_LEVEL_COLORS } from '@/features/road-risk/utils/riskOverlay';
+import type { Bounds } from '@/features/road-risk/types/roadRisk.types';
 
 import { DEFAULT_CENTER, DEFAULT_ZOOM, FOLLOW_ZOOM, mapStyleUrl } from '../utils/mapStyle';
 import { toFeatureCollection, type MapOverlays } from '../utils/mapOverlays';
@@ -31,6 +33,9 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
   const camera = useRef<CameraRef>(null);
   const theme = useTheme();
   const scheme = theme.background === Colors.background ? 'light' : 'dark';
+  // A new object makes MapLibre rebuild the layer, so it only changes with the roads.
+  const riskRoads = useMemo(() => toFeatureCollection(overlays['risk-roads']), [overlays]);
+  const hazards = useMemo(() => toFeatureCollection(overlays.hazards), [overlays]);
 
   useImperativeHandle(ref, () => ({
     recenter(center) {
