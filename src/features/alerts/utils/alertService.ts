@@ -13,7 +13,8 @@ export interface AlertState {
   permission: AlertPermission;
   canAskAgain: boolean;
   requesting: boolean;
-  // Settings (#20) writes here. Every alert is on until then.
+  // Sound and haptics for alerts other than crashes. Nothing turns them off yet;
+  // Settings decides which alerts are delivered and spoken through `getSettings`.
   preferences: AlertPreferences;
 }
 

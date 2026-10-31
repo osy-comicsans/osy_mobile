@@ -2,10 +2,7 @@ import { randomUUID } from 'expo-crypto';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { getLanguage } from '@/common/lib/i18n/i18n';
-import { speak } from '@/common/lib/native/speech';
 import { useAlertService } from '@/features/alerts/hooks/useAlerts';
-import { usesSound } from '@/features/alerts/utils/alertRules';
 import { useCurrentLocation, useDrivingState } from '@/features/location/hooks/useLocation';
 import { useCheckInState } from '@/features/safety/hooks/useCheckIn';
 
@@ -42,7 +39,6 @@ export function RiskWarningMonitor() {
       { id: randomUUID(), type: 'potential_accident', detail },
       { title: t('alerts.potential_accident.title'), body: detail },
     );
-    if (usesSound('potential_accident', alerts.store.getState().preferences)) speak(detail, getLanguage());
     // Runs once for each fix, and everything else is read at that moment.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fix]);

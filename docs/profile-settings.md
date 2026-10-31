@@ -23,7 +23,7 @@ The web preview uses a session-only profile cache and does not persist medical/c
 | Crash detection | Starts/stops crash sensor monitoring independently of GPS/roads; Home Pause/Resume still applies |
 | Sensitivity | Actual rule impact/confidence thresholds and model crash probability threshold; the standard values preserve the existing thresholds |
 | Countdown | 60/120/180 seconds total, split into three stages; an active countdown freezes its original duration |
-| Voice and voice language | `common/lib/native/voice.ts` / Expo Speech; disabling voice cancels speech, and missing native support leaves visual controls usable |
+| Voice and voice language | Spoken alerts, including road-risk reasons, and the check-in question, through `common/lib/native/voice.ts` / Expo Speech; the check-in listens for an answer either way. Disabling voice cancels speech, and missing native support leaves visual controls usable |
 | App language | Existing persisted language preference, API language headers, and RTL restart behavior |
 | Units | Home dial, current speed, road speed limits, Map, weather wind, radius labels and profile distance; stored/risk inputs remain SI |
 | Appearance | Shared text, cards, inputs, buttons, glass, navigation, Home/Map and account surfaces; device/light/dark |
