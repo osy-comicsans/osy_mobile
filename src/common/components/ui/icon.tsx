@@ -21,6 +21,9 @@ const icons = {
   error: { ios: 'exclamationmark.circle', android: 'error', web: 'error' },
   location: { ios: 'location.fill', android: 'my_location', web: 'my_location' },
   shield: { ios: 'lock.shield', android: 'shield_lock', web: 'shield_lock' },
+  mic: { ios: 'mic', android: 'mic', web: 'mic' },
+  micOff: { ios: 'mic.slash', android: 'mic_off', web: 'mic_off' },
+  speaker: { ios: 'speaker.wave.2', android: 'volume_up', web: 'volume_up' },
 } satisfies Record<string, SymbolViewProps['name']>;
 
 // These point the way the reader moves. SF Symbols flip them on their own in

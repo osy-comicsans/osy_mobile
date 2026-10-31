@@ -135,7 +135,15 @@
     "escalatedTitle": "Nous n’avons pas pu confirmer que tout va bien",
     "seconds": "secondes",
     "confirmedTitle": "Tant mieux, tout va bien",
-    "backHome": "Retour à l’accueil"
+    "backHome": "Retour à l’accueil",
+    "voice": {
+      "prompt": "Tout va bien ? Dites « Je vais bien » ou « Au secours ».",
+      "speaking": "Question posée à voix haute",
+      "listening": "J’écoute. Dites « Je vais bien » ou « Au secours ».",
+      "listeningEscalated": "J’écoute. Dites « Je vais bien » pour annuler la demande d’aide.",
+      "denied": "Le micro est désactivé. Répondez avec les boutons.",
+      "unavailable": "La réponse vocale n’est pas disponible sur ce téléphone. Répondez avec les boutons."
+    }
   },
   "auth": {
     "loginTitle": "Bon retour",

@@ -5,7 +5,9 @@
     "NSMotionUsageDescription": "OSY utilise les données de mouvement pour aider à détecter un accident.",
     "NSCameraUsageDescription": "OSY utilise l’appareil photo pour scanner votre permis de conduire et votre carte grise.",
     "NSPhotoLibraryUsageDescription": "OSY vous permet de choisir une photo de votre permis de conduire et de votre carte grise.",
-    "NSLocationAlwaysAndWhenInUseUsageDescription": "OSY utilise votre position en arrière-plan pendant la conduite pour détecter un accident lorsque votre téléphone est verrouillé."
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "OSY utilise votre position en arrière-plan pendant la conduite pour détecter un accident lorsque votre téléphone est verrouillé.",
+    "NSMicrophoneUsageDescription": "OSY utilise le micro pour que vous puissiez répondre à voix haute après un accident.",
+    "NSSpeechRecognitionUsageDescription": "OSY utilise la reconnaissance vocale pour comprendre votre réponse quand il vous demande si tout va bien."
   },
   "android": {
     "app_name": "OSY"

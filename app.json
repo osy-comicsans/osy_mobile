@@ -108,7 +108,14 @@
         }
       ],
       "onnxruntime-react-native",
-      "@maplibre/maplibre-react-native"
+      "@maplibre/maplibre-react-native",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "OSY uses the microphone so you can answer “Are you OK?” out loud after a crash.",
+          "speechRecognitionPermission": "OSY uses speech recognition to understand your answer when it asks if you are OK."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
