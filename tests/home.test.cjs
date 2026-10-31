@@ -272,30 +272,3 @@ test('area cache persists through migration, validates payloads, and never adds 
   assert.equal(await repo.read(area.key), null);
   assert.equal(areaLabel(null), null);
 });
-
-function loadGlass(platform, native) {
-  const filename = path.join(__dirname, '../src/common/lib/native/glass.ts');
-  const compiled = ts.transpileModule(fs.readFileSync(filename, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } });
-  const instance = new Module(filename, module);
-  instance.require = (name) => name === 'react-native'
-    ? { Platform: { OS: platform }, AccessibilityInfo: { isReduceTransparencyEnabled: async () => true,
-      addEventListener: () => ({ remove() {} }) } }
-    : name === 'expo-glass-effect' ? native() : require(name);
-  instance._compile(compiled.outputText, filename);
-  return instance.exports;
-}
-
-test('glass requires both native guards and respects reduced transparency; unsupported builds do not load it', async () => {
-  const unsupported = loadGlass('android', () => { throw new Error('must not load'); });
-  assert.equal(unsupported.nativeGlassView(), null);
-  const absent = loadGlass('ios', () => { throw new Error('missing native module'); });
-  assert.equal(absent.nativeGlassView(), null);
-  const unavailable = loadGlass('ios', () => ({ isGlassEffectAPIAvailable: () => false }));
-  assert.equal(unavailable.nativeGlassView(), null);
-  const view = () => null;
-  const available = loadGlass('ios', () => ({ isGlassEffectAPIAvailable: () => true, isLiquidGlassAvailable: () => true, GlassView: view }));
-  assert.equal(available.nativeGlassView(), view);
-  let reduced;
-  const stop = available.subscribeReducedTransparency((value) => { reduced = value; });
-  await flush(); assert.equal(reduced, true); stop();
-});

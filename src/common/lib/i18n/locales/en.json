@@ -145,7 +145,7 @@
       "listening": "Listening. Say “I’m OK” or “Help”.",
       "listeningEscalated": "Listening. Say “I’m OK” to cancel the request for help.",
       "denied": "The microphone is off. Answer with the buttons.",
-      "unavailable": "Voice answers are not available on this phone. Answer with the buttons."
+      "unavailable": "Voice answers need Dictation turned on in your phone’s settings. Answer with the buttons for now."
     }
   },
   "auth": {
@@ -338,7 +338,6 @@
     "refresh": "Refresh",
     "loading": "Loading local weather",
     "unknown": "—",
-    "unconfigured": "Weather will be available when the weather service is connected.",
     "offline": "No saved weather is available for this area. Reconnect to update.",
     "locationRequired": "Allow location access and wait for a recent position to load local weather.",
     "unavailable": "Weather is unavailable. Try refreshing shortly.",
@@ -597,6 +596,16 @@
     "detectionDisabledHint": "Location and roads remain available. Enable crash detection in Settings to resume it."
   },
   "account": {
+    "vehicleMore": "All vehicle details",
+    "vehicleLess": "Fewer details",
+    "myVehicle": "My vehicle",
+    "vehicleEmpty": "Your car’s details appear here once you confirm your registration in OSY.",
+    "vehiclePhotoCredit": "Reference photo of this model · Wikipedia",
+    "vehiclePhotoLabel": "Photo of a {{model}}",
+    "vehicleSpecs": "Registration details",
+    "editDetails": "Personal and medical details",
+    "manage": "Manage",
+    "signedInAs": "Signed in as {{email}}",
     "description": "Your details, safety circle and driving activity.",
     "details": "Personal details",
     "guest": "Your profile",

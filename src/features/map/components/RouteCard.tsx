@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Space[3],
     padding: Space[4],
-    borderRadius: Radius.lg,
+    borderRadius: Radius.xl,
     backgroundColor: Colors.surface,
     boxShadow: Shadow.md,
   },

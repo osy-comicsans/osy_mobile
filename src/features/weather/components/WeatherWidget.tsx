@@ -1,4 +1,3 @@
-import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
@@ -40,16 +39,16 @@ export function WeatherWidget({ compact = false, glass = false }: { compact?: bo
     const distance = distanceParts(language, meters, settings.units);
     return t(`units.${distance.unit}`, { value: distance.value });
   };
-  const status = !weather.configured ? 'unconfigured' : weather.offline ? 'offline'
+  const status = weather.offline ? 'offline'
     : weather.awaitingLocation ? 'locationRequired' : 'unavailable';
 
   return (
-    <Card glass={glass} style={styles.card}>
+    <Card tone="accentSoft" style={styles.card}>
       <View style={styles.header}>
-        <ThemedText type="headingS">{t('weather.title')}</ThemedText>
+        <ThemedText type="overline" themeColor="accent">{t('weather.title')}</ThemedText>
         <Button label={t('weather.refresh')} variant="text" size="small"
           onPress={weather.refresh} loading={weather.refreshing}
-          disabled={weather.offline || weather.awaitingLocation || !weather.configured} />
+          disabled={weather.offline || weather.awaitingLocation} />
       </View>
       {weather.loading ? <ContentSkeleton label={t('weather.loading')} /> : !value ? (
         <ThemedText type="body" themeColor="textSecondary">{t(`weather.${status}`)}</ThemedText>
@@ -106,9 +105,7 @@ export function WeatherWidget({ compact = false, glass = false }: { compact?: bo
           {weather.error ? <ThemedText type="label" themeColor="textSecondary">{t('weather.refreshFailed')}</ThemedText> : null}
         </>
       )}
-      <Link href="https://open-meteo.com/" asChild>
-        <Button variant="text" size="small" label={t('weather.attribution')} />
-      </Link>
+      <ThemedText type="small" themeColor="textSecondary">{t('weather.attribution')}</ThemedText>
     </Card>
   );
 }
@@ -126,7 +123,7 @@ const makeStyles = (Colors: ReturnType<typeof useTheme>) => StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: Space[2] },
   current: { gap: Space[1] },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Space[4] },
-  icing: { backgroundColor: Colors.accentSoft, padding: Space[3], borderRadius: Radius.md, gap: Space[1] },
+  icing: { backgroundColor: Colors.surface, padding: Space[3], borderRadius: Radius.md, gap: Space[1] },
   forecast: { flexDirection: 'row', flexWrap: 'wrap', gap: Space[2] },
-  hour: { flexGrow: 1, minWidth: 70, gap: Space[1], padding: Space[2], borderRadius: Radius.sm, backgroundColor: Colors.backgroundElement },
+  hour: { flexGrow: 1, minWidth: 70, gap: Space[1], padding: Space[2], borderRadius: Radius.sm, backgroundColor: Colors.surface },
 });

@@ -105,19 +105,6 @@ export const Shadow = {
   accent: '0 8px 24px rgba(99,22,219,0.30)',
 } as const;
 
-/** Frosted variants of the fixed OSY white/lavender/charcoal palette. */
-export const Glass = {
-  darkSurface: 'rgba(23,31,37,0.86)',
-  darkAccent: 'rgba(44,10,104,0.88)',
-  darkTint: 'rgba(23,31,37,0.32)',
-  surface: 'rgba(255,255,255,0.86)',
-  accent: 'rgba(236,224,255,0.88)',
-  edge: 'rgba(255,255,255,0.92)',
-  tint: 'rgba(255,255,255,0.32)',
-  accentTint: 'rgba(216,194,255,0.28)',
-  backdropFilter: 'blur(20px) saturate(125%)',
-} as const;
-
 /** 4px base scale from DESIGN §6. Access as Space[6]. */
 export const Space = {
   1: 4,

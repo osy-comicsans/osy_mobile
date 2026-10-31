@@ -8,8 +8,8 @@ import { useTheme } from '@/common/hooks/use-theme';
 import { Radius, Space } from '@/common/lib/theme';
 
 export function SettingsGroup({ title, description, children }: PropsWithChildren<{ title: string; description?: string }>) {
-  return <Card glass style={styles.group}>
-    <ThemedText type="heading" accessibilityRole="header">{title}</ThemedText>
+  return <Card style={styles.group}>
+    <ThemedText type="headingS" accessibilityRole="header">{title}</ThemedText>
     {description ? <ThemedText type="label" themeColor="textSecondary">{description}</ThemedText> : null}
     {children}
   </Card>;
@@ -31,9 +31,9 @@ export function ChoiceRow<T extends string | number>({ label, value, options, di
     <ThemedText type="label" themeColor="textSecondary">{label}</ThemedText>
     <View style={styles.pills} accessibilityRole="radiogroup" accessibilityLabel={label}>
       {options.map((option) => <Pressable key={option.value} accessibilityRole="radio" accessibilityState={{ checked: option.value === value, disabled }}
-        disabled={disabled} onPress={() => onChange(option.value)} style={[styles.pill, { borderColor: option.value === value ? theme.accent : theme.border,
-          backgroundColor: option.value === value ? theme.accentSoft : theme.surface }]}>
-        <ThemedText type="label" themeColor={option.value === value ? 'accent' : 'textSecondary'}>{option.label}</ThemedText>
+        disabled={disabled} onPress={() => onChange(option.value)} style={[styles.pill, { borderColor: option.value === value ? theme.accent : theme.borderStrong,
+          backgroundColor: option.value === value ? theme.accent : theme.surface }]}>
+        <ThemedText type="label" themeColor={option.value === value ? 'onAccent' : 'textPrimary'}>{option.label}</ThemedText>
       </Pressable>)}
     </View>
   </View>;

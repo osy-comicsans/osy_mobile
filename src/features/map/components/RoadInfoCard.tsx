@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   card: {
     gap: Space[2],
     padding: Space[4],
-    borderRadius: Radius.lg,
+    borderRadius: Radius.xl,
     backgroundColor: Colors.surface,
     boxShadow: Shadow.soft,
   },
