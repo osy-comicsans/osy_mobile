@@ -7,6 +7,7 @@ With "Always" location access, crash detection keeps running while the app is in
 1. A task in `src/features/location/native/backgroundLocation.ts` receives location updates and feeds them into the normal location service.
 2. Those updates keep the app alive, so the crash sensors and check-in timers keep running.
 3. Sensors still run only while driving.
+4. Trips for the driving stats on Profile are recorded from the same updates.
 
 | State | GPS in the background |
 |---|---|

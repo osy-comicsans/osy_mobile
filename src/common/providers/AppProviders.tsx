@@ -4,10 +4,13 @@ import { createContext, useEffect, useState, type PropsWithChildren } from 'reac
 import { api, authSession } from '@/common/lib/api/axios';
 import { createOfflineRuntime, type OfflineRuntime } from '@/common/lib/database/offlineRuntime';
 import { ACCIDENT_REPORT_ENTITY } from '@/common/lib/database/repositories/accidentReportRepository';
+import { TRIP_ENTITY } from '@/common/lib/database/repositories/tripRepository';
 import { createAccidentReportSyncAdapter } from '@/common/lib/database/sync/createAccidentReportSyncAdapter';
+import { createTripSyncAdapter } from '@/common/lib/database/sync/createTripSyncAdapter';
 import { refreshDeviceLanguage } from '@/common/lib/i18n/i18n';
 import { subscribeToForeground } from '@/common/lib/native/appLifecycle';
 import { subscribeToConnectivity } from '@/common/lib/network/connectivity';
+import { createProfileApi } from '@/features/profile/api/profileApi';
 import { createSafetyApi } from '@/features/safety/api/safetyApi';
 import { reportPhotos } from '@/features/safety/native/reportPhotos';
 import { profilePhotos } from '@/common/lib/native/profilePhoto';
@@ -32,6 +35,7 @@ export function AppProviders({ children }: PropsWithChildren) {
     if (runtime.status.getState().supported) {
       // Web keeps profile previews in memory; native platforms use SQLite.
       runtime.registerSyncAdapter(ACCIDENT_REPORT_ENTITY, createAccidentReportSyncAdapter(createSafetyApi(api), reportPhotos));
+      runtime.registerSyncAdapter(TRIP_ENTITY, createTripSyncAdapter(createProfileApi(api)));
       runtime.start(() => queryClient.invalidateQueries({ queryKey: ['local'] }));
     }
     const unsubscribeNetwork = subscribeToConnectivity((online) => {

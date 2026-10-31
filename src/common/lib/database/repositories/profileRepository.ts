@@ -49,6 +49,7 @@ export class ProfileRepository {
   async purgePersonalData(userId: string) {
     await this.database.write(async (db) => {
       await db.runAsync('DELETE FROM profile_cache WHERE user_id = ?', userId);
+      await db.runAsync('DELETE FROM trips WHERE owner = ?', userId);
       // Older device-local queues have no account column. Clear them on an
       // explicit data-erasure action so deleted data cannot be sent again.
       await db.execAsync('DELETE FROM sync_queue; DELETE FROM sync_conflicts; DELETE FROM sync_metadata; DELETE FROM todos; DELETE FROM weather_cache; DELETE FROM location_areas;');

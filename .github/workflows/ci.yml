@@ -95,6 +95,9 @@ jobs:
       - name: Nearby accident tests
         run: pnpm test:nearby
 
+      - name: Driving stats tests
+        run: pnpm test:driving-stats
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks

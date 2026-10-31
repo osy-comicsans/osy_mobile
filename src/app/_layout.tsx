@@ -22,6 +22,7 @@ import { previewAccess } from '@/features/auth/utils/previewAccess';
 import { CrashDetectionProvider } from '@/features/crash-detection/providers/CrashDetectionProvider';
 import { LocationProvider } from '@/features/location/providers/LocationProvider';
 import { DrivingModeProvider } from '@/features/driving/providers/DrivingModeProvider';
+import { TripMonitor } from '@/features/driving/components/TripMonitor';
 import { AreaProvider } from '@/features/location/providers/AreaProvider';
 import { RoadProvider } from '@/features/roads/providers/RoadProvider';
 import { CheckInProvider } from '@/features/safety/providers/CheckInProvider';
@@ -84,6 +85,7 @@ export default function RootLayout() {
                           importantForAccessibility={!dismissed && !emergency ? 'no-hide-descendants' : 'auto'}>
                           <CheckInProvider>
                             <AlertProvider>
+                              <TripMonitor />
                               <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
                                 <Stack screenOptions={{ headerShown: false }}>
                                   <Stack.Protected guard={canAccessApp} redirectTo="/login">

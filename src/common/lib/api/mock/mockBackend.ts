@@ -35,6 +35,7 @@ interface MockUser {
   medical?: { bloodType: string; allergies: string; conditions: string };
   preferences?: unknown;
   reports?: { id: string; occurredAt: string; type: string; severity: string; status: string }[];
+  trips?: { id: string; startedAt: string; endedAt: string; distanceMeters: number; warnings: number }[];
 }
 
 interface MockStorage {
@@ -109,12 +110,12 @@ export function createMockBackend(storage: MockStorage, latency = LATENCY_MS, op
     if (options.persistSensitive) storage.setItem(STORAGE_KEY, JSON.stringify(users));
     else {
       ephemeral = users;
-      const nonSensitive = users.map(({ medical: _medical, contacts: _contacts, reports: _reports, photoUrl: _photo, ...user }) => user);
+      const nonSensitive = users.map(({ medical: _medical, contacts: _contacts, reports: _reports, trips: _trips, photoUrl: _photo, ...user }) => user);
       storage.setItem(STORAGE_KEY, JSON.stringify(nonSensitive));
     }
   };
 
-  const profile = ({ documents, contacts: _contacts, reports: _reports, preferences: _preferences, ...user }: MockUser) => ({ ...user, onboardingStatus: onboardingStatus(documents) });
+  const profile = ({ documents, contacts: _contacts, reports: _reports, trips: _trips, preferences: _preferences, ...user }: MockUser) => ({ ...user, onboardingStatus: onboardingStatus(documents) });
 
   function onboardingStatus(documents: MockUser['documents']) {
     return Object.values(documents).every(({ status }) => status === 'pending' || status === 'verified')
@@ -192,11 +193,24 @@ export function createMockBackend(storage: MockStorage, latency = LATENCY_MS, op
       if (!uri) return fail(422, 'invalid_photo', 'Choose a photo on a device.');
       user.photoUrl = uri; save(users); return { status: 200, data: { photoUrl: uri } };
     }
-    if (key === 'GET /me/driving-stats') return { status: 200, data: { trips: 0, distanceMeters: 0, warnings: 0 } };
+    if (key === 'GET /me/driving-stats') {
+      const trips = user.trips ?? [];
+      return { status: 200, data: { trips: trips.length, distanceMeters: trips.reduce((sum, trip) => sum + trip.distanceMeters, 0),
+        warnings: trips.reduce((sum, trip) => sum + trip.warnings, 0) } };
+    }
+    // A repeated id is the same trip, so a retried upload is counted once.
+    if (key === 'POST /me/trips') {
+      const recorded = user.trips?.find(({ id }) => id === body.id);
+      if (recorded) return { status: 201, data: recorded };
+      const { id, startedAt, endedAt, distanceMeters, warnings } = body;
+      const trip = { id, startedAt, endedAt, distanceMeters, warnings };
+      user.trips = [...(user.trips ?? []), trip]; save(users);
+      return { status: 201, data: trip };
+    }
     if (key === 'GET /me/reports') return { status: 200, data: { reports: user.reports ?? [] } };
     if (key === 'PUT /me/preferences') { user.preferences = body; save(users); return { status: 204 }; }
     if (key === 'DELETE /me/data') {
-      user.contacts = []; user.medical = { bloodType: '', allergies: '', conditions: '' }; user.reports = [];
+      user.contacts = []; user.medical = { bloodType: '', allergies: '', conditions: '' }; user.reports = []; user.trips = [];
       user.photoUrl = null; user.vehicle = null; user.preferences = undefined;
       save(users); return { status: 204 };
     }

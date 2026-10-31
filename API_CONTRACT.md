@@ -98,6 +98,7 @@ Schemas: `src/features/safety/types/safety.schemas.ts`.
 | `PUT` | `/me` | `firstName`, `lastName`, `mobileNumber`, optional `vehicle`, `medical` | `200` updated profile |
 | `PUT` | `/me/photo` | Multipart JPEG `photo`, up to 2 MB | `200` `{ photoUrl }` |
 | `GET` | `/me/driving-stats` | None | `200` `{ trips, distanceMeters, warnings }` |
+| `POST` | `/me/trips` | `id`, `startedAt`, `endedAt`, `distanceMeters`, `warnings` | `201` trip |
 | `GET` | `/me/reports` | None | `200` `{ reports }`, latest 100 |
 | `PUT` | `/me/preferences` | Settings object described below | `204` |
 | `DELETE` | `/me/data` | None | `204`; retain identity, erase personal feature data |
@@ -112,7 +113,9 @@ The profile extends the authentication user with nullable `photoUrl` (HTTPS in p
 
 The profile client binds requests to `X-OSY-Owner`, the user ID captured before dispatch. The mobile auth interceptor cancels mismatched requests and retries. The backend must also verify this header, when present, against the authenticated user; it is never an authorization mechanism by itself.
 
-Driving stats are real account totals; distance is always metres. Reports contain `id`, `occurredAt`, `type`, `severity`, and `status` (`received`, `reviewing`, `resolved`), newest first. The client caches the latest 100 and never invents trips or warnings. The local mock starts with zero totals and records reports submitted to it.
+The phone records a trip while monitoring is on and the driving state is driving, and uploads it once it ends. A trip carries totals only, never coordinates or a route: `id` (generated on the device), `startedAt`, `endedAt`, `distanceMeters` (whole metres), and `warnings` (warnings shown to the driver during the trip). A repeated `id` is the same trip and returns the original result, so a retried upload is counted once. The upload sends `X-OSY-Owner` with the account that drove, even when another account is signed in, so the trip waits for its owner. `GET /me/driving-stats` totals are the sum of the account's uploaded trips; distance is always metres.
+
+Reports contain `id`, `occurredAt`, `type`, `severity`, and `status` (`received`, `reviewing`, `resolved`), newest first. The client caches the latest 100 and never invents trips or warnings. The local mock records trips and reports submitted to it, and its totals are the sum of those trips.
 
 Preferences use `src/features/settings/types/settings.types.ts`: per-type notification flags, `nearbyRadiusKm`, crash detection, sensitivity, countdown total, voice/language, units, appearance, and optional analytics/medical-sharing consent. The radius is always kilometres; display units do not change storage or risk-model inputs. The backend must apply notification flags and radius **before sending closed-app push notifications**, and include a valid `distanceMeters` for nearby alerts. On-device settings cannot prevent the OS from displaying a push that the server already sent. Never treat optional analytics consent as consent to share medical information.
 
@@ -154,4 +157,4 @@ Invalid coordinates return `422`; the standalone per-client rate limit returns `
 
 ## Offline sync
 
-Offline sync requires a signed-in user, a backend, and a registered adapter. Accident reports use it through `POST /incidents`. Task sync stays off until `EXPO_PUBLIC_SYNC_ENABLED` is `true` and its endpoints exist, which are not defined yet. The backend must deduplicate `clientOperationId`, keep client-generated IDs, and return `409` for conflicts.
+Offline sync requires a signed-in user, a backend, and a registered adapter. Accident reports use it through `POST /incidents`, and trips through `POST /me/trips`. Task sync stays off until `EXPO_PUBLIC_SYNC_ENABLED` is `true` and its endpoints exist, which are not defined yet. The backend must deduplicate `clientOperationId`, keep client-generated IDs, and return `409` for conflicts.
