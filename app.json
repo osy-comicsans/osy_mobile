@@ -102,8 +102,8 @@
       [
         "expo-image-picker",
         {
-          "cameraPermission": "OSY uses the camera to scan your driver’s licence and car registration.",
-          "photosPermission": "OSY lets you choose a photo of your driver’s licence and car registration.",
+          "cameraPermission": "OSY uses the camera to scan your driver’s licence and car registration, and to photograph accidents you report.",
+          "photosPermission": "OSY lets you choose a photo of your driver’s licence, your car registration, or an accident you report.",
           "microphonePermission": false
         }
       ],
