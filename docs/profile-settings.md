@@ -14,7 +14,7 @@ The web preview uses a session-only profile cache and does not persist medical/c
 
 ## Settings consumers
 
-`features/settings/utils/settingsService.ts` validates and serializes durable preference writes. Failed writes do not show false success. Account-scoped analytics and medical-sharing consent survive a restart for the same account and reset on sign-out/account change.
+`features/settings/utils/settingsService.ts` validates and serializes durable preference writes. Failed writes do not show false success. Saved values are restored over the defaults, so a setting added or renamed in a later version starts at its default without resetting the others; a file that cannot be read or validated leaves crash detection paused and shows the save error. Account-scoped analytics and medical-sharing consent survive a restart for the same account and reset on sign-out/account change.
 
 | Setting | Consumer |
 | --- | --- |

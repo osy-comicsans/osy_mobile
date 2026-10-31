@@ -126,6 +126,18 @@ test('privacy consent belongs to one account and survives that account restartin
   assert.equal(reopened.store.getState().consentOwner, 'bob');
 });
 
+test('a setting added or renamed since saving starts at its default and keeps the rest', async () => {
+  const saved = { ...structuredClone(defaultSettings), units: 'mph', crashDetection: false, consentOwner: 'alice', retired: true };
+  delete saved.theme; delete saved.notifications.accident_nearby; saved.notifications.potential_accident = false;
+  const memory = storage(); await memory.setItem('osy.settings.v1', JSON.stringify(saved));
+  const service = createSettingsService(memory); await service.start();
+  const { settings, error, consentOwner } = service.store.getState();
+  assert.equal(error, false); assert.equal(consentOwner, 'alice');
+  assert.equal(settings.units, 'mph'); assert.equal(settings.crashDetection, false); assert.equal(settings.theme, 'system');
+  assert.deepEqual(settings.notifications, { crash_detected: true, potential_accident: false, accident_nearby: true });
+  assert.equal('retired' in settings, false);
+});
+
 test('an unreadable settings file leaves automatic detection paused', async () => {
   const service = createSettingsService({ getItem: async () => '{bad', setItem: async () => {} });
   await service.start(); assert.equal(service.store.getState().error, true);
