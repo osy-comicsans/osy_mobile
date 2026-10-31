@@ -76,7 +76,7 @@ function ContactsEditor() {
       {failed && <ThemedText type="label" themeColor="errorText" accessibilityRole="alert">{t('contacts.failed')}</ThemedText>}
 
       {contacts.map((contact) => (
-        <Card glass key={contact.id} style={styles.contact}>
+        <Card key={contact.id} style={styles.contact}>
           <View style={styles.text}>
             <ThemedText type="headingS">{contact.name}</ThemedText>
             <ThemedText type="label" themeColor="textSecondary">{leftToRight(contact.mobileNumber)}</ThemedText>
@@ -103,7 +103,7 @@ function ContactsEditor() {
         </Card>
       ))}
 
-      <Card glass style={styles.form}>
+      <Card style={styles.form}>
         <ThemedText type="headingS" accessibilityRole="header">{t(editing ? 'contacts.edit' : 'contacts.add')}</ThemedText>
         <Input label={t('contacts.name')} value={name} onChangeText={setName} autoComplete="name" />
         <Input

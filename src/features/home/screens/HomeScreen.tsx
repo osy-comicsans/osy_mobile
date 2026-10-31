@@ -1,63 +1,54 @@
-import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AmbientBackground } from '@/common/components/ui/ambient-background';
-import { ThemedText } from '@/common/components/themed-text';
+import { ScreenHero } from '@/common/components/ui/screen-hero';
 import { MaxContentWidth, Space } from '@/common/lib/theme';
-import { GlassAppearanceProvider } from '@/common/providers/GlassAppearanceProvider';
 import { useTheme } from '@/common/hooks/use-theme';
 import { AlertPermissionCard } from '@/features/alerts/components/AlertPermissionCard';
 import { LocationPermissionCard } from '@/features/location/components/LocationPermissionCard';
 import { WeatherWidget } from '@/features/weather/components/WeatherWidget';
-import { MonitoringCard } from '../components/MonitoringCard';
-import { SpeedCard } from '../components/SpeedCard';
 import { CurrentRoadCard } from '../components/CurrentRoadCard';
 import { RiskCard } from '../components/RiskCard';
+import { MonitoringPill, SpeedHero } from '../components/SpeedHero';
 import { QuickActions } from '../components/QuickActions';
 
 export function HomeScreen() {
-  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   return (
-    <GlassAppearanceProvider>
+    <>
       <View style={[styles.root, { backgroundColor: theme.background }]}>
-        <AmbientBackground />
-        <ScrollView contentContainerStyle={[styles.scroll, { paddingTop: insets.top + Space[6], paddingBottom: insets.bottom + Space[8] }]}
-          contentInsetAdjustmentBehavior="never">
+        <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + Space[8] }} contentInsetAdjustmentBehavior="never">
+          <ScreenHero>
+            <MonitoringPill />
+            <SpeedHero />
+          </ScreenHero>
+          <View style={styles.scroll}>
           <View style={styles.content}>
-            <View style={styles.header}>
-              <ThemedText type="overline" themeColor="accent">{t('dashboard.eyebrow')}</ThemedText>
-              <ThemedText type="display" accessibilityRole="header">{t('dashboard.title')}</ThemedText>
-              <ThemedText type="body" themeColor="textSecondary">{t('dashboard.subtitle')}</ThemedText>
-            </View>
-            <MonitoringCard />
-            <LocationPermissionCard glass />
+            <LocationPermissionCard />
             <View style={styles.grid}>
               <View style={styles.column}>
-                <SpeedCard />
-                <CurrentRoadCard />
-              </View>
+                              </View>
               <View style={styles.column}>
                 <RiskCard />
-                <WeatherWidget compact glass />
+                <CurrentRoadCard />
+                <WeatherWidget compact />
               </View>
             </View>
             <QuickActions />
-            <AlertPermissionCard glass />
+            <AlertPermissionCard />
+          </View>
           </View>
         </ScrollView>
       </View>
-    </GlassAppearanceProvider>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  scroll: { alignItems: 'center', paddingHorizontal: Space[4] },
+  scroll: { alignItems: 'center', padding: Space[4] },
   content: { width: '100%', maxWidth: MaxContentWidth, gap: Space[4] },
-  header: { gap: Space[2], paddingHorizontal: Space[2], paddingBottom: Space[2] },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Space[4] },
   column: { flexBasis: 300, flexGrow: 1, flexShrink: 1, minWidth: 0, gap: Space[4] },
 });

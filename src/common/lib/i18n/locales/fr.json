@@ -145,7 +145,7 @@
       "listening": "J’écoute. Dites « Je vais bien » ou « Au secours ».",
       "listeningEscalated": "J’écoute. Dites « Je vais bien » pour annuler la demande d’aide.",
       "denied": "Le micro est désactivé. Répondez avec les boutons.",
-      "unavailable": "La réponse vocale n’est pas disponible sur ce téléphone. Répondez avec les boutons."
+      "unavailable": "La réponse vocale nécessite d’activer la dictée dans les réglages du téléphone. Répondez avec les boutons pour l’instant."
     }
   },
   "auth": {
@@ -338,7 +338,6 @@
     "refresh": "Actualiser",
     "loading": "Chargement de la météo locale",
     "unknown": "—",
-    "unconfigured": "La météo sera disponible lorsque le service météo sera connecté.",
     "offline": "Aucune météo enregistrée pour cette zone. Reconnectez-vous pour actualiser.",
     "locationRequired": "Autorisez la localisation et attendez une position récente pour charger la météo locale.",
     "unavailable": "Météo indisponible. Réessayez dans un instant.",
@@ -597,6 +596,16 @@
     "detectionDisabledHint": "La position et les routes restent disponibles. Activez la détection dans les réglages pour la reprendre."
   },
   "account": {
+    "vehicleMore": "Tous les détails du véhicule",
+    "vehicleLess": "Moins de détails",
+    "myVehicle": "Mon véhicule",
+    "vehicleEmpty": "Les détails de votre voiture apparaissent ici une fois votre carte grise confirmée dans OSY.",
+    "vehiclePhotoCredit": "Photo de référence de ce modèle · Wikipédia",
+    "vehiclePhotoLabel": "Photo d’une {{model}}",
+    "vehicleSpecs": "Détails de la carte grise",
+    "editDetails": "Informations personnelles et médicales",
+    "manage": "Gérer",
+    "signedInAs": "Connecté en tant que {{email}}",
     "description": "Vos informations, vos proches et votre activité.",
     "details": "Informations personnelles",
     "guest": "Votre profil",

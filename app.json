@@ -8,7 +8,7 @@
     "scheme": "osymobile",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/icon.png",
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true
       },
@@ -16,7 +16,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#ECE0FF",
+        "backgroundColor": "#6316DB",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -104,7 +104,7 @@
         {
           "cameraPermission": "OSY uses the camera to scan your driver’s licence and car registration, and to photograph accidents you report.",
           "photosPermission": "OSY lets you choose a photo of your driver’s licence, your car registration, or an accident you report.",
-          "microphonePermission": false
+          "microphonePermission": "OSY uses the microphone so you can answer “Are you OK?” out loud after a crash."
         }
       ],
       "onnxruntime-react-native",

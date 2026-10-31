@@ -230,21 +230,35 @@ test('a signed-out user lands on the signed-out phase', async () => {
   assert.equal(f.phase(), 'signedOut');
 });
 
-test('a user who quit mid-onboarding returns to onboarding', async () => {
-  const f = account({ tokens: signedIn, listDocuments: async () => incomplete });
+test('a user who quit during sign-up returns to onboarding', async () => {
+  const f = account({ tokens: signedIn, listDocuments: async () => incomplete, storage: memory({ 'osy.auth.signUpPending': '1' }) });
   await settle();
   assert.equal(f.phase(), 'onboarding');
 });
 
-test('only a complete account reaches the app', async () => {
-  const f = account({ tokens: signedIn, listDocuments: async () => complete });
+test('logging in never starts onboarding, even with documents missing', async () => {
+  const f = account({ tokens: signedIn, listDocuments: async () => incomplete });
   await settle();
   assert.equal(f.phase(), 'ready');
 });
 
-test('signing in loads the account, and signing out ends it', async () => {
+test('logging in reaches the app when the document check fails', async () => {
+  const f = account({ tokens: signedIn, listDocuments: async () => { throw new Error('offline'); } });
+  await settle();
+  assert.equal(f.phase(), 'ready');
+});
+
+test('finishing the documents ends onboarding', async () => {
+  const f = account({ tokens: signedIn, listDocuments: async () => complete, storage: memory({ 'osy.auth.signUpPending': '1' }) });
+  await settle();
+  assert.equal(f.phase(), 'ready');
+  assert.equal(f.storage.getItem('osy.auth.signUpPending'), null);
+});
+
+test('signing up starts onboarding, and signing out ends it', async () => {
   const f = account({ listDocuments: async () => incomplete });
   await settle();
+  f.service.beginSignUp();
   await f.session.save({ accessToken: 'a', refreshToken: 'r' });
   await settle();
   assert.equal(f.phase(), 'onboarding');
@@ -263,27 +277,20 @@ test('logging out sends a finished user back to sign in', async () => {
   assert.equal(session.getTokens(), null);
 });
 
-test('offline, a finished user still gets into the app', async () => {
-  const storage = memory({ 'osy.auth.onboardingComplete': '1' });
+test('offline, someone mid sign-up stays in onboarding with a retry', async () => {
+  const storage = memory({ 'osy.auth.signUpPending': '1' });
   const f = account({ tokens: signedIn, storage, listDocuments: async () => { throw new ApiError('network', 'Down'); } });
-  await settle();
-  assert.equal(f.phase(), 'ready');
-});
-
-test('offline, an unfinished user stays in onboarding with a retry', async () => {
-  const f = account({ tokens: signedIn, listDocuments: async () => { throw new ApiError('network', 'Down'); } });
   await settle();
   assert.equal(f.phase(), 'onboarding');
   assert.equal(f.service.store.getState().loadFailed, true);
 });
 
-test('signing out forgets the finished state', async () => {
-  const storage = memory();
-  const f = account({ tokens: signedIn, storage, listDocuments: async () => complete });
+test('signing out forgets an unfinished sign-up, so the next login reaches the app', async () => {
+  const storage = memory({ 'osy.auth.signUpPending': '1' });
+  const f = account({ tokens: signedIn, storage, listDocuments: async () => incomplete });
   await settle();
-  assert.equal(storage.getItem('osy.auth.onboardingComplete'), '1');
   await f.session.clear();
-  assert.equal(storage.getItem('osy.auth.onboardingComplete'), null);
+  assert.equal(storage.getItem('osy.auth.signUpPending'), null);
 });
 
 test('auth code never logs', () => {

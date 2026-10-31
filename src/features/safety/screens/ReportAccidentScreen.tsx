@@ -4,7 +4,6 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/common/components/themed-text';
-import { AmbientBackground } from '@/common/components/ui/ambient-background';
 import { Button } from '@/common/components/ui/button';
 import { Card } from '@/common/components/ui/card';
 import { Input } from '@/common/components/ui/input';
@@ -118,7 +117,6 @@ export function ReportAccidentScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
-      <AmbientBackground />
       <SafeAreaView style={styles.root} edges={['bottom']}>
         <ScrollView
           contentContainerStyle={styles.content}
@@ -225,7 +223,6 @@ function Centered({ children }: { children: React.ReactNode }) {
   const theme = useTheme();
   return (
     <View style={[styles.root, styles.centered, { backgroundColor: theme.background }]}>
-      <AmbientBackground />
       {children}
     </View>
   );

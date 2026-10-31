@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AmbientBackground } from '@/common/components/ui/ambient-background';
 import { Button } from '@/common/components/ui/button';
 import { Card } from '@/common/components/ui/card';
 import { ContentSkeleton } from '@/common/components/ui/loading';
@@ -29,7 +28,6 @@ export function TodosView({ controller }: { controller: TodosController }) {
 
   return (
     <View style={styles.root}>
-      <AmbientBackground />
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <FlatList
           data={todos}

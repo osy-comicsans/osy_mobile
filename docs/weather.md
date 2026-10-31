@@ -1,6 +1,6 @@
 # Weather integration
 
-OSY uses Open-Meteo through a standalone Node service in `server/weather/`. The phone never contacts Open-Meteo or receives its API key. This follows `INTEGRATION_EXPO_SDK57.md`: presentation in components, React Query in hooks, HTTP transport through the shared Axios infrastructure, SQL in repositories, and location through the existing location service. The application remains on its existing SDK 58.
+OSY uses Open-Meteo. With no weather service configured, the app calls Open-Meteo's free public endpoint directly, so weather works with no setup. That endpoint is for non-commercial use only. For commercial use, deploy the standalone Node service in `server/weather/`, which holds the API key, and point the app at it; the phone never receives that key. Both paths share `src/features/weather/utils/openMeteo.ts`. This follows `INTEGRATION_EXPO_SDK57.md`: presentation in components, React Query in hooks, HTTP transport through the shared Axios infrastructure, SQL in repositories, and location through the existing location service. The application remains on its existing SDK 58.
 
 ## Start the service
 
@@ -23,7 +23,7 @@ EXPO_PUBLIC_WEATHER_API_URL=http://YOUR_COMPUTER_LAN_IP:8787
 
 The phone and computer must be able to reach each other. Allow the service port through the local firewall when required. `localhost` on a phone refers to the phone. For web previews, put the exact Expo web origin in the server's `WEATHER_ALLOWED_ORIGINS` comma-separated list. Restart Expo after changing public environment variables.
 
-Start the app with `pnpm start --clear`. Sign-in can continue to use the existing mock when the main backend URL is blank: weather requests explicitly use the network transport, not mock weather. If the weather URL is blank, weather uses `EXPO_PUBLIC_API_URL/weather`. That fallback requires the main backend to mount the weather handler. An unconfigured service shows an unavailable state and never produces fake readings.
+Start the app with `pnpm start --clear`. Sign-in can continue to use the existing mock when the main backend URL is blank: weather requests explicitly use the network transport, not mock weather. If the weather URL is blank, weather uses `EXPO_PUBLIC_API_URL/weather`, which requires the main backend to mount the weather handler. If both are blank, the app calls Open-Meteo directly. A failed request shows an unavailable state and never produces fake readings.
 
 ## Provider configuration
 
@@ -41,7 +41,7 @@ Production hosting needs HTTPS. The standalone read-only weather endpoint does n
 
 ## Data flow and caching
 
-`WeatherWidget -> useWeather -> weatherApi -> shared Axios -> weather service -> Open-Meteo`
+`WeatherWidget -> useWeather -> weatherApi -> Axios -> weather service (when configured) -> Open-Meteo`
 
 The weather hook reads through `runtime.weather`, a repository using the same serialized `LocalDatabase` executor as other repositories. Migration 002 creates only `weather_cache`; it does not change existing task data. Reads do not depend on internet connectivity. Disk hydration publishes into React Query before a stale snapshot triggers a network refresh, so the widget does not wait for the provider to display saved data. There is no second Zustand weather entity store.
 
@@ -51,7 +51,7 @@ The server shares one in-flight request per area and caches by area plus a 15-mi
 
 The device retains at most 40 areas for 48 hours. Snapshots are read-only downloaded reference data and never enter the outgoing sync queue. A slower old response cannot overwrite a newer persisted snapshot. Reopening in airplane mode can show the matching saved area. There are no requests in the background; while mounted/foreground, the hook refreshes every 15 minutes and rechecks stale data on foreground/reconnection. Changing areas also hydrates/fetches that area's data. Web uses memory caching only, matching the project's existing SQLite web boundary.
 
-The UI shows provider-valid time separately from retrieval time, flags stale and previous-area data, and retains saved values after refresh errors. Shared skeletons are confined to the weather card. Emergency check-in and startup never await weather. Labels and condition descriptions are localized in English, French and Arabic; attribution links to Open-Meteo and identifies OSY's adaptation.
+The UI shows provider-valid time separately from retrieval time, flags stale and previous-area data, and retains saved values after refresh errors. Shared skeletons are confined to the weather card. Emergency check-in and startup never await weather. Labels and condition descriptions are localized in English, French and Arabic; attribution names Open-Meteo in plain text and identifies OSY's adaptation.
 
 ## Normalized contract and risk inputs
 

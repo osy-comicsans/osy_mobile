@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from '@tanstack/react-query';
+import { clearVehicle } from '@/features/auth/native/documentVault';
 import { createContext, useEffect, useState, type PropsWithChildren } from 'react';
 
 import { api, authSession } from '@/common/lib/api/axios';
@@ -27,6 +28,7 @@ export function AppProviders({ children }: PropsWithChildren) {
     async finishPrivacyReset(owner) {
       reportPhotos.clearAll();
       await profilePhotos.clearOwner(owner);
+      await clearVehicle(owner);
       await settingsService.update(defaultSettings);
     },
   }));

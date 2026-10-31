@@ -76,7 +76,7 @@ export function LocationPermissionCard({ glass = false }: { glass?: boolean }) {
   const canOpenSettings = message.action === 'settings' && Platform.OS !== 'web';
 
   return (
-    <Card glass={glass} tone="accentSoft" style={styles.card}>
+    <Card tone="accentSoft" style={styles.card}>
       <ThemedText type="headingS">{message.title}</ThemedText>
       <ThemedText type="body" themeColor="textSecondary">{message.body}</ThemedText>
       {message.action === 'request' && (

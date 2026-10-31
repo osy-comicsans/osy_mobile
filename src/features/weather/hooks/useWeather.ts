@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useOfflineRuntime, useOfflineStatus } from '@/common/hooks/use-offline';
 import { useCurrentLocation, useLocationState } from '@/features/location/hooks/useLocation';
 
-import { getWeather, weatherConfigured } from '../weatherServices';
+import { getWeather } from '../weatherServices';
 import type { WeatherSnapshot } from '../types/weather.types';
 import { nextWeatherHours, weatherArea, weatherFreshness, weatherPolicy } from '../utils/weatherPolicy';
 import { toWeatherRiskInputs } from '../utils/weatherRiskInputs';
@@ -46,7 +46,7 @@ export function useWeather() {
 
   const query = useQuery({
     queryKey,
-    enabled: Boolean(area && weatherConfigured && online !== false && foreground
+    enabled: Boolean(area && online !== false && foreground
       && (!supported || hydratedKey === key)),
     queryFn: async ({ signal }) => {
       if (!area || !fix || Date.now() - fix.timestamp > weatherPolicy.locationMaxAgeMs) {
@@ -72,12 +72,11 @@ export function useWeather() {
     freshness: snapshot ? weatherFreshness(snapshot, now) : null,
     previousArea: Boolean(snapshot && !matchingArea),
     offline: online === false,
-    configured: weatherConfigured,
     awaitingLocation: !area,
     loading: !snapshot && (query.isFetching || (supported && ready && hydratedKey !== key)),
     refreshing: query.isFetching,
     error: query.isError,
-    refresh: () => { if (area && weatherConfigured && online !== false && foreground) void query.refetch(); },
+    refresh: () => { if (area && online !== false && foreground) void query.refetch(); },
   };
 }
 

@@ -23,36 +23,36 @@ interface AccountOptions {
   };
 }
 
-const ONBOARDING_KEY = 'osy.auth.onboardingComplete';
+// Onboarding belongs to sign-up. It is remembered so quitting halfway resumes it,
+// and logging in never starts it.
+const SIGN_UP_KEY = 'osy.auth.signUpPending';
 
 export function createAccountService({ session, listDocuments, storage }: AccountOptions) {
   const store = createStore<AccountState>(() => ({ phase: 'loading', documents: [], loadFailed: false }));
 
+  const pending = () => storage.getItem(SIGN_UP_KEY) !== null;
+
   const apply = ({ documents, onboardingStatus }: DocumentsResponse) => {
-    const complete = onboardingStatus === 'complete';
-    if (complete) storage.setItem(ONBOARDING_KEY, '1');
-    else storage.removeItem(ONBOARDING_KEY);
-    store.setState({ documents, phase: complete ? 'ready' : 'onboarding', loadFailed: false });
+    if (onboardingStatus === 'complete') storage.removeItem(SIGN_UP_KEY);
+    store.setState({ documents, phase: pending() ? 'onboarding' : 'ready', loadFailed: false });
   };
 
   const refresh = async () => {
     try {
       apply(await listDocuments());
     } catch {
-      // A safety app must still open offline for someone who finished onboarding.
       const { phase } = store.getState();
-      if (phase === 'signedOut') return;
-      const remembered = storage.getItem(ONBOARDING_KEY) !== null;
-      store.setState({ loadFailed: true, phase: remembered ? 'ready' : 'onboarding' });
+      if (phase === 'signedOut' && session.status.getState().status !== 'signedIn') return;
+      store.setState({ loadFailed: true, phase: pending() ? 'onboarding' : 'ready' });
     }
   };
 
   const sync = (status: string) => {
     if (status === 'signedOut') {
-      storage.removeItem(ONBOARDING_KEY);
+      storage.removeItem(SIGN_UP_KEY);
       store.setState({ phase: 'signedOut', documents: [], loadFailed: false });
     } else if (status === 'signedIn') {
-      if (storage.getItem(ONBOARDING_KEY) !== null) store.setState({ phase: 'ready' });
+      store.setState({ phase: pending() ? 'onboarding' : 'ready' });
       void refresh();
     }
   };
@@ -61,6 +61,8 @@ export function createAccountService({ session, listDocuments, storage }: Accoun
     store,
     apply,
     refresh,
+    beginSignUp: () => storage.setItem(SIGN_UP_KEY, '1'),
+    cancelSignUp: () => storage.removeItem(SIGN_UP_KEY),
 
     start() {
       const unsubscribe = session.status.subscribe((state, previous) => {

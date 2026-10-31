@@ -17,7 +17,7 @@ import { AuthScreen, sheetCard } from '../components/AuthScreen';
 import { FormNotice } from '../components/FormNotice';
 import { useKeyText } from '../hooks/useKeyText';
 import { deleteCapturedFiles } from '../native/documentCapture';
-import { saveConfirmedFields } from '../native/documentVault';
+import { saveConfirmedFields, saveVehicle } from '../native/documentVault';
 import { CONSENT_VERSION, DOCUMENT_FIELDS, type DocumentFieldKey, type User } from '../types/auth.schemas';
 import { formErrorKey, missingFields, nameMismatch } from '../utils/authForm';
 import { documentDraft, getConsentedAt, pageUris, resetDraftPages } from '../utils/documentDraft';
@@ -78,6 +78,10 @@ export function DocumentReviewScreen() {
         return;
       }
       await saveConfirmedFields(type, fields, captureLanguage).catch(() => undefined);
+      if (type === 'vehicle_registration') {
+        await Promise.resolve(account ?? profileApi.getProfile())
+          .then(({ id }) => saveVehicle(id, fields)).catch(() => undefined);
+      }
       deleteCapturedFiles(pageUris());
       resetDraftPages();
       accountService.apply(response);

@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Switch, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, View } from 'react-native';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Card } from '@/common/components/ui/card';
-import { Colors, Palette, Radius, Space } from '@/common/lib/theme';
+import { Icon } from '@/common/components/ui/icon';
+import { Colors, Palette, Radius, Shadow, Space } from '@/common/lib/theme';
 import type { RoadHazardKind } from '@/features/road-risk/types/roadRisk.types';
 import { HAZARD_COLORS, RISK_LEVEL_COLORS, RISK_LEVELS, type RiskMapStatus } from '@/features/road-risk/utils/riskOverlay';
 
@@ -15,10 +17,15 @@ interface RiskLegendProps {
 
 export function RiskLegend({ visible, onToggle, status }: RiskLegendProps) {
   const { t } = useTranslation();
+  // Closed by default, so the road stays in view.
+  const [open, setOpen] = useState(false);
   return (
     <Card style={styles.card}>
       <View style={styles.row}>
-        <ThemedText type="bodyMedium">{t('roadRisk.legendTitle')}</ThemedText>
+        <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} hitSlop={8} onPress={() => setOpen(!open)} style={styles.title}>
+          <ThemedText type="bodyMedium">{t('roadRisk.legendTitle')}</ThemedText>
+          <Icon name={open ? 'close' : 'forward'} size={12} color={Colors.textTertiary} />
+        </Pressable>
         <Switch
           accessibilityLabel={t('roadRisk.show')}
           value={visible}
@@ -26,7 +33,7 @@ export function RiskLegend({ visible, onToggle, status }: RiskLegendProps) {
           trackColor={{ true: Colors.accent, false: Palette.neutral[200] }}
         />
       </View>
-      {visible && (
+      {visible && open && (
         <>
           <View style={styles.levels}>
             {RISK_LEVELS.map((level) => (
@@ -57,7 +64,8 @@ export function RiskLegend({ visible, onToggle, status }: RiskLegendProps) {
 }
 
 const styles = StyleSheet.create({
-  card: { gap: Space[2], maxWidth: 260 },
+  card: { gap: Space[2], maxWidth: 260, padding: Space[3], boxShadow: Shadow.md },
+  title: { flexDirection: 'row', alignItems: 'center', gap: Space[2] },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Space[3] },
   levels: { gap: Space[1] },
   level: { flexDirection: 'row', alignItems: 'center', gap: Space[2] },

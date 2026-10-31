@@ -1,3 +1,6 @@
+import { requireOptionalNativeModule } from 'expo';
+import { Platform } from 'react-native';
+
 import type { Language } from '@/common/lib/i18n/languages';
 import { speak, stopSpeaking } from '@/common/lib/native/speech';
 
@@ -6,9 +9,12 @@ import type { VoiceDriver, VoicePermission } from '../utils/voiceCheckIn';
 type Recognition = typeof import('expo-speech-recognition').ExpoSpeechRecognitionModule;
 type Subscription = ReturnType<Recognition['addListener']>;
 
-// Loaded on use, because a build made before this module was added has no native
-// side and would crash on import. Voice then reports itself unavailable.
+// Expo Go and builds made before this module was added have no native side, and
+// the package throws on import without it. Metro reports a throw during a lazy
+// require as fatal before any catch here runs, so check first. Voice then reports
+// itself unavailable. The web build registers its own module and needs no check.
 function recognition(): Recognition | null {
+  if (Platform.OS !== 'web' && !requireOptionalNativeModule('ExpoSpeechRecognition')) return null;
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     return (require('expo-speech-recognition') as typeof import('expo-speech-recognition'))

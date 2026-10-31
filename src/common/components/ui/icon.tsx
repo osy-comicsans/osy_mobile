@@ -24,6 +24,10 @@ const icons = {
   mic: { ios: 'mic', android: 'mic', web: 'mic' },
   micOff: { ios: 'mic.slash', android: 'mic_off', web: 'mic_off' },
   speaker: { ios: 'speaker.wave.2', android: 'volume_up', web: 'volume_up' },
+  car: { ios: 'car.fill', android: 'directions_car', web: 'directions_car' },
+  people: { ios: 'person.2', android: 'group', web: 'group' },
+  edit: { ios: 'pencil', android: 'edit', web: 'edit' },
+  settings: { ios: 'gearshape', android: 'settings', web: 'settings' },
 } satisfies Record<string, SymbolViewProps['name']>;
 
 // These point the way the reader moves. SF Symbols flip them on their own in

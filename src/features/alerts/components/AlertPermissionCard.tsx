@@ -18,7 +18,7 @@ export function AlertPermissionCard({ glass = false }: { glass?: boolean }) {
   const denied = permission === 'denied';
 
   return (
-    <Card glass={glass} tone="accentSoft" style={styles.card}>
+    <Card tone="accentSoft" style={styles.card}>
       <ThemedText type="headingS">{t(denied ? 'alerts.permission.deniedTitle' : 'alerts.permission.requestTitle')}</ThemedText>
       <ThemedText type="body" themeColor="textSecondary">
         {t(denied ? 'alerts.permission.deniedBody' : 'alerts.permission.requestBody')}

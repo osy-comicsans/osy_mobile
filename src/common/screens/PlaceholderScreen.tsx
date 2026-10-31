@@ -2,7 +2,6 @@ import type { PropsWithChildren } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/common/components/themed-text';
-import { AmbientBackground } from '@/common/components/ui/ambient-background';
 import { MaxContentWidth, Spacing } from '@/common/lib/theme';
 
 type PlaceholderScreenProps = PropsWithChildren<{
@@ -13,7 +12,6 @@ type PlaceholderScreenProps = PropsWithChildren<{
 export function PlaceholderScreen({ title, description, children }: PlaceholderScreenProps) {
   return (
     <View style={styles.container}>
-      <AmbientBackground />
       <ThemedText type="heading" style={styles.text}>
         {title}
       </ThemedText>

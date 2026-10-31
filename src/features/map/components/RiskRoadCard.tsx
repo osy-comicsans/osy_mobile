@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/common/components/themed-text';
 import { Card } from '@/common/components/ui/card';
 import { Icon } from '@/common/components/ui/icon';
-import { Colors, Radius, Space } from '@/common/lib/theme';
+import { Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 import type { SegmentRisk } from '@/features/road-risk/types/roadRisk.types';
 import { RISK_LEVEL_COLORS } from '@/features/road-risk/utils/riskOverlay';
 
@@ -37,7 +37,7 @@ export function RiskRoadCard({ risk, weatherKnown, onClose }: RiskRoadCardProps)
 }
 
 const styles = StyleSheet.create({
-  card: { gap: Space[1] },
+  card: { gap: Space[1], boxShadow: Shadow.md },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { flexDirection: 'row', alignItems: 'center', gap: Space[2] },
   swatch: { width: 12, height: 12, borderRadius: Radius.full },
