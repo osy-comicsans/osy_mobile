@@ -45,7 +45,8 @@
     "title": "Profile",
     "description": "Your details, emergency contacts, and driving stats will appear here.",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "emergencyContacts": "Emergency contacts"
   },
   "settings": {
     "title": "Settings",
@@ -84,6 +85,12 @@
       "motionRequestBody": "Motion access helps OSY notice a crash. Location still works without it.",
       "motionDeniedTitle": "Motion access is off",
       "motionDeniedBody": "Location still works, but OSY will not be able to use motion to notice a crash."
+    },
+    "background": {
+      "serviceTitle": "OSY is watching your drive",
+      "serviceBody": "Crash detection is on.",
+      "title": "Keep crash detection on",
+      "body": "OSY needs your location all the time to notice a crash while your phone is locked or another app is open. It runs at full power only while you drive, and your location is not recorded."
     }
   },
   "alerts": {
@@ -110,7 +117,8 @@
     "dev": {
       "title": "Test alerts",
       "now": "Now",
-      "delayed": "In {{seconds}} s"
+      "delayed": "In {{seconds}} s",
+      "lockedCrash": "Simulate a crash in 15 s (lock the phone now)"
     }
   },
   "checkIn": {
@@ -126,7 +134,6 @@
       "speed": "Your speed before the crash"
     },
     "escalatedTitle": "We could not confirm you’re OK",
-    "escalatedBody": "OSY has not contacted anyone yet. If you need help, call emergency services yourself.",
     "seconds": "seconds",
     "confirmedTitle": "Glad you’re OK",
     "backHome": "Back to home"
@@ -326,9 +333,16 @@
     "refreshFailed": "Could not refresh weather. The last saved values remain visible.",
     "attribution": "Weather by Open-Meteo · data adapted by OSY",
     "conditions": {
-      "clear": "Clear", "partly_cloudy": "Partly cloudy", "cloudy": "Cloudy", "fog": "Fog",
-      "drizzle": "Drizzle", "rain": "Rain", "freezing_precipitation": "Freezing precipitation",
-      "snow": "Snow", "thunderstorm": "Thunderstorm", "unknown": "Conditions unavailable"
+      "clear": "Clear",
+      "partly_cloudy": "Partly cloudy",
+      "cloudy": "Cloudy",
+      "fog": "Fog",
+      "drizzle": "Drizzle",
+      "rain": "Rain",
+      "freezing_precipitation": "Freezing precipitation",
+      "snow": "Snow",
+      "thunderstorm": "Thunderstorm",
+      "unknown": "Conditions unavailable"
     }
   },
   "loading": {
@@ -338,5 +352,37 @@
     "tasks": "Loading saved tasks",
     "action": "Please wait",
     "checkIn": "Open emergency check-in"
+  },
+  "escalation": {
+    "testMode": "Test mode: nobody was contacted.",
+    "call": "Call emergency services ({{number}})",
+    "status": {
+      "idle": "Tell OSY if you need help.",
+      "sending": "Sending your request for help…",
+      "sent": "Your request for help was sent to OSY. Sharing your location.",
+      "waitingForSignal": "No connection. OSY keeps trying. Call if you can.",
+      "noLocation": "OSY does not know your location. Call emergency services.",
+      "canceled": "Your request for help was canceled."
+    }
+  },
+  "contacts": {
+    "description": "OSY alerts these people if you need help after a crash.",
+    "add": "Add a contact",
+    "name": "Name",
+    "save": "Save contact",
+    "remove": "Remove",
+    "invalid": "Enter a name and a valid mobile number.",
+    "failed": "That did not work. Check your connection and try again."
+  },
+  "crashModel": {
+    "title": "Crash model check",
+    "hint": "Uses real sensors for 16 seconds. Shake the phone to see the scores change. No alert is raised.",
+    "run": "Run a 16-second check",
+    "running": "Reading sensors…",
+    "result": "Crash {{crash}} · Near miss {{nearMiss}} · Normal {{normal}}",
+    "stats": "Accelerometer {{accelerometer}} Hz · Gyroscope {{gyroscope}} Hz · Peak {{peak}} g",
+    "noRuntime": "ONNX Runtime is not available. This needs a development build.",
+    "noSensors": "No sensor data arrived.",
+    "failed": "The model check failed."
   }
 }

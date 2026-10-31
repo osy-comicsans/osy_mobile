@@ -19,12 +19,14 @@ interface CheckInOptions {
   escalate: (trigger: EscalationTrigger, event: CrashEvent | null) => void;
   // Called at the start of each round after the first.
   remind: () => void;
+  // "I'm OK" after escalating, which takes the request for help back.
+  cancelEscalation?: () => void;
   now?: () => number;
 }
 
 const idle: CheckInState = { status: 'idle', round: 0, endsAt: null, event: null };
 
-export function createCheckInService({ escalate, remind, now = Date.now }: CheckInOptions) {
+export function createCheckInService({ escalate, remind, cancelEscalation, now = Date.now }: CheckInOptions) {
   const store = createStore<CheckInState>(() => idle);
   let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -80,6 +82,7 @@ export function createCheckInService({ escalate, remind, now = Date.now }: Check
 
     confirmOk() {
       clearTimeout(timer);
+      if (store.getState().status === 'escalated') cancelEscalation?.();
       store.setState({ ...idle, status: 'confirmed' });
     },
 

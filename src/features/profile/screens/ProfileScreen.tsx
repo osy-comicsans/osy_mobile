@@ -21,6 +21,11 @@ export function ProfileScreen() {
       title={t('profile.title')}
       description={t('profile.description')}>
       <Button label={t('profile.settings')} variant="secondary" onPress={() => router.push('/profile/settings')} />
+      <Button
+        label={t('profile.emergencyContacts')}
+        variant="secondary"
+        onPress={() => router.push('/profile/emergency-contacts')}
+      />
       <Button label={t('profile.logout')} variant="logout" loading={signingOut} onPress={logOut} />
     </PlaceholderScreen>
   );

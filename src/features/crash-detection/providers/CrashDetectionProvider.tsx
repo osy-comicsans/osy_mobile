@@ -4,6 +4,7 @@ import { useLocationService } from '@/features/location/hooks/useLocation';
 import { useDrivingModeService } from '@/features/driving/hooks/useDrivingMode';
 import { bindMonitoring } from '@/features/driving/utils/bindMonitoring';
 
+import { classifyCrash } from '../native/crashModelRuntime';
 import { crashSensorDriver } from '../native/crashSensorDriver';
 import { createCrashDetectionService, type CrashDetectionService } from '../utils/crashDetectionService';
 
@@ -12,7 +13,7 @@ export const CrashDetectionContext = createContext<CrashDetectionService | null>
 export function CrashDetectionProvider({ children }: PropsWithChildren) {
   const mode = useDrivingModeService();
   const location = useLocationService();
-  const [service] = useState(() => createCrashDetectionService(crashSensorDriver, location.store));
+  const [service] = useState(() => createCrashDetectionService(crashSensorDriver, location.store, Date.now, classifyCrash));
 
   useEffect(() => bindMonitoring(mode.store, service), [mode, service]);
 

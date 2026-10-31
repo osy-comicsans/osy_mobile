@@ -73,6 +73,8 @@ Field keys are defined in #28. A document marked `rejected` must include a `reje
 | `POST` | `/incidents` | Incident | `201` incident |
 | `GET` | `/incidents/nearby` | `latitude`, `longitude`, `radiusKm` | `200` `incidents` |
 | `POST` | `/emergency/escalate` | Escalation | `201` escalation status |
+| `POST` | `/emergency/escalate/{id}/location` | `latitude`, `longitude` | `204` |
+| `POST` | `/emergency/escalate/{id}/cancel` | None | `200` escalation status |
 
 Incident: `id`, `source` (`user_report`, `crash_detected`), `location`, `occurredAt`, `type`, `severity` (`minor`, `serious`, `critical`), `injuriesVisible`, `note`.
 

@@ -281,3 +281,105 @@ test('stop removes the watch', async () => {
   assert.equal(f.watches[0].removed, true);
   assert.equal(f.state().status, 'idle');
 });
+
+function backgroundFixture({ permission = 'granted' } = {}) {
+  const log = [];
+  const background = {
+    onLocation: null,
+    available: async () => true,
+    getPermission: async () => permission,
+    requestPermission: async () => 'granted',
+    async start(profile, onLocation) {
+      log.push(`start:${profile.accuracy}`);
+      background.onLocation = onLocation;
+    },
+    async stop() { log.push('stop'); },
+  };
+  const f = fixture({ background });
+  return { ...f, background, log };
+}
+
+const driveTo = async (f, speed = 25) => {
+  for (let t = 1; t <= 6; t += 1) {
+    f.watches[f.watches.length - 1].onLocation(reading(t * 1000, speed));
+    await settle();
+  }
+};
+
+test('without Always access, leaving the app stops tracking', async () => {
+  const f = backgroundFixture({ permission: 'denied' });
+  await f.service.enterForeground();
+  await settle();
+  await f.service.enterBackground();
+  assert.equal(f.state().status, 'idle');
+  assert.deepEqual(f.log, ['stop'].slice(0, f.log.length));
+});
+
+test('with Always access, tracking continues at low power in the background', async () => {
+  const f = backgroundFixture();
+  await f.service.enterForeground();
+  await settle();
+  await f.service.enterBackground();
+  assert.equal(f.state().status, 'watching');
+  assert.deepEqual(f.log, ['start:balanced']);
+  assert.ok(f.watches.every((watch) => watch.removed));
+});
+
+test('driving starts the background service while the app is still open', async () => {
+  const f = backgroundFixture();
+  await f.service.enterForeground();
+  await settle();
+  await driveTo(f);
+  assert.equal(f.state().drivingState, 'driving');
+  assert.deepEqual(f.log, ['start:navigation']);
+});
+
+test('a background fix keeps the driving state moving', async () => {
+  const f = backgroundFixture();
+  await f.service.enterForeground();
+  await settle();
+  await f.service.enterBackground();
+  for (let t = 1; t <= 6; t += 1) {
+    f.background.onLocation(reading(t * 1000, 25));
+    await settle();
+  }
+  assert.equal(f.state().drivingState, 'driving');
+  assert.deepEqual(f.log, ['start:balanced', 'start:navigation']);
+  assert.equal(f.state().fix.speedKmh, 90);
+});
+
+test('coming back ends the low-power service, and stopping ends it entirely', async () => {
+  const f = backgroundFixture();
+  await f.service.enterForeground();
+  await settle();
+  await f.service.enterBackground();
+  await f.service.enterForeground();
+  await settle();
+  assert.equal(f.state().status, 'watching');
+  assert.deepEqual(f.log, ['start:balanced', 'stop']);
+});
+
+test('a failed background start falls back to stopping', async () => {
+  const f = backgroundFixture();
+  f.background.start = async () => { throw new Error('not allowed'); };
+  await f.service.enterForeground();
+  await settle();
+  await f.service.enterBackground();
+  assert.equal(f.state().status, 'idle');
+});
+
+test('a device without background support reports it as unavailable', async () => {
+  const f = backgroundFixture();
+  f.background.available = async () => false;
+  await f.service.start();
+  assert.equal(f.state().background, 'unavailable');
+});
+
+test('Always access is requested through the service', async () => {
+  const f = backgroundFixture({ permission: 'undetermined' });
+  await f.service.start();
+  assert.equal(f.state().background, 'undetermined');
+  await f.service.requestBackgroundPermission();
+  assert.equal(f.state().background, 'granted');
+  assert.equal(f.state().requesting, false);
+});

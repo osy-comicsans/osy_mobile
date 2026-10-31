@@ -2,14 +2,17 @@ import { createStore } from 'zustand/vanilla';
 
 import type {
   DrivingState,
+  BackgroundPermission,
   LocationDriver,
   LocationError,
   LocationState,
   MotionPermission,
   Removable,
   RawLocation,
+  SamplingProfile,
 } from '../types/location.types';
 import {
+  backgroundProfiles,
   initialDrivingTracker,
   nextDrivingTracker,
   samplingProfiles,
@@ -25,6 +28,7 @@ const initialState: LocationState = {
   canAskAgain: true,
   motion: 'undetermined',
   requesting: false,
+  background: 'undetermined',
   fix: null,
   drivingState: 'stationary',
   error: null,
@@ -40,6 +44,9 @@ export function createLocationService(driver: LocationDriver) {
   let subscription: Removable | null = null;
   let activeProfile: DrivingState | null = null;
   let swappingSession: number | null = null;
+  let inBackground = false;
+  let backgroundProfile: SamplingProfile | null = null;
+  let backgroundBusy = false;
 
   const removeWatch = () => {
     subscription?.remove();
@@ -54,6 +61,12 @@ export function createLocationService(driver: LocationDriver) {
     store.setState({ status: 'error', error });
   };
 
+  const backgroundPermission = async (): Promise<BackgroundPermission> => {
+    const { background } = driver;
+    if (!background || !(await background.available().catch(() => false))) return 'unavailable';
+    return background.getPermission().catch((): BackgroundPermission => 'unavailable');
+  };
+
   const motionPermission = (read: () => Promise<MotionPermission>) =>
     read().catch((): MotionPermission => 'unavailable');
 
@@ -65,7 +78,8 @@ export function createLocationService(driver: LocationDriver) {
     const fix = toLocationFix(location, previous);
     tracker = nextDrivingTracker(tracker, fix.speedKmh, fix.timestamp);
     store.setState({ fix, drivingState: tracker.state });
-    void applyProfile(id);
+    if (!inBackground) void applyProfile(id);
+    void syncBackground();
   };
 
   // The new watch starts before the old one stops, so a swap never leaves a gap.
@@ -95,19 +109,44 @@ export function createLocationService(driver: LocationDriver) {
     }
   };
 
+  // Android only lets a foreground service start while the app is visible, so it
+  // begins when driving starts, and runs alongside the watch until the drive ends.
+  const syncBackground = async (): Promise<void> => {
+    const { background } = driver;
+    if (!background || backgroundBusy) return;
+    backgroundBusy = true;
+    try {
+      for (;;) {
+        const wanted = store.getState().background === 'granted' && (inBackground || tracker.state === 'driving');
+        const target = wanted ? backgroundProfiles[tracker.state] : null;
+        if (target === backgroundProfile) return;
+        if (target) {
+          const id = session;
+          await background.start(target, (location) => receive(id, location));
+        } else {
+          await background.stop();
+        }
+        backgroundProfile = target;
+      }
+    } finally {
+      backgroundBusy = false;
+    }
+  };
+
   const start = async (): Promise<void> => {
     started = true;
     const id = ++session;
     removeWatch();
     store.setState({ status: 'checking', error: null });
     try {
-      const [servicesEnabled, permission, motion] = await Promise.all([
+      const [servicesEnabled, permission, motion, background] = await Promise.all([
         driver.servicesEnabled(),
         driver.getPermission(),
         motionPermission(driver.getMotionPermission),
+        backgroundPermission(),
       ]);
       if (id !== session) return;
-      store.setState({ location: permission.location, canAskAgain: permission.canAskAgain, motion });
+      store.setState({ location: permission.location, canAskAgain: permission.canAskAgain, motion, background });
       if (permission.location === 'undetermined' || permission.location === 'denied') {
         store.setState({ status: 'permissionRequired' });
       } else if (!servicesEnabled) {
@@ -123,9 +162,40 @@ export function createLocationService(driver: LocationDriver) {
 
   const stop = () => {
     started = false;
+    inBackground = false;
     session++;
     removeWatch();
     store.setState({ status: 'idle' });
+    void syncBackground().catch(() => undefined);
+  };
+
+  // Keeps watching through the background task when "Always" access allows it.
+  const enterBackground = async (): Promise<void> => {
+    const { status, background, requesting } = store.getState();
+    // The iOS permission dialog makes the app inactive too.
+    if (requesting) {
+      stop();
+      return;
+    }
+    if (status !== 'watching' || background !== 'granted') {
+      stop();
+      return;
+    }
+    inBackground = true;
+    session++;
+    removeWatch();
+    try {
+      backgroundProfile = null;
+      await syncBackground();
+    } catch {
+      stop();
+    }
+  };
+
+  const enterForeground = async (): Promise<void> => {
+    inBackground = false;
+    await start();
+    await syncBackground().catch(() => undefined);
   };
 
   // The iOS permission dialog makes the app inactive, which stops the service.
@@ -148,7 +218,19 @@ export function createLocationService(driver: LocationDriver) {
     if (started) await start();
   };
 
-  return { store, start, stop, requestPermission };
+  const requestBackgroundPermission = async (): Promise<void> => {
+    if (!driver.background || store.getState().requesting) return;
+    store.setState({ requesting: true, error: null });
+    try {
+      store.setState({ background: await driver.background.requestPermission() });
+    } catch {
+      store.setState({ error: PERMISSION_ERROR });
+    } finally {
+      store.setState({ requesting: false });
+    }
+  };
+
+  return { store, start, stop, requestPermission, requestBackgroundPermission, enterBackground, enterForeground };
 }
 
 export type LocationService = ReturnType<typeof createLocationService>;
