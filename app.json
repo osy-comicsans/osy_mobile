@@ -104,7 +104,7 @@
         {
           "cameraPermission": "OSY uses the camera to scan your driver’s licence and car registration, and to photograph accidents you report.",
           "photosPermission": "OSY lets you choose a photo of your driver’s licence, your car registration, or an accident you report.",
-          "microphonePermission": false
+          "microphonePermission": "OSY uses the microphone so you can answer “Are you OK?” out loud after a crash."
         }
       ],
       "onnxruntime-react-native",
