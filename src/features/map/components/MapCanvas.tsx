@@ -34,6 +34,7 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
   // A new object makes MapLibre rebuild the layer, so it only changes with the roads.
   const riskRoads = useMemo(() => toFeatureCollection(overlays['risk-roads']), [overlays]);
   const hazards = useMemo(() => toFeatureCollection(overlays.hazards), [overlays]);
+  const route = useMemo(() => toFeatureCollection(overlays.route), [overlays]);
 
   useImperativeHandle(ref, () => ({
     recenter(center) {
@@ -88,6 +89,13 @@ export const MapCanvas = forwardRef<MapCanvasHandle, MapCanvasProps>(function Ma
             circleStrokeColor: Colors.surface,
             circleStrokeWidth: 2,
           }}
+        />
+      </GeoJSONSource>
+      <GeoJSONSource id="route" data={route}>
+        <Layer
+          id="route-line"
+          type="line"
+          style={{ lineColor: Colors.accent, lineWidth: 6, lineOpacity: 0.85, lineCap: 'round', lineJoin: 'round' }}
         />
       </GeoJSONSource>
       <GeoJSONSource id="incidents" data={toFeatureCollection(overlays.incidents)}>

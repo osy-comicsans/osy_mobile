@@ -503,5 +503,18 @@
     "hazardsNearby": "Dangers à venir",
     "warningOne": "{{first}}. Ralentissez.",
     "warningTwo": "{{first}}, {{second}}. Ralentissez."
+  },
+  "nearby": {
+    "severity": {
+      "minor": "Accident léger",
+      "serious": "Accident grave",
+      "critical": "Accident très grave"
+    },
+    "navigate": "Itinéraire",
+    "routeTitle": "Itinéraire vers l’accident",
+    "routeSummary": "{{distance}}, environ {{minutes}} min",
+    "routeLoading": "Recherche d’un itinéraire",
+    "routeFailed": "Aucun itinéraire trouvé. Vérifiez votre connexion.",
+    "endRoute": "Terminer"
   }
 }
