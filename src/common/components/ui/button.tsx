@@ -9,12 +9,12 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { Colors, Palette, Radius, Shadow, Typography } from '@/common/lib/theme';
+import { Colors, Palette, Radius, Typography } from '@/common/lib/theme';
 import { useFontFallback } from '@/common/providers/FontReadinessProvider';
 import { LoadingIndicator } from './loading';
 import { useTheme } from '@/common/hooks/use-theme';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'subtle' | 'text' | 'destructive' | 'logout';
+export type ButtonVariant = 'primary' | 'tonal' | 'secondary' | 'subtle' | 'text' | 'destructive' | 'logout';
 export type ButtonSize = 'large' | 'medium' | 'small';
 export type ButtonTone = 'light' | 'dark';
 
@@ -31,7 +31,7 @@ export type ButtonProps = Omit<PressableProps, 'children' | 'style'> & {
 };
 
 const sizes = {
-  large: { height: 48, paddingHorizontal: 24, type: Typography.buttonLarge },
+  large: { height: 52, paddingHorizontal: 24, type: Typography.buttonLarge },
   medium: { height: 40, paddingHorizontal: 20, type: Typography.buttonMedium },
   small: { height: 32, paddingHorizontal: 16, type: Typography.buttonSmall },
 } as const;
@@ -41,6 +41,8 @@ function palette(variant: ButtonVariant, tone: ButtonTone, Colors: Record<keyof 
   switch (variant) {
     case 'primary':
       return { bg: Colors.accent, fg: Colors.onAccent, border: 'transparent', borderWidth: 0 };
+    case 'tonal':
+      return { bg: Colors.backgroundElement, fg: Colors.accentActive, border: 'transparent', borderWidth: 0 };
     case 'logout':
       return { bg: Colors.logoutSoft, fg: Colors.logoutText, border: 'transparent', borderWidth: 0 };
     case 'destructive':
@@ -117,7 +119,6 @@ export function Button({
           borderColor: colors.border,
           borderWidth: colors.borderWidth,
         },
-        variant === 'primary' && tone === 'light' && styles.accentGlow,
         isDisabled && (variant === 'primary' ? styles.disabledPrimary : styles.disabled),
         style,
       ]}>
@@ -145,8 +146,7 @@ const styles = StyleSheet.create({
     gap: 8,
     borderRadius: Radius.full,
   },
-  accentGlow: { boxShadow: Shadow.accent },
   disabled: { opacity: 0.5 },
-  // DESIGN.md §7.3: purple-300 at 60%, with no glow.
-  disabledPrimary: { backgroundColor: 'rgba(183,138,255,0.6)', boxShadow: 'none' },
+  // DESIGN.md §7.3: purple-300 at 60%.
+  disabledPrimary: { backgroundColor: 'rgba(183,138,255,0.6)' },
 });

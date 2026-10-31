@@ -18,7 +18,6 @@ export const userSchema = z.object({
   onboardingStatus: onboardingStatusSchema,
 });
 
-// The API only needs the validated password, and `confirmPassword` is never sent.
 export const registerRequestSchema = z.object({
   firstName: nameField,
   lastName: nameField,
@@ -80,17 +79,14 @@ export const registerFormSchema = z.object({
   firstName: formName,
   lastName: formName,
   email: formEmail,
-  mobileNumber: z.string().trim().regex(/^\+[1-9]\d{7,14}$/, 'auth.errors.mobileInvalid'),
+  // The form only takes Algerian numbers: +213 and the 9 national digits.
+  mobileNumber: z.string().trim().regex(/^\+213\d{9}$/, 'auth.errors.mobileInvalid'),
   password: z.string()
     .min(8, 'auth.errors.passwordShort')
     .max(72, 'auth.errors.passwordLong')
     .regex(/[a-z]/, 'auth.errors.passwordLowercase')
     .regex(/[A-Z]/, 'auth.errors.passwordUppercase')
     .regex(/[0-9]/, 'auth.errors.passwordNumber'),
-  confirmPassword: z.string(),
-}).refine((form) => form.password === form.confirmPassword, {
-  path: ['confirmPassword'],
-  message: 'auth.errors.passwordMismatch',
 });
 
 export const loginFormSchema = z.object({

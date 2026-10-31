@@ -459,6 +459,11 @@ pill-shaped (`--radius-full`).
   Small    32px               16px        13px / 600   16px
   Icon     square (=height)   ---         ---          centered
 
+> `[v3]` Large buttons are **52px** with no accent glow. A **Tonal**
+> variant (`--color-background-element` fill, `--color-accent-active`
+> text, `--purple-100` when pressed) is the second way forward next to a
+> primary, as on Welcome and Sign in.
+
 ### 7.3 State Matrix (applies to every variant)
 
   --------------------------------------------------------------------------------------
@@ -520,6 +525,14 @@ floating-label pattern.
 -   **Floating label** (notched into the top border) for labeled fields.
 -   Caption text below in 13px secondary (or semantic color for
     success/error).
+
+> `[v3]` Form fields replace the floating label with a **label above**
+> (14px / 600), a **52px** field, 16px text, a `--color-background`
+> fill and a 1px `borderField` edge (`--neutral-400`, 3:1 on white).
+> Focus turns the field white with a 1.5px accent border and a 4px
+> `focusRing`. Error uses a 1.5px `--color-error-text` border; a value
+> to check (read by OCR) uses a 1.5px `--color-warning` border. Both put
+> an icon and a 13px message under the field.
 
 > `[v2.1]` **Search input** in the frames is a wide pill-ish field with
 > a leading home/search glyph and a trailing **✕** clear. Confirmed as

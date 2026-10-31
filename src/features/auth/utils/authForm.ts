@@ -52,6 +52,27 @@ export function loginErrorKey(error: unknown): string {
     : formErrorKey(error);
 }
 
+// Keeps the 9 national digits of an Algerian mobile number, dropping a leading 0 or a pasted 213.
+export function nationalMobileDigits(input: string): string {
+  const digits = input.replace(/\D/g, '');
+  const national = digits.length > 9 && digits.startsWith('213') ? digits.slice(3) : digits.replace(/^0/, '');
+  return national.slice(0, 9);
+}
+
+// 555123456 reads as 555 12 34 56.
+export function formatMobileDigits(digits: string): string {
+  return [digits.slice(0, 3), digits.slice(3, 5), digits.slice(5, 7), digits.slice(7, 9)].filter(Boolean).join(' ');
+}
+
+// The rules shown live under the password field. registerFormSchema enforces the same ones.
+export function passwordRules(password: string) {
+  return {
+    length: password.length >= 8,
+    letterCase: /[a-z]/.test(password) && /[A-Z]/.test(password),
+    number: /[0-9]/.test(password),
+  };
+}
+
 export function nextDocument(documents: DocumentRecord[]): DocumentType | null {
   const isDone = (type: DocumentType) => {
     const status = documents.find((document) => document.type === type)?.status;

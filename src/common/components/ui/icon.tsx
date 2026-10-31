@@ -28,6 +28,9 @@ const icons = {
   people: { ios: 'person.2', android: 'group', web: 'group' },
   edit: { ios: 'pencil', android: 'edit', web: 'edit' },
   settings: { ios: 'gearshape', android: 'settings', web: 'settings' },
+  globe: { ios: 'globe', android: 'language', web: 'language' },
+  idCard: { ios: 'person.text.rectangle', android: 'id_card', web: 'id_card' },
+  retake: { ios: 'arrow.counterclockwise', android: 'restart_alt', web: 'restart_alt' },
 } satisfies Record<string, SymbolViewProps['name']>;
 
 // These point the way the reader moves. SF Symbols flip them on their own in

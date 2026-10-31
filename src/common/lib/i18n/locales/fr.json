@@ -158,7 +158,6 @@
     "email": "E-mail",
     "mobileNumber": "Numéro de mobile",
     "password": "Mot de passe",
-    "confirmPassword": "Confirmez le mot de passe",
     "signIn": "Se connecter",
     "createAccount": "Créer un compte",
     "haveAccount": "Vous avez déjà un compte ?",
@@ -167,27 +166,44 @@
       "nameShort": "Au moins 2 caractères.",
       "nameLong": "50 caractères au maximum.",
       "emailInvalid": "Saisissez une adresse e-mail valide.",
-      "mobileInvalid": "Saisissez un numéro valide, par exemple +213555123456.",
+      "mobileInvalid": "Saisissez les 9 chiffres, par exemple 555 12 34 56.",
       "passwordShort": "Au moins 8 caractères.",
       "passwordLong": "72 caractères au maximum.",
       "passwordLowercase": "Doit contenir une lettre minuscule.",
       "passwordUppercase": "Doit contenir une lettre majuscule.",
       "passwordNumber": "Doit contenir un chiffre.",
-      "passwordMismatch": "Les mots de passe ne correspondent pas.",
       "passwordRequired": "Saisissez votre mot de passe.",
       "emailTaken": "Cet e-mail est déjà enregistré.",
       "mobileTaken": "Ce numéro de mobile est déjà enregistré.",
-      "invalidCredentials": "L’e-mail ou le mot de passe est incorrect."
+      "invalidCredentials": "L’e-mail ou le mot de passe est incorrect.",
+      "invalidCredentialsHint": "Vérifiez les deux et réessayez."
     },
     "mobileHint": "Indiquez l’indicatif du pays, par exemple +213.",
-    "passwordHint": "Au moins 8 caractères, avec une majuscule, une minuscule et un chiffre.",
     "noAccount": "Nouveau sur OSY ?",
     "back": "Retour",
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
     "stepOne": "Étape 1 sur 3",
     "stepTwo": "Étape 2 sur 3",
-    "stepThree": "Étape 3 sur 3"
+    "stepThree": "Étape 3 sur 3",
+    "welcomeTitle": "Des trajets plus sûrs. Une détection plus intelligente.",
+    "welcomeDescription": "Alertes routières, détection des accidents et aide quand vous en avez besoin.",
+    "emergencyTitle": "Vérification d’urgence",
+    "emergencyHint": "Sans compte",
+    "emergencyLink": "Vérification d’urgence, sans compte",
+    "continue": "Continuer",
+    "secureTitle": "Sécurisez votre compte",
+    "secureDescription": "Vous vous connecterez avec votre e-mail et ce mot de passe.",
+    "progress": {
+      "account": "Votre compte",
+      "documents": "Documents",
+      "review": "Vérification"
+    },
+    "passwordRules": {
+      "length": "8 caractères ou plus",
+      "letterCase": "Majuscules et minuscules",
+      "number": "Un chiffre"
+    }
   },
   "documents": {
     "title": "Vos documents",
@@ -214,7 +230,8 @@
       "missing": "À ajouter",
       "pending": "En cours d’examen",
       "verified": "Vérifié",
-      "rejected": "Refusé"
+      "rejected": "Refusé",
+      "next": "Suivant"
     },
     "errors": {
       "fileType": "Utilisez un fichier JPG, PNG ou PDF.",
@@ -248,13 +265,24 @@
     "front": "Recto",
     "back": "Verso",
     "scanHint": "Photographiez le document maintenant",
-    "photoHint": "Utilisez une photo existante",
+    "photoHint": "Depuis votre galerie",
     "fileHint": "Fichier JPG, PNG ou PDF, 10 Mo au maximum",
     "reading": "Lecture de votre document…",
     "detailsTitle": "Informations du document",
     "checkField": "Vérifiez ce champ. Il a peut-être été mal lu.",
     "nameMismatch": "Le nom sur ce permis ne correspond pas à votre compte.",
-    "ocrFailed": "Nous n’avons pas pu lire ce document automatiquement. Veuillez saisir les informations vous-même."
+    "ocrFailed": "Nous n’avons pas pu lire ce document automatiquement. Veuillez saisir les informations vous-même.",
+    "add": {
+      "driver_license": "Ajouter le permis de conduire",
+      "vehicle_registration": "Ajouter la carte grise"
+    },
+    "tips": {
+      "flat": "Posez-le à plat, les quatre coins visibles",
+      "light": "Choisissez un bon éclairage, sans reflets"
+    },
+    "otherSources": "Ou utilisez une photo ou un fichier existant",
+    "privacy": "Le texte est lu sur votre téléphone. Rien n’est envoyé avant que vous confirmiez les informations.",
+    "photos": "Photos"
   },
   "errors": {
     "api": {

@@ -2,29 +2,48 @@ import { Image } from 'expo-image';
 import { Redirect, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useStore } from 'zustand';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
 import { Icon } from '@/common/components/ui/icon';
 import { Input } from '@/common/components/ui/input';
+import { useTheme } from '@/common/hooks/use-theme';
 import { getLanguage } from '@/common/lib/i18n/i18n';
-import { Colors, Radius, Space } from '@/common/lib/theme';
+import { Radius, Space, Typography } from '@/common/lib/theme';
 
 import { accountService, documentsApi, profileApi } from '../authServices';
-import { AuthScreen, sheetCard } from '../components/AuthScreen';
+import { AuthScreen } from '../components/AuthScreen';
 import { FormNotice } from '../components/FormNotice';
 import { useKeyText } from '../hooks/useKeyText';
 import { deleteCapturedFiles } from '../native/documentCapture';
 import { saveConfirmedFields, saveVehicle } from '../native/documentVault';
-import { CONSENT_VERSION, DOCUMENT_FIELDS, type DocumentFieldKey, type User } from '../types/auth.schemas';
+import {
+  CONSENT_VERSION,
+  DOCUMENT_FIELDS,
+  type DocumentFieldKey,
+  type DocumentType,
+  type User,
+} from '../types/auth.schemas';
 import { formErrorKey, missingFields, nameMismatch } from '../utils/authForm';
 import { documentDraft, getConsentedAt, pageUris, resetDraftPages } from '../utils/documentDraft';
+
+// Short licence details share a row. Every other field gets a row of its own.
+const PAIRED_FIELDS: Partial<Record<DocumentType, DocumentFieldKey[][]>> = {
+  driver_license: [['lastName', 'firstName'], ['dateOfBirth', 'category']],
+};
+
+function fieldRows(type: DocumentType): DocumentFieldKey[][] {
+  const pairs = PAIRED_FIELDS[type] ?? [];
+  const paired = new Set(pairs.flat());
+  return [...pairs, ...DOCUMENT_FIELDS[type].filter((field) => !paired.has(field)).map((field) => [field])];
+}
 
 export function DocumentReviewScreen() {
   const { t } = useTranslation();
   const text = useKeyText();
+  const theme = useTheme();
   const { type, source, pages, fields, lowConfidence, ocrFailed, ocrFailureReason } = useStore(documentDraft);
   const [account, setAccount] = useState<User | null>(null);
   const [showMissing, setShowMissing] = useState(false);
@@ -97,36 +116,59 @@ export function DocumentReviewScreen() {
     <AuthScreen
       title={t(`documents.types.${type}`)}
       description={t('documents.reviewDescription')}
-      overline={t('auth.stepThree')}
+      progress={{ step: 2, fill: 0.5 }}
       showBack
-      onBack={() => retake()}>
-      <View style={sheetCard}>
+      onBack={() => retake()}
+      footer={(
+        <>
+          {uploadError && <FormNotice message={text(uploadError)} />}
+          <Button
+            label={t(uploadError ? 'common.tryAgain' : 'documents.confirm')}
+            size="large"
+            loading={uploading}
+            onPress={() => void confirm()}
+          />
+        </>
+      )}>
+      <View style={styles.section}>
+        <View style={styles.heading}>
+          <ThemedText type="headingS" accessibilityRole="header">{t('documents.photos')}</ThemedText>
+          <Pressable
+            accessibilityRole="button"
+            disabled={uploading}
+            onPress={() => retake()}
+            style={({ pressed }) => [styles.retake, (pressed || uploading) && styles.retakeFaded]}>
+            <Icon name="retake" size={16} color={theme.accent} />
+            <ThemedText style={[Typography.bodyStrong, { color: theme.accent }]}>{t('documents.retake')}</ThemedText>
+          </Pressable>
+        </View>
         <View style={styles.pages}>
-          {pages.map((page) => (
-            <View key={page.side} style={styles.pageColumn}>
-              <ThemedText type="overline" themeColor="textTertiary">
-                {t(page.side === 'front' ? 'documents.front' : 'documents.back')}
-              </ThemedText>
-              {page.mimeType === 'application/pdf' ? (
-                <View style={[styles.page, styles.pdf]}>
-                  <Icon name="file" size={24} color={Colors.accent} />
-                  <ThemedText type="label" themeColor="textSecondary" numberOfLines={2}>{page.fileName}</ThemedText>
-                </View>
-              ) : (
-                <Image
-                  source={{ uri: page.uri }}
-                  contentFit="cover"
-                  accessibilityLabel={t(page.side === 'front' ? 'documents.front' : 'documents.back')}
-                  style={styles.page}
-                />
-              )}
-            </View>
-          ))}
+          {pages.map((page) => {
+            const label = t(page.side === 'front' ? 'documents.front' : 'documents.back');
+            return (
+              <View key={page.side} style={styles.pageColumn}>
+                {page.mimeType === 'application/pdf' ? (
+                  <View style={[styles.page, styles.pdf, { borderColor: theme.border, backgroundColor: theme.backgroundElement }]}>
+                    <Icon name="file" size={24} color={theme.accent} />
+                    <ThemedText type="label" themeColor="textSecondary" numberOfLines={2}>{page.fileName}</ThemedText>
+                  </View>
+                ) : (
+                  <Image
+                    source={{ uri: page.uri }}
+                    contentFit="cover"
+                    accessibilityLabel={label}
+                    style={[styles.page, { borderColor: theme.border, backgroundColor: theme.backgroundElement }]}
+                  />
+                )}
+                <ThemedText type="label" themeColor="textSecondary">{label}</ThemedText>
+              </View>
+            );
+          })}
         </View>
       </View>
 
-      <View style={sheetCard}>
-        <ThemedText type="heading" accessibilityRole="header">{t('documents.detailsTitle')}</ThemedText>
+      <View style={styles.details}>
+        <ThemedText type="headingS" accessibilityRole="header">{t('documents.detailsTitle')}</ThemedText>
         {ocrFailed && (
           <FormNotice
             tone="warning"
@@ -136,33 +178,37 @@ export function DocumentReviewScreen() {
         {account && type === 'driver_license' && nameMismatch(fields, account) && (
           <FormNotice tone="warning" message={t('documents.nameMismatch')} />
         )}
-        {DOCUMENT_FIELDS[type].map((field) => (
-          <Input
-            key={field}
-            label={t(`documents.fields.${field}`)}
-            value={fields[field] ?? ''}
-            onChangeText={(value) => change(field, value)}
-            error={showMissing && missing.includes(field) ? t('documents.errors.fieldRequired') : undefined}
-            hint={lowConfidence.includes(field) ? t('documents.checkField') : undefined}
-            editable={!uploading}
-          />
+        {fieldRows(type).map((row) => (
+          <View key={row.join()} style={styles.fieldRow}>
+            {row.map((field) => (
+              <Input
+                key={field}
+                label={t(`documents.fields.${field}`)}
+                value={fields[field] ?? ''}
+                onChangeText={(value) => change(field, value)}
+                error={showMissing && missing.includes(field) ? t('documents.errors.fieldRequired') : undefined}
+                warning={lowConfidence.includes(field) ? t('documents.checkField') : undefined}
+                editable={!uploading}
+                containerStyle={styles.field}
+              />
+            ))}
+          </View>
         ))}
-        {uploadError && <FormNotice message={text(uploadError)} />}
-        <Button
-          label={t(uploadError ? 'common.tryAgain' : 'documents.confirm')}
-          size="large"
-          loading={uploading}
-          onPress={() => void confirm()}
-        />
-        <Button label={t('documents.retake')} variant="text" disabled={uploading} onPress={() => retake()} />
       </View>
     </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
+  section: { gap: Space[2] },
+  heading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  retake: { flexDirection: 'row', alignItems: 'center', gap: Space[2], minHeight: 44 },
+  retakeFaded: { opacity: 0.5 },
   pages: { flexDirection: 'row', gap: Space[3] },
   pageColumn: { flex: 1, gap: Space[2] },
-  page: { height: 112, borderRadius: Radius.md, backgroundColor: Colors.backgroundElement },
+  page: { height: 104, borderRadius: Radius.md, borderWidth: 1 },
   pdf: { alignItems: 'center', justifyContent: 'center', gap: Space[1], padding: Space[2] },
+  details: { gap: Space[4], marginTop: Space[1] },
+  fieldRow: { flexDirection: 'row', gap: Space[3] },
+  field: { flex: 1 },
 });

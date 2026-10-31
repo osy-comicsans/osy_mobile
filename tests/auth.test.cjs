@@ -27,13 +27,14 @@ const {
 } = require('../src/features/auth/types/auth.schemas.ts');
 const { createAccountService } = require('../src/features/auth/utils/accountService.ts');
 const {
-  fieldErrors, formErrorKey, loginErrorKey, mapRegisterError, missingFields, nextDocument,
+  fieldErrors, formatMobileDigits, formErrorKey, loginErrorKey, mapRegisterError, missingFields,
+  nationalMobileDigits, nextDocument, passwordRules,
 } = require('../src/features/auth/utils/authForm.ts');
 const en = require('../src/common/lib/i18n/locales/en.json');
 
 const valid = {
   firstName: 'Amina', lastName: 'Test', email: ' Amina@Example.com ', mobileNumber: '+213555123456',
-  password: 'Secret123', confirmPassword: 'Secret123',
+  password: 'Secret123',
 };
 
 function memory(initial = {}) {
@@ -79,7 +80,7 @@ test('a valid form has no errors', () => {
 test('each invalid field shows its own message', () => {
   const errors = fieldErrors(registerFormSchema, {
     firstName: 'A', lastName: 'x'.repeat(51), email: 'nope', mobileNumber: '0555123456',
-    password: 'short', confirmPassword: 'short',
+    password: 'short',
   });
   assert.equal(errors.firstName, 'auth.errors.nameShort');
   assert.equal(errors.lastName, 'auth.errors.nameLong');
@@ -89,23 +90,42 @@ test('each invalid field shows its own message', () => {
 });
 
 test('password rules each have a message', () => {
-  const error = (password) => fieldErrors(registerFormSchema, { ...valid, password, confirmPassword: password }).password;
+  const error = (password) => fieldErrors(registerFormSchema, { ...valid, password }).password;
   assert.equal(error('SECRET123'), 'auth.errors.passwordLowercase');
   assert.equal(error('secret123'), 'auth.errors.passwordUppercase');
   assert.equal(error('SecretWord'), 'auth.errors.passwordNumber');
   assert.equal(error(`Aa1${'x'.repeat(70)}`), 'auth.errors.passwordLong');
 });
 
-test('mismatched passwords block the form', () => {
-  const errors = fieldErrors(registerFormSchema, { ...valid, confirmPassword: 'Different1' });
-  assert.deepEqual(errors, { confirmPassword: 'auth.errors.passwordMismatch' });
+test('the live password rules match the form rules', () => {
+  assert.deepEqual(passwordRules('secret'), { length: false, letterCase: false, number: false });
+  assert.deepEqual(passwordRules('Secret123'), { length: true, letterCase: true, number: true });
+  for (const password of ['Secret123', 'secret123', 'SECRET123', 'SecretWord', 'Sec1']) {
+    const { length, letterCase, number } = passwordRules(password);
+    assert.equal(length && letterCase && number, !fieldErrors(registerFormSchema, { ...valid, password }).password, password);
+  }
 });
 
-test('the email is trimmed and lowercased, and confirmPassword stays out of the request', async () => {
+test('the form takes the 9 digits of an Algerian mobile number', () => {
+  const error = (mobileNumber) => fieldErrors(registerFormSchema, { ...valid, mobileNumber }).mobileNumber;
+  assert.equal(error('+213555123456'), undefined);
+  assert.equal(error('+21355512'), 'auth.errors.mobileInvalid');
+  assert.equal(error('+33612345678'), 'auth.errors.mobileInvalid');
+});
+
+test('mobile digits drop a leading 0 or a pasted 213, and read in groups', () => {
+  assert.equal(nationalMobileDigits('0555 12 34 56'), '555123456');
+  assert.equal(nationalMobileDigits('+213 555 12 34 56'), '555123456');
+  assert.equal(nationalMobileDigits('5551234567'), '555123456');
+  assert.equal(formatMobileDigits('55512'), '555 12');
+  assert.equal(formatMobileDigits('555123456'), '555 12 34 56');
+});
+
+test('the email is trimmed and lowercased, and the password is not stored', async () => {
   const { auth, store } = backend();
-  const { confirmPassword, ...request } = registerFormSchema.parse(valid);
+  const request = registerFormSchema.parse(valid);
   assert.equal(request.email, 'amina@example.com');
-  await auth.register({ ...request, confirmPassword });
+  await auth.register(request);
   assert.doesNotMatch(store.getItem('osy.mock.backend'), /Secret123/);
 });
 
@@ -161,13 +181,13 @@ test('all document fields are required except the previous number', () => {
 });
 
 test('every form message and field has a label', () => {
-  for (const key of ['nameShort', 'mobileInvalid', 'passwordMismatch', 'invalidCredentials']) assert.ok(en.auth.errors[key]);
+  for (const key of ['nameShort', 'mobileInvalid', 'passwordNumber', 'invalidCredentials']) assert.ok(en.auth.errors[key]);
   for (const field of Object.values(DOCUMENT_FIELDS).flat()) assert.ok(en.documents.fields[field], field);
 });
 
 test('the mock registers a user and signs them in again', async () => {
   const { auth } = backend();
-  const { confirmPassword: _c, ...request } = registerFormSchema.parse(valid);
+  const request = registerFormSchema.parse(valid);
   const user = await auth.register(request);
   assert.equal(user.onboardingStatus, 'documents_required');
   assert.equal((await auth.login({ email: request.email, password: 'Secret123' })).id, user.id);
@@ -175,7 +195,7 @@ test('the mock registers a user and signs them in again', async () => {
 
 test('the mock rejects a taken email and mobile number', async () => {
   const { auth } = backend();
-  const { confirmPassword: _c, ...request } = registerFormSchema.parse(valid);
+  const request = registerFormSchema.parse(valid);
   const error = await auth.register({ ...request, email: 'taken@osy.test', mobileNumber: '+213555000000' }).catch(toApiError);
   assert.equal(error.kind, 'conflict');
   assert.deepEqual(Object.keys(error.fields).sort(), ['email', 'mobileNumber']);
