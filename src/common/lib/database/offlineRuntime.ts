@@ -29,6 +29,7 @@ export interface OfflineStatus extends QueueSummary {
 export function createOfflineRuntime() {
   const database = new LocalDatabase(getDatabase);
   const todos = new TodoRepository(database, createId);
+  const reports = new AccidentReportRepository(database, createId);
   const weather = new WeatherRepository(database);
   const areas = new AreaRepository(database);
   const queue = new SyncQueue(database);
@@ -97,7 +98,7 @@ export function createOfflineRuntime() {
   };
 
   return {
-    status, todos, weather, areas, queue, sync, initialize, changed,
+    status, todos, reports, weather, areas, queue, sync, initialize, changed,
     start(onChange: () => Promise<void>) {
       active = true;
       invalidate = onChange;

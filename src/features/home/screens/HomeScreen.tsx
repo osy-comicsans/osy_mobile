@@ -8,7 +8,6 @@ import { Colors, MaxContentWidth, Space } from '@/common/lib/theme';
 import { GlassAppearanceProvider } from '@/common/providers/GlassAppearanceProvider';
 import { AlertPermissionCard } from '@/features/alerts/components/AlertPermissionCard';
 import { LocationPermissionCard } from '@/features/location/components/LocationPermissionCard';
-import { ReportAccidentButton } from '@/features/safety/components/ReportAccidentButton';
 import { WeatherWidget } from '@/features/weather/components/WeatherWidget';
 import { MonitoringCard } from '../components/MonitoringCard';
 import { SpeedCard } from '../components/SpeedCard';
