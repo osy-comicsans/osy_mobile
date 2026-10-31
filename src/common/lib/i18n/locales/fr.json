@@ -393,5 +393,24 @@
       "no": "Non",
       "unsure": "Je ne sais pas"
     }
+  },
+  "roadRisk": {
+    "level": {
+      "low": "Risque faible",
+      "medium": "Risque moyen",
+      "high": "Risque élevé"
+    },
+    "factor": {
+      "roadClass": "Type de route rapide et fréquentée",
+      "curves": "Virages serrés",
+      "junctions": "Nombreux carrefours",
+      "wet": "Route mouillée",
+      "icing": "Verglas possible",
+      "visibility": "Visibilité réduite",
+      "wind": "Vent fort",
+      "darkness": "Route sombre et mal éclairée",
+      "speeding": "Vitesse au-dessus de la limite",
+      "incidents": "Accidents récents à proximité"
+    }
   }
 }

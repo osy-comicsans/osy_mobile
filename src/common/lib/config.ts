@@ -6,6 +6,8 @@ const osrmUrl = process.env.EXPO_PUBLIC_OSRM_URL?.trim() || 'https://router.proj
 export const config = {
   apiUrl,
   osrmUrl,
+  // The public server is rate limited, and it can take over 30 seconds or be busy.
+  overpassUrl: process.env.EXPO_PUBLIC_OVERPASS_URL?.trim() || 'https://overpass-api.de/api/interpreter',
   // Optional URL for the standalone weather service. This is public routing
   // configuration; the Open-Meteo credential stays on that service.
   weatherApiUrl: process.env.EXPO_PUBLIC_WEATHER_API_URL?.trim().replace(/\/+$/, '') ?? '',
