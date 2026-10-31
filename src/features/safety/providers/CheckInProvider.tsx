@@ -8,6 +8,7 @@ import { useLocationService } from '@/features/location/hooks/useLocation';
 import { RoadContext } from '@/features/roads/providers/RoadProvider';
 
 import { createSafetyApi } from '../api/safetyApi';
+import { nearbyIncidents } from '../nearbyServices';
 import { createCheckInService, type CheckInService } from '../utils/checkInService';
 import { createEscalationService, type EscalationService } from '../utils/escalationService';
 
@@ -28,6 +29,7 @@ export function CheckInProvider({ children }: PropsWithChildren) {
     currentRoad: () => road?.store.getState().road ?? null,
     storage: secureStorage,
     createId: randomUUID,
+    onIncident: (id) => void nearbyIncidents.markOwn(id),
   }));
   const [service] = useState(() => createCheckInService({
     escalate: (trigger, event) => void escalation.start(trigger, event),
