@@ -1,6 +1,6 @@
 import type { AxiosInstance } from 'axios';
 
-import { parseResponse } from '@/common/lib/api/apiError';
+import { parseResponse, sendRequest } from '@/common/lib/api/apiError';
 
 import {
   escalationRequestSchema, escalationResponseSchema, incidentRequestSchema, incidentSchema,
@@ -19,6 +19,12 @@ export function createSafetyApi(client: AxiosInstance) {
     ),
     escalate: (request: EscalationRequest) => parseResponse(
       client.post('/emergency/escalate', escalationRequestSchema.parse(request)), escalationResponseSchema,
+    ),
+    shareLocation: (id: string, location: { latitude: number; longitude: number }) => sendRequest(
+      client.post(`/emergency/escalate/${id}/location`, location),
+    ),
+    cancelEscalation: (id: string) => parseResponse(
+      client.post(`/emergency/escalate/${id}/cancel`), escalationResponseSchema,
     ),
   };
 }

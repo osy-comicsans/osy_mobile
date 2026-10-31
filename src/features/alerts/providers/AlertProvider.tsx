@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { api, authSession } from '@/common/lib/api/axios';
 import { config } from '@/common/lib/config';
 import { getLanguage } from '@/common/lib/i18n/i18n';
-import { useCrashDetected } from '@/features/crash-detection/hooks/useCrashDetection';
+import { useCrashDetected, useNearMiss } from '@/features/crash-detection/hooks/useCrashDetection';
 import type { CrashEvent } from '@/features/crash-detection/types/crash.types';
 import { createProfileApi } from '@/features/profile/api/profileApi';
 import { useCheckInService } from '@/features/safety/hooks/useCheckIn';
@@ -52,6 +52,11 @@ export function AlertProvider({ children }: PropsWithChildren) {
     checkIn.begin(event);
     raiseCrashAlert();
   });
+
+  useNearMiss(() => service.raise(
+    { id: randomUUID(), type: 'potential_accident' },
+    { title: t('alerts.potential_accident.title'), body: t('alerts.potential_accident.body') },
+  ));
 
   useEffect(() => {
     const channels = ALERT_TYPES.map((type) => ({

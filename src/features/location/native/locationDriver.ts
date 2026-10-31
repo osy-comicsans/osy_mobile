@@ -3,8 +3,10 @@ import { DeviceMotion } from 'expo-sensors';
 
 import type { LocationDriver, MotionPermission, PermissionSummary } from '../types/location.types';
 import { toLocationPermission } from '../utils/location.utils';
+import { backgroundDriver } from './backgroundLocation';
 
 const accuracies = {
+  balanced: Location.Accuracy.Balanced,
   high: Location.Accuracy.High,
   navigation: Location.Accuracy.BestForNavigation,
 } as const;
@@ -20,6 +22,7 @@ const toMotion = ({ granted, status }: { granted: boolean; status: string }): Mo
 };
 
 export const locationDriver: LocationDriver = {
+  background: backgroundDriver,
   servicesEnabled: () => Location.hasServicesEnabledAsync(),
   getPermission: async () => toPermission(await Location.getForegroundPermissionsAsync()),
   requestPermission: async () => toPermission(await Location.requestForegroundPermissionsAsync()),

@@ -45,7 +45,8 @@
     "title": "Profil",
     "description": "Vos informations, vos contacts d’urgence et vos statistiques de conduite s’afficheront ici.",
     "settings": "Réglages",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "emergencyContacts": "Contacts d’urgence"
   },
   "settings": {
     "title": "Réglages",
@@ -84,6 +85,12 @@
       "motionRequestBody": "L’accès aux mouvements aide OSY à détecter un accident. La position fonctionne aussi sans cet accès.",
       "motionDeniedTitle": "L’accès aux mouvements est désactivé",
       "motionDeniedBody": "La position fonctionne toujours, mais OSY ne pourra pas utiliser les mouvements pour détecter un accident."
+    },
+    "background": {
+      "serviceTitle": "OSY surveille votre trajet",
+      "serviceBody": "La détection d’accident est activée.",
+      "title": "Gardez la détection d’accident active",
+      "body": "OSY a besoin de votre position en permanence pour détecter un accident lorsque votre téléphone est verrouillé ou qu’une autre application est ouverte. Il ne fonctionne à pleine puissance que pendant la conduite, et votre position n’est pas enregistrée."
     }
   },
   "alerts": {
@@ -110,7 +117,8 @@
     "dev": {
       "title": "Tester les alertes",
       "now": "Maintenant",
-      "delayed": "Dans {{seconds}} s"
+      "delayed": "Dans {{seconds}} s",
+      "lockedCrash": "Simuler un accident dans 15 s (verrouillez le téléphone)"
     }
   },
   "checkIn": {
@@ -126,7 +134,6 @@
       "speed": "Votre vitesse avant l’accident"
     },
     "escalatedTitle": "Nous n’avons pas pu confirmer que tout va bien",
-    "escalatedBody": "OSY n’a encore contacté personne. Si vous avez besoin d’aide, appelez vous-même les secours.",
     "seconds": "secondes",
     "confirmedTitle": "Tant mieux, tout va bien",
     "backHome": "Retour à l’accueil"
@@ -326,9 +333,16 @@
     "refreshFailed": "Actualisation impossible. Les dernières valeurs enregistrées restent affichées.",
     "attribution": "Météo par Open-Meteo · données adaptées par OSY",
     "conditions": {
-      "clear": "Ciel dégagé", "partly_cloudy": "Partiellement nuageux", "cloudy": "Nuageux", "fog": "Brouillard",
-      "drizzle": "Bruine", "rain": "Pluie", "freezing_precipitation": "Précipitations verglaçantes",
-      "snow": "Neige", "thunderstorm": "Orage", "unknown": "Conditions indisponibles"
+      "clear": "Ciel dégagé",
+      "partly_cloudy": "Partiellement nuageux",
+      "cloudy": "Nuageux",
+      "fog": "Brouillard",
+      "drizzle": "Bruine",
+      "rain": "Pluie",
+      "freezing_precipitation": "Précipitations verglaçantes",
+      "snow": "Neige",
+      "thunderstorm": "Orage",
+      "unknown": "Conditions indisponibles"
     }
   },
   "loading": {
@@ -338,5 +352,37 @@
     "tasks": "Chargement des tâches enregistrées",
     "action": "Veuillez patienter",
     "checkIn": "Ouvrir la vérification d’urgence"
+  },
+  "escalation": {
+    "testMode": "Mode test : personne n’a été contacté.",
+    "call": "Appeler les secours ({{number}})",
+    "status": {
+      "idle": "Dites à OSY si vous avez besoin d’aide.",
+      "sending": "Envoi de votre demande d’aide…",
+      "sent": "Votre demande d’aide a été envoyée à OSY. Votre position est partagée.",
+      "waitingForSignal": "Pas de connexion. OSY continue d’essayer. Appelez si vous le pouvez.",
+      "noLocation": "OSY ne connaît pas votre position. Appelez les secours.",
+      "canceled": "Votre demande d’aide a été annulée."
+    }
+  },
+  "contacts": {
+    "description": "OSY prévient ces personnes si vous avez besoin d’aide après un accident.",
+    "add": "Ajouter un contact",
+    "name": "Nom",
+    "save": "Enregistrer le contact",
+    "remove": "Retirer",
+    "invalid": "Saisissez un nom et un numéro de mobile valide.",
+    "failed": "Cela n’a pas fonctionné. Vérifiez votre connexion et réessayez."
+  },
+  "crashModel": {
+    "title": "Vérification du modèle d’accident",
+    "hint": "Utilise les vrais capteurs pendant 16 secondes. Secouez le téléphone pour voir les scores changer. Aucune alerte n’est déclenchée.",
+    "run": "Lancer une vérification de 16 secondes",
+    "running": "Lecture des capteurs…",
+    "result": "Accident {{crash}} · Quasi-accident {{nearMiss}} · Normal {{normal}}",
+    "stats": "Accéléromètre {{accelerometer}} Hz · Gyroscope {{gyroscope}} Hz · Pic {{peak}} g",
+    "noRuntime": "ONNX Runtime n’est pas disponible. Une version de développement est nécessaire.",
+    "noSensors": "Aucune donnée de capteur reçue.",
+    "failed": "La vérification du modèle a échoué."
   }
 }

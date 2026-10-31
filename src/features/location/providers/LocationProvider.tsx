@@ -12,8 +12,8 @@ export function LocationProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const unsubscribe = subscribeToForeground((active) => {
-      if (active) void service.start();
-      else service.stop();
+      if (active) void service.enterForeground();
+      else void service.enterBackground();
     });
     return () => {
       unsubscribe();

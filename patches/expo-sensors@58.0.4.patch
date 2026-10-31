@@ -1,0 +1,19 @@
+diff --git a/android/src/main/java/expo/modules/sensors/SensorProxy.kt b/android/src/main/java/expo/modules/sensors/SensorProxy.kt
+index 4bface74e6f2b787dace27ecb81c68fef3d30a12..663ceae36bf42e5ebdf6230030a0fbdfdc39d3ac 100644
+--- a/android/src/main/java/expo/modules/sensors/SensorProxy.kt
++++ b/android/src/main/java/expo/modules/sensors/SensorProxy.kt
+@@ -92,14 +92,6 @@ internal fun ModuleDefinitionBuilder.UseSensorProxy(
+     sensorProxyGetter().stopObserving()
+   }
+ 
+-  OnActivityEntersForeground {
+-    sensorProxyGetter().onHostResume()
+-  }
+-
+-  OnActivityEntersBackground {
+-    sensorProxyGetter().onHostPause()
+-  }
+-
+   OnActivityDestroys {
+     sensorProxyGetter().onHostDestroy()
+   }

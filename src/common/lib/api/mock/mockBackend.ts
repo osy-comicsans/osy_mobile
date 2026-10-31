@@ -28,6 +28,7 @@ interface MockUser {
   email: string;
   mobileNumber: string;
   documents: Record<DocumentType, MockDocument>;
+  contacts?: unknown[];
 }
 
 interface MockStorage {
@@ -79,7 +80,7 @@ export function createMockBackend(storage: MockStorage, latency = LATENCY_MS): A
   };
   const save = (users: MockUser[]) => storage.setItem(STORAGE_KEY, JSON.stringify(users));
 
-  const profile = ({ documents, ...user }: MockUser) => ({ ...user, onboardingStatus: onboardingStatus(documents) });
+  const profile = ({ documents, contacts: _contacts, ...user }: MockUser) => ({ ...user, onboardingStatus: onboardingStatus(documents) });
 
   function onboardingStatus(documents: MockUser['documents']) {
     return Object.values(documents).every(({ status }) => status === 'pending' || status === 'verified')
@@ -143,6 +144,27 @@ export function createMockBackend(storage: MockStorage, latency = LATENCY_MS): A
     if (key === 'GET /me') return { status: 200, data: profile(user) };
     if (key === 'GET /me/documents') return { status: 200, data: documentsResponse(user) };
     if (key === 'POST /me/push-tokens') return { status: 204 };
+
+    if (key === 'GET /me/emergency-contacts') return { status: 200, data: { contacts: user.contacts ?? [] } };
+    if (key === 'PUT /me/emergency-contacts') {
+      user.contacts = body.contacts;
+      save(users);
+      return { status: 200, data: { contacts: body.contacts } };
+    }
+
+    // Nothing is sent to anyone. The real backend notifies contacts by SMS or push.
+    if (key === 'POST /incidents') {
+      const { note: _note, ...incident } = body;
+      return { status: 201, data: { ...incident, roadName: null, distanceMeters: null } };
+    }
+    if (key === 'POST /emergency/escalate') {
+      return { status: 201, data: { id: body.id, status: 'escalating', liveLocationUrl: null } };
+    }
+    const escalation = request.url?.match(/^\/emergency\/escalate\/([^/]+)\/(location|cancel)$/);
+    if (request.method?.toUpperCase() === 'POST' && escalation) {
+      if (escalation[2] === 'location') return { status: 204 };
+      return { status: 200, data: { id: escalation[1], status: 'canceled', liveLocationUrl: null } };
+    }
 
     if (key === 'POST /me/documents') {
       const type = formField(body, 'type') as DocumentType;

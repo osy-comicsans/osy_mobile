@@ -12,6 +12,7 @@ import { getLanguage } from '@/common/lib/i18n/i18n';
 import { Colors, Space } from '@/common/lib/theme';
 
 import { CountdownRing } from '../components/CountdownRing';
+import { EscalationPanel } from '../components/EscalationPanel';
 import { useCheckInService, useCheckInState } from '../hooks/useCheckIn';
 import { CHECK_IN_ROUNDS_SECONDS } from '../utils/checkInService';
 
@@ -74,9 +75,7 @@ export function CheckInScreen() {
         </ThemedText>
 
         {escalated ? (
-          <ThemedText type="body" themeColor="textSecondary" style={styles.centered}>
-            {t('checkIn.escalatedBody')}
-          </ThemedText>
+          <EscalationPanel />
         ) : (
           <CountdownRing
             key={round}
