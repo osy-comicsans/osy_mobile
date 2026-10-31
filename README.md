@@ -163,7 +163,7 @@ Push needs a development build, not Expo Go. It uses the Expo push service, whic
 
 ## Accounts and the mock backend
 
-Users must sign in and add both documents before they can reach the tabs. With no `EXPO_PUBLIC_API_URL`, development builds use the mock backend in `src/common/lib/api/mock/`. It sits behind the real API client, so setting the URL is all that is needed to use a real backend. Release builds never fall back to it unless `EXPO_PUBLIC_MOCK_API` is `true`.
+Onboarding runs after sign-up only: a new user adds both documents before reaching the tabs, and logging in always goes straight to the app. With no `EXPO_PUBLIC_API_URL`, development builds use the mock backend in `src/common/lib/api/mock/`. It sits behind the real API client, so setting the URL is all that is needed to use a real backend. Release builds never fall back to it unless `EXPO_PUBLIC_MOCK_API` is `true`.
 
 | Mock test | How |
 | --- | --- |
@@ -188,7 +188,7 @@ French and Arabic strings are drafts until a fluent speaker has reviewed them. D
 
 ## Splash and shared loading
 
-Native startup uses the OSY wordmark in `assets/brand/`, with purple on the light canvas and lavender on charcoal in dark mode. Both platforms share the same image size and transparent safe-zone padding. SVG outlines are committed alongside the PNGs; `scripts/generate-splash-art.ps1` regenerates them from the bundled Gabarito font on Windows. Native appearance follows the device; the existing application screens retain the light OSY theme.
+Native startup uses the OSY logo in `assets/brand/`, with a charcoal "SY" on the light canvas and a white one in dark mode. Both platforms share the same image size and transparent safe-zone padding. `osy-logo-emblem.png` and `osy-logo-letters.png` are the logo's two white layers, tinted and animated separately by `AnimatedLogo`. Native appearance follows the device; the existing application screens retain the light OSY theme.
 
 `useStartup` waits for local fonts, the existing SecureStore auth-session restore, locale direction, artwork decoding, and the first content layout. It never waits for a network request, location access, or database synchronization. Startup errors settle the affected task; a four-second deadline releases a stalled startup. System fonts keep emergency text and buttons usable if the custom fonts fail. The navigator remains mounted throughout startup, preserving cold deep links and the check-in modal anchor.
 

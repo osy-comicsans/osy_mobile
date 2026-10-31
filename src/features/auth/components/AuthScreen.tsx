@@ -5,6 +5,7 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/common/components/themed-text';
+import { AnimatedLogo } from '@/common/components/ui/animated-logo';
 import { Icon } from '@/common/components/ui/icon';
 import { useOnline } from '@/common/hooks/use-online';
 import { Colors, MaxContentWidth, Palette, Radius, Shadow, Space } from '@/common/lib/theme';
@@ -27,17 +28,6 @@ type AuthScreenProps = PropsWithChildren<{
   onBack?: () => void;
   footer?: ReactNode;
 }>;
-
-function BrandMark() {
-  return (
-    <View style={styles.brand}>
-      <View style={styles.mark}>
-        <View style={styles.markDot} />
-      </View>
-      <ThemedText type="heading" style={styles.brandName}>OSY</ThemedText>
-    </View>
-  );
-}
 
 export function AuthScreen({ title, description, overline, showBack, onBack, footer, children }: AuthScreenProps) {
   const theme = useTheme();
@@ -62,7 +52,7 @@ export function AuthScreen({ title, description, overline, showBack, onBack, foo
                 style={({ pressed }) => [styles.back, pressed && styles.backPressed]}>
                 <Icon name="back" size={18} color={Colors.onAccent} />
               </Pressable>
-            ) : <BrandMark />}
+            ) : <AnimatedLogo width={132} emblemColor={Colors.onAccent} lettersColor={Colors.onAccent} />}
           </View>
           <View style={styles.heroText}>
             {overline && <ThemedText type="overline" style={styles.overline}>{overline}</ThemedText>}
@@ -95,18 +85,6 @@ const styles = StyleSheet.create({
     gap: Space[6],
   },
   heroBar: { minHeight: 36, flexDirection: 'row', alignItems: 'center' },
-  brand: { flexDirection: 'row', alignItems: 'center', gap: Space[2] },
-  mark: {
-    width: 28,
-    height: 28,
-    borderRadius: Radius.full,
-    borderWidth: 5,
-    borderColor: Colors.onAccent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  markDot: { width: 6, height: 6, borderRadius: Radius.full, backgroundColor: Palette.purple[200] },
-  brandName: { color: Colors.onAccent },
   back: {
     width: 36,
     height: 36,
