@@ -2,6 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const Module = require('node:module');
 const ts = require('typescript');
 const { z } = require('zod');
 
@@ -10,6 +11,11 @@ require.extensions['.ts'] = (module, filename) => {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }, fileName: filename,
   });
   module._compile(outputText, filename);
+};
+const resolveFilename = Module._resolveFilename;
+Module._resolveFilename = function (request, ...rest) {
+  const mapped = request.startsWith('@/') ? path.join(__dirname, '../src', request.slice(2)) : request;
+  return resolveFilename.call(this, mapped, ...rest);
 };
 
 const src = path.join(__dirname, '../src');
@@ -90,8 +96,17 @@ test('dates follow the language', () => {
 });
 
 test('distances switch from metres to kilometres', () => {
-  assert.deepEqual(distanceParts('en', 850.4), { unit: 'distanceMeters', value: '850' });
-  assert.deepEqual(distanceParts('fr', 1500), { unit: 'distanceKilometers', value: '1,5' });
+  assert.deepEqual(distanceParts('en', 850.4, 'kmh'), { unit: 'distanceMeters', value: '850' });
+  assert.deepEqual(distanceParts('fr', 1500, 'kmh'), { unit: 'distanceKilometers', value: '1,5' });
+  assert.deepEqual(distanceParts('en', 123, 'kmh', 10), { unit: 'distanceMeters', value: '120' });
+});
+
+test('in miles, distances switch from feet at a tenth of a mile', () => {
+  assert.deepEqual(distanceParts('en', 100, 'mph'), { unit: 'distanceFeet', value: '328' });
+  assert.deepEqual(distanceParts('en', 100, 'mph', 10), { unit: 'distanceFeet', value: '330' });
+  assert.deepEqual(distanceParts('en', 160, 'mph'), { unit: 'distanceFeet', value: '525' });
+  assert.deepEqual(distanceParts('en', 161, 'mph'), { unit: 'distanceMiles', value: '0.1' });
+  assert.deepEqual(distanceParts('fr', 2414, 'mph'), { unit: 'distanceMiles', value: '1,5' });
 });
 
 test('zod reports validation errors in each language', () => {

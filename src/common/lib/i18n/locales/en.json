@@ -29,7 +29,9 @@
     "speedSpoken": "Speed {{value}} kilometres per hour",
     "speedUnknown": "Speed unknown",
     "distanceMeters": "{{value}} m",
-    "distanceKilometers": "{{value}} km"
+    "distanceKilometers": "{{value}} km",
+    "distanceFeet": "{{value}} ft",
+    "distanceMiles": "{{value}} mi"
   },
   "home": {
     "title": "Home",
@@ -88,6 +90,7 @@
     "background": {
       "serviceTitle": "OSY is watching your drive",
       "serviceBody": "Crash detection is on.",
+      "serviceBodyDetectionOff": "Using your location while you drive.",
       "title": "Keep crash detection on",
       "body": "OSY needs your location all the time to notice a crash while your phone is locked or another app is open. It runs at full power only while you drive, and your location is not recorded."
     }
@@ -350,7 +353,6 @@
     "sunrise": "Sunrise",
     "sunset": "Sunset",
     "celsius": "{{value}} °C",
-    "metres": "{{value}} m",
     "millimetres": "{{value}} mm",
     "windValue": "{{value}} m/s",
     "precipitationValue": "{{value}} mm / {{minutes}} min",
@@ -503,7 +505,7 @@
       "animals": "Animals",
       "hazard": "Road hazard"
     },
-    "hazardDistance": "{{name}} in {{distance}} m",
+    "hazardDistance": "{{name}} in {{distance}}",
     "hazardsNearby": "Road hazards ahead",
     "warningOne": "{{first}}. Slow down.",
     "warningTwo": "{{first}}, {{second}}. Slow down."
@@ -554,6 +556,7 @@
     "motion": "Motion sensors",
     "background": "Background location",
     "notifications": "Notifications",
+    "microphone": "Microphone and speech recognition",
     "permissionValue": "{{value}}",
     "permission": {
       "undetermined": "Not requested",
@@ -572,7 +575,8 @@
     "deleteData": "Delete my saved data",
     "deleteAccount": "Delete account",
     "deleteHint": "Deletion requires a connection. Saved reports, medical info, contacts, local pending data and caches are removed. Deleting the account also removes your identity.",
-    "confirmation": "Type DELETE to confirm",
+    "confirmation": "Type {{word}} to confirm",
+    "confirmationWord": "DELETE",
     "confirmDelete": "Confirm deletion",
     "cancel": "Cancel",
     "deleteOnline": "Connect to the internet to confirm deletion.",

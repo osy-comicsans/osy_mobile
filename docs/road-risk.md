@@ -55,7 +55,7 @@ A warning needs a score of 0.7 or more, on two fixes in a row, with one of those
 
 To limit alerts, there are at least 2 minutes between warnings and at most 6 an hour. A road piece warns once in 30 minutes, and the score must fall below 0.55 before the next warning. Warnings stop during a check-in.
 
-The banner and notification give the top two reasons, and the app reads them aloud unless sound is off in alert preferences. These warnings run only while the app is running, and iOS stays silent with the ringer off. All of these values are starting points to tune on real drives.
+The banner and notification give the top two reasons. With "Read alerts aloud" and this alert type on in Settings, the alert reads them aloud once. A voice language other than the app language reads the general warning instead, because the reasons are written in the app language. These warnings run only while the app is running, and iOS stays silent with the ringer off. All of these values are starting points to tune on real drives.
 
 ## Limits
 

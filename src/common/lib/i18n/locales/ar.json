@@ -29,7 +29,9 @@
     "speedSpoken": "السرعة {{value}} كيلومتر في الساعة",
     "speedUnknown": "السرعة غير معروفة",
     "distanceMeters": "{{value}} م",
-    "distanceKilometers": "{{value}} كم"
+    "distanceKilometers": "{{value}} كم",
+    "distanceFeet": "{{value}} قدم",
+    "distanceMiles": "{{value}} ميل"
   },
   "home": {
     "title": "الرئيسية",
@@ -88,6 +90,7 @@
     "background": {
       "serviceTitle": "يتابع OSY رحلتك",
       "serviceBody": "رصد الحوادث مفعّل.",
+      "serviceBodyDetectionOff": "يستخدم موقعك أثناء القيادة.",
       "title": "أبقِ رصد الحوادث مفعّلًا",
       "body": "يحتاج OSY إلى موقعك طوال الوقت لرصد الحادث عندما يكون هاتفك مقفلًا أو عند فتح تطبيق آخر. ولا يعمل بكامل طاقته إلا أثناء القيادة، ولا يُسجَّل موقعك."
     }
@@ -350,7 +353,6 @@
     "sunrise": "شروق الشمس",
     "sunset": "غروب الشمس",
     "celsius": "{{value}} °م",
-    "metres": "{{value}} م",
     "millimetres": "{{value}} مم",
     "windValue": "{{value}} م/ث",
     "precipitationValue": "{{value}} مم / {{minutes}} دقيقة",
@@ -503,7 +505,7 @@
       "animals": "حيوانات",
       "hazard": "خطر على الطريق"
     },
-    "hazardDistance": "{{name}} بعد {{distance}} م",
+    "hazardDistance": "{{name}} بعد {{distance}}",
     "hazardsNearby": "مخاطر على الطريق أمامك",
     "warningOne": "{{first}}. خفف السرعة.",
     "warningTwo": "{{first}}، {{second}}. خفف السرعة."
@@ -554,6 +556,7 @@
     "motion": "مستشعرات الحركة",
     "background": "الموقع في الخلفية",
     "notifications": "الإشعارات",
+    "microphone": "الميكروفون والتعرّف على الكلام",
     "permissionValue": "الحالة: {{value}}",
     "permission": {
       "undetermined": "لم يُطلب بعد",
@@ -572,7 +575,8 @@
     "deleteData": "حذف بياناتي المحفوظة",
     "deleteAccount": "حذف الحساب",
     "deleteHint": "يتطلب الحذف اتصالاً. تُحذف البلاغات والمعلومات الطبية وجهات الاتصال والبيانات المحلية المعلقة والذاكرة المؤقتة. حذف الحساب يزيل هويتك أيضاً.",
-    "confirmation": "اكتب DELETE للتأكيد",
+    "confirmation": "اكتب «{{word}}» للتأكيد",
+    "confirmationWord": "حذف",
     "confirmDelete": "تأكيد الحذف",
     "cancel": "إلغاء",
     "deleteOnline": "اتصل بالإنترنت لتأكيد الحذف.",

@@ -6,6 +6,7 @@ import { Button } from '@/common/components/ui/button';
 import { distanceParts, formatNumber } from '@/common/lib/i18n/format';
 import { getLanguage } from '@/common/lib/i18n/i18n';
 import { Colors, Radius, Shadow, Space } from '@/common/lib/theme';
+import { useSettings } from '@/features/settings/hooks/useSettings';
 
 interface RouteCardProps {
   route: { distanceMeters: number; durationSeconds: number } | null;
@@ -15,11 +16,12 @@ interface RouteCardProps {
 
 export function RouteCard({ route, failed, onEnd }: RouteCardProps) {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const language = getLanguage();
 
   let summary = t(failed ? 'nearby.routeFailed' : 'nearby.routeLoading');
   if (route) {
-    const distance = distanceParts(language, route.distanceMeters);
+    const distance = distanceParts(language, route.distanceMeters, settings.units);
     summary = t('nearby.routeSummary', {
       distance: t(`units.${distance.unit}`, { value: distance.value }),
       minutes: formatNumber(language, Math.max(1, Math.round(route.durationSeconds / 60))),

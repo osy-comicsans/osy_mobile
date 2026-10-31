@@ -13,7 +13,11 @@ export function createSettingsService(storage: { getItem(key: string): Promise<s
     try {
       const saved = await storage.getItem('osy.settings.v1');
       const value = saved ? JSON.parse(saved) : null;
-      store.setState({ settings: value ? settingsSchema.parse(value) : defaultSettings, ready: true,
+      // Laid over the defaults, so a setting added or renamed since this was saved
+      // starts at its default instead of resetting every other one.
+      const settings = value ? settingsSchema.parse({ ...defaultSettings, ...value,
+        notifications: { ...defaultSettings.notifications, ...value.notifications } }) : defaultSettings;
+      store.setState({ settings, ready: true,
         consentOwner: typeof value?.consentOwner === 'string' ? value.consentOwner : null });
     } catch { store.setState({ settings: { ...defaultSettings, crashDetection: false }, ready: true, error: true }); }
   })();

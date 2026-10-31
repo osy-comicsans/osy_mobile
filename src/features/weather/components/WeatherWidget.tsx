@@ -7,7 +7,7 @@ import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
 import { Card } from '@/common/components/ui/card';
 import { ContentSkeleton } from '@/common/components/ui/loading';
-import { formatDateTime, formatNumber } from '@/common/lib/i18n/format';
+import { distanceParts, formatDateTime, formatNumber } from '@/common/lib/i18n/format';
 import { getLanguage } from '@/common/lib/i18n/i18n';
 import { Radius, Space } from '@/common/lib/theme';
 import { useTheme } from '@/common/hooks/use-theme';
@@ -35,6 +35,11 @@ export function WeatherWidget({ compact = false, glass = false }: { compact?: bo
     value: ms === null ? t('weather.unknown') : number(speedValue(ms * 3.6, settings.units), 1),
     unit: t(settings.units === 'mph' ? 'preferences.mph' : 'units.kmh'),
   });
+  const visibility = (meters: number | null) => {
+    if (meters === null) return t('weather.unknown');
+    const distance = distanceParts(language, meters, settings.units);
+    return t(`units.${distance.unit}`, { value: distance.value });
+  };
   const status = !weather.configured ? 'unconfigured' : weather.offline ? 'offline'
     : weather.awaitingLocation ? 'locationRequired' : 'unavailable';
 
@@ -66,7 +71,7 @@ export function WeatherWidget({ compact = false, glass = false }: { compact?: bo
               value: number(value.current.precipitationMm, 1),
               minutes: number(value.current.precipitationIntervalSeconds / 60),
             })} />
-            <Metric label={t('weather.visibility')} value={t('weather.metres', { value: number(value.current.visibilityM) })} />
+            <Metric label={t('weather.visibility')} value={visibility(value.current.visibilityM)} />
             <Metric label={t('weather.wind')} value={wind(value.current.windSpeedMs)} />
             {showDetails ? <>
               <Metric label={t('weather.gusts')} value={wind(value.current.windGustMs)} />

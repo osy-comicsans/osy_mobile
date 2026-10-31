@@ -39,8 +39,13 @@ export function AlertProvider({ children }: PropsWithChildren) {
     getSettings: () => settingsService.store.getState().settings,
     speak: (alert) => {
       const settings = settingsService.store.getState().settings;
-      const language = settings.voiceLanguage === 'app' ? getLanguage() : settings.voiceLanguage;
-      if (settings.voice) void speakGuidance(translations.t(`alerts.${alert.type}.body`, { lng: language }), language);
+      const appLanguage = getLanguage();
+      const language = settings.voiceLanguage === 'app' ? appLanguage : settings.voiceLanguage;
+      // A detail is written in the app language, so another voice language reads the general text.
+      const text = alert.detail && language === appLanguage
+        ? alert.detail
+        : translations.t(`alerts.${alert.type}.body`, { lng: language });
+      if (settings.voice) void speakGuidance(text, language);
     },
     onCheckInAnswer: (action) => {
       if (action === CHECK_IN_ACTIONS.ok) checkIn.confirmOk();

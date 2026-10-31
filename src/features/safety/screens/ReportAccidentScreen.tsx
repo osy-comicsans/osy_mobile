@@ -8,7 +8,8 @@ import { AmbientBackground } from '@/common/components/ui/ambient-background';
 import { Button } from '@/common/components/ui/button';
 import { Card } from '@/common/components/ui/card';
 import { Input } from '@/common/components/ui/input';
-import { Colors, MaxContentWidth, Space } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
+import { MaxContentWidth, Space } from '@/common/lib/theme';
 import { pickPhoto, scanPage, type CaptureResult, type PickedFile } from '@/features/auth/native/documentCapture';
 import { useCurrentLocation, useDrivingState } from '@/features/location/hooks/useLocation';
 import { isMapAvailable } from '@/features/map/utils/mapAvailability';
@@ -24,6 +25,7 @@ import {
 
 export function ReportAccidentScreen() {
   const { t } = useTranslation();
+  const theme = useTheme();
   const dismiss = useDismissModal();
   const fix = useCurrentLocation();
   const driving = useDrivingState() === 'driving';
@@ -87,7 +89,7 @@ export function ReportAccidentScreen() {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { ReportLocationMap } = require('../components/ReportLocationMap') as { ReportLocationMap: typeof ReportLocationMapType };
     return (
-      <View style={styles.root}>
+      <View style={[styles.root, { backgroundColor: theme.background }]}>
         <ReportLocationMap initial={location} onChange={setDraftLocation} />
         <SafeAreaView pointerEvents="box-none" style={styles.mapOverlay}>
           <Card>
@@ -115,9 +117,9 @@ export function ReportAccidentScreen() {
   };
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { backgroundColor: theme.background }]}>
       <AmbientBackground />
-      <SafeAreaView style={[styles.root, { backgroundColor: 'transparent' }]} edges={['bottom']}>
+      <SafeAreaView style={styles.root} edges={['bottom']}>
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
@@ -220,8 +222,9 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function Centered({ children }: { children: React.ReactNode }) {
+  const theme = useTheme();
   return (
-    <View style={[styles.root, styles.centered]}>
+    <View style={[styles.root, styles.centered, { backgroundColor: theme.background }]}>
       <AmbientBackground />
       {children}
     </View>
@@ -229,7 +232,7 @@ function Centered({ children }: { children: React.ReactNode }) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: Colors.background },
+  root: { flex: 1 },
   centered: { alignItems: 'center', justifyContent: 'center', gap: Space[3], padding: Space[6] },
   content: { gap: Space[5], padding: Space[4], paddingTop: Space[6], width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
   header: { gap: Space[1] },

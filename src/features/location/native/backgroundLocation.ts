@@ -4,6 +4,7 @@ import * as TaskManager from 'expo-task-manager';
 
 import { i18n } from '@/common/lib/i18n/i18n';
 import { Colors } from '@/common/lib/theme';
+import { settingsService } from '@/features/settings/settingsService';
 
 import type { BackgroundDriver, BackgroundPermission, RawLocation, SamplingProfile } from '../types/location.types';
 
@@ -40,6 +41,7 @@ export const backgroundDriver: BackgroundDriver = {
 
   async start({ accuracy, timeInterval, distanceInterval }: SamplingProfile, onLocation) {
     listener = onLocation;
+    const { ready, settings } = settingsService.store.getState();
     await Location.startLocationUpdatesAsync(TASK, {
       accuracy: accuracies[accuracy],
       timeInterval,
@@ -49,7 +51,8 @@ export const backgroundDriver: BackgroundDriver = {
       showsBackgroundLocationIndicator: true,
       foregroundService: {
         notificationTitle: i18n.t('location.background.serviceTitle'),
-        notificationBody: i18n.t('location.background.serviceBody'),
+        notificationBody: i18n.t(ready && settings.crashDetection
+          ? 'location.background.serviceBody' : 'location.background.serviceBodyDetectionOff'),
         notificationColor: Colors.accent,
       },
     });
