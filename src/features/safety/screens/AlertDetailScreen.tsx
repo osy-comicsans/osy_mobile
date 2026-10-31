@@ -9,6 +9,7 @@ import { getLanguage } from '@/common/lib/i18n/i18n';
 import { PlaceholderScreen } from '@/common/screens/PlaceholderScreen';
 import { useAlertService } from '@/features/alerts/hooks/useAlerts';
 import { useCurrentLocation } from '@/features/location/hooks/useLocation';
+import { useSettings } from '@/features/settings/hooks/useSettings';
 
 import { useDismissModal } from '../hooks/useDismissModal';
 import { useNearbyIncident } from '../hooks/useNearbyIncidents';
@@ -22,9 +23,10 @@ export function AlertDetailScreen() {
   const nearby = alert?.type === 'accident_nearby';
   const incident = useNearbyIncident(nearby ? id : undefined);
   const fix = useCurrentLocation();
+  const { settings } = useSettings();
   const askedNearby = useRef(false);
   const distanceMeters = incident?.distanceMeters ?? alert?.distanceMeters;
-  const distance = distanceMeters === undefined ? null : distanceParts(getLanguage(), distanceMeters);
+  const distance = distanceMeters === undefined ? null : distanceParts(getLanguage(), distanceMeters, settings.units);
   const roadName = incident?.roadName ?? alert?.roadName;
 
   // A push can be opened before the app has looked nearby, and the route needs

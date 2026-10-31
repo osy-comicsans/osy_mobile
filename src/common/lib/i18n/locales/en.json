@@ -29,7 +29,9 @@
     "speedSpoken": "Speed {{value}} kilometres per hour",
     "speedUnknown": "Speed unknown",
     "distanceMeters": "{{value}} m",
-    "distanceKilometers": "{{value}} km"
+    "distanceKilometers": "{{value}} km",
+    "distanceFeet": "{{value}} ft",
+    "distanceMiles": "{{value}} mi"
   },
   "home": {
     "title": "Home",
@@ -355,7 +357,6 @@
     "sunrise": "Sunrise",
     "sunset": "Sunset",
     "celsius": "{{value}} °C",
-    "metres": "{{value}} m",
     "millimetres": "{{value}} mm",
     "windValue": "{{value}} m/s",
     "precipitationValue": "{{value}} mm / {{minutes}} min",
@@ -507,7 +508,7 @@
       "animals": "Animals",
       "hazard": "Road hazard"
     },
-    "hazardDistance": "{{name}} in {{distance}} m",
+    "hazardDistance": "{{name}} in {{distance}}",
     "hazardsNearby": "Road hazards ahead",
     "warningOne": "{{first}}. Slow down.",
     "warningTwo": "{{first}}, {{second}}. Slow down."

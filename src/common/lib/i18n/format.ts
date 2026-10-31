@@ -1,3 +1,5 @@
+import { distanceValue } from '@/features/settings/utils/units';
+
 import { intlLocale, type Language } from './languages';
 
 export function formatNumber(
@@ -16,12 +18,17 @@ export function formatDateTime(
   return new Intl.DateTimeFormat(intlLocale(language), options).format(value);
 }
 
-// Under a kilometre reads as whole metres, otherwise one decimal of kilometres.
-export function distanceParts(language: Language, meters: number) {
-  return meters < 1000
-    ? { unit: 'distanceMeters', value: formatNumber(language, Math.round(meters)) } as const
-    : {
-      unit: 'distanceKilometers',
-      value: formatNumber(language, meters / 1000, { maximumFractionDigits: 1 }),
-    } as const;
+// Under a kilometre reads as metres, otherwise one decimal of kilometres. In miles,
+// under a tenth of a mile reads as feet. `step` rounds metres or feet, such as to tens.
+export function distanceParts(language: Language, meters: number, units: 'kmh' | 'mph', step = 1) {
+  const value = distanceValue(meters, units);
+  const rounded = (small: number) => formatNumber(language, Math.round(small / step) * step);
+  if (units === 'mph') {
+    return value < 0.1
+      ? { unit: 'distanceFeet', value: rounded(value * 5280) } as const
+      : { unit: 'distanceMiles', value: formatNumber(language, value, { maximumFractionDigits: 1 }) } as const;
+  }
+  return value < 1
+    ? { unit: 'distanceMeters', value: rounded(meters) } as const
+    : { unit: 'distanceKilometers', value: formatNumber(language, value, { maximumFractionDigits: 1 }) } as const;
 }

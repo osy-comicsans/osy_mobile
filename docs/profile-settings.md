@@ -25,7 +25,7 @@ The web preview uses a session-only profile cache and does not persist medical/c
 | Countdown | 60/120/180 seconds total, split into three stages; an active countdown freezes its original duration |
 | Voice and voice language | Spoken alerts, including road-risk reasons, and the check-in question, through `common/lib/native/voice.ts` / Expo Speech; the check-in listens for an answer either way. Disabling voice cancels speech, and missing native support leaves visual controls usable |
 | App language | Existing persisted language preference, API language headers, and RTL restart behavior |
-| Units | Home dial, current speed, road speed limits, Map, weather wind, radius labels and profile distance; stored/risk inputs remain SI |
+| Units | Every speed and distance shown: the Home dial and speed limit, current speed, the Map road card speed and limit, weather wind and visibility, hazards ahead, the distance to a nearby accident, the route to it, radius labels and profile distance. Kilometres switch to metres, and miles to feet, below 1 km or 0.1 mi. Stored values, API data and risk inputs remain SI, and temperature and rainfall stay metric |
 | Appearance | Shared text, cards, inputs, buttons, glass, navigation, Home/Map and account surfaces; device/light/dark |
 | Optional analytics | Saved consent sent to the backend; this change adds no analytics uploader |
 | Medical-sharing consent | Account-checked `shareMedicalInfo` on escalation; revocation applies before a queued escalation is sent |

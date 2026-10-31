@@ -29,7 +29,9 @@
     "speedSpoken": "السرعة {{value}} كيلومتر في الساعة",
     "speedUnknown": "السرعة غير معروفة",
     "distanceMeters": "{{value}} م",
-    "distanceKilometers": "{{value}} كم"
+    "distanceKilometers": "{{value}} كم",
+    "distanceFeet": "{{value}} قدم",
+    "distanceMiles": "{{value}} ميل"
   },
   "home": {
     "title": "الرئيسية",
@@ -355,7 +357,6 @@
     "sunrise": "شروق الشمس",
     "sunset": "غروب الشمس",
     "celsius": "{{value}} °م",
-    "metres": "{{value}} م",
     "millimetres": "{{value}} مم",
     "windValue": "{{value}} م/ث",
     "precipitationValue": "{{value}} مم / {{minutes}} دقيقة",
@@ -507,7 +508,7 @@
       "animals": "حيوانات",
       "hazard": "خطر على الطريق"
     },
-    "hazardDistance": "{{name}} بعد {{distance}} م",
+    "hazardDistance": "{{name}} بعد {{distance}}",
     "hazardsNearby": "مخاطر على الطريق أمامك",
     "warningOne": "{{first}}. خفف السرعة.",
     "warningTwo": "{{first}}، {{second}}. خفف السرعة."

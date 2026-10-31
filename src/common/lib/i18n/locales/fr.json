@@ -29,7 +29,9 @@
     "speedSpoken": "Vitesse {{value}} kilomètres par heure",
     "speedUnknown": "Vitesse inconnue",
     "distanceMeters": "{{value}} m",
-    "distanceKilometers": "{{value}} km"
+    "distanceKilometers": "{{value}} km",
+    "distanceFeet": "{{value}} ft",
+    "distanceMiles": "{{value}} mi"
   },
   "home": {
     "title": "Accueil",
@@ -355,7 +357,6 @@
     "sunrise": "Lever du soleil",
     "sunset": "Coucher du soleil",
     "celsius": "{{value}} °C",
-    "metres": "{{value}} m",
     "millimetres": "{{value}} mm",
     "windValue": "{{value}} m/s",
     "precipitationValue": "{{value}} mm / {{minutes}} min",
@@ -507,7 +508,7 @@
       "animals": "Animaux",
       "hazard": "Danger"
     },
-    "hazardDistance": "{{name}} dans {{distance}} m",
+    "hazardDistance": "{{name}} dans {{distance}}",
     "hazardsNearby": "Dangers à venir",
     "warningOne": "{{first}}. Ralentissez.",
     "warningTwo": "{{first}}, {{second}}. Ralentissez."
