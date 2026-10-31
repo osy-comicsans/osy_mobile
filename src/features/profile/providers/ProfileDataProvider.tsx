@@ -38,6 +38,10 @@ export function ProfileDataProvider({ children }: PropsWithChildren) {
       (id) => authSession.status.getState().status === 'signedIn' && authSession.status.getState().userId === id);
   });
   useProfileCacheInvalidation(service);
+  // A delivered report changes the history the server returns.
+  useEffect(() => runtime.status.subscribe((state, previous) => {
+    if (state.lastSyncAt !== previous.lastSyncAt) void service.refresh();
+  }), [runtime, service]);
   useEffect(() => { void settingsService.start(); }, []);
   useEffect(() => { if (status !== 'unknown') void settingsService.setAccount(status === 'signedIn' ? userId : null); }, [status, userId]);
   useEffect(() => { void service.connect(status === 'signedIn' ? userId : null); return () => { void service.connect(null); }; }, [service, status, userId]);

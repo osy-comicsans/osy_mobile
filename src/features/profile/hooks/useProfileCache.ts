@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useOfflineRuntime, useOfflineStatus } from '@/common/hooks/use-offline';
 import type { ProfileService } from '../utils/profileService';
 
 const key = (userId: string | null) => ['local', 'profile', userId] as const;
@@ -17,5 +18,12 @@ export function useProfileCacheInvalidation(service: ProfileService) {
 
 export function useProfileCache(service: ProfileService, userId: string | null, enabled: boolean) {
   return useQuery({ queryKey: key(userId), queryFn: () => service.read(userId), enabled,
+    networkMode: 'always', retry: false, staleTime: Infinity });
+}
+
+// Queued reports have no owner: whoever is signed in when the queue runs sends them.
+export function useWaitingReports() {
+  const runtime = useOfflineRuntime(); const { ready } = useOfflineStatus();
+  return useQuery({ queryKey: ['local', 'reports', 'waiting'], queryFn: () => runtime.reports.waiting(), enabled: ready,
     networkMode: 'always', retry: false, staleTime: Infinity });
 }
