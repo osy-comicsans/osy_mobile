@@ -14,7 +14,7 @@ Module._resolveFilename = function (request, ...rest) {
 const { createDrivingModeService, monitoringEnabled } = require('../src/features/driving/utils/drivingModeService.ts');
 const { bindMonitoring } = require('../src/features/driving/utils/bindMonitoring.ts');
 const {
-  homeLocationPresentation, homeMonitoringStatus, homeRiskPresentation,
+  homeLocationPresentation, homeMonitoringStatus, homeRiskPresentation, homeSpeedLimitStatus,
 } = require('../src/features/home/utils/homePresentation.ts');
 const { createAreaService, areaCell, areaLabel } = require('../src/features/location/utils/areaService.ts');
 const { areaPolicy } = require('../src/features/location/utils/areaPolicy.ts');
@@ -162,6 +162,17 @@ test('speed distinguishes real zero from unknown, denied, old and stopped readin
   assert.equal(homeMonitoringStatus({ ready: true, paused: true }, state(), 'monitoring', at), 'paused');
   assert.equal(homeMonitoringStatus({ ready: true, paused: false }, state(), 'unavailable', at), 'limited');
   assert.equal(homeMonitoringStatus({ ready: true, paused: false }, state(), 'monitoring', at), 'monitoring');
+});
+
+test('a speed limit is shown only for the road under a fresh fix', () => {
+  assert.equal(homeSpeedLimitStatus(home(), false, 50), 'current');
+  assert.equal(homeSpeedLimitStatus(home(), false, null), 'unknown');
+  assert.equal(homeSpeedLimitStatus(home(), true, null), 'loading');
+  assert.equal(homeSpeedLimitStatus(home({ fix: null }), false, null), 'loading');
+  for (const value of [state({ fix: fix(at - 31_000) }), state({ location: 'denied' }), state({ status: 'idle' })]) {
+    assert.equal(homeSpeedLimitStatus(homeLocationPresentation(value, at), false, 50), 'unknown');
+    assert.equal(homeSpeedLimitStatus(homeLocationPresentation(value, at), true, 50), 'unknown');
+  }
 });
 
 test('live risk shows the level, a score out of 100, and translated top factors', () => {

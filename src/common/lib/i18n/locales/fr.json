@@ -289,8 +289,7 @@
       "unit": "km/h",
       "limit": "Limitation de vitesse",
       "limitUnknown": "Indisponible",
-      "signed": "Limite signalée · OpenStreetMap",
-      "default": "Limite par défaut · non signalée"
+      "signed": "Limite signalée · OpenStreetMap"
     },
     "location": {
       "title": "Votre position",

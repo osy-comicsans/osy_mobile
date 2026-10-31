@@ -289,8 +289,7 @@
       "unit": "km/h",
       "limit": "Road speed limit",
       "limitUnknown": "Not available",
-      "signed": "Signed limit · OpenStreetMap",
-      "default": "Default limit · not a signed limit"
+      "signed": "Signed limit · OpenStreetMap"
     },
     "location": {
       "title": "Where you are",

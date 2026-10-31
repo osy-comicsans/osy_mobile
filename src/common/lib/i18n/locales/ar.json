@@ -289,8 +289,7 @@
       "unit": "كم/س",
       "limit": "حد سرعة الطريق",
       "limitUnknown": "غير متاح",
-      "signed": "حد موثّق بإشارة · OpenStreetMap",
-      "default": "حد افتراضي · غير موثّق بإشارة"
+      "signed": "حد موثّق بإشارة · OpenStreetMap"
     },
     "location": {
       "title": "موقعك الحالي",

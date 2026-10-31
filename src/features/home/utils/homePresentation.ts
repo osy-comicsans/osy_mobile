@@ -21,6 +21,12 @@ export function homeLocationPresentation(state: LocationState, now: number) {
 
 type HomeLocation = ReturnType<typeof homeLocationPresentation>;
 
+// Only a fresh fix places the driver on a road, so an older one has no current limit.
+export function homeSpeedLimitStatus(location: HomeLocation, roadsLoading: boolean, valueKmh: number | null) {
+  if (location.loading || (location.fresh && roadsLoading)) return 'loading';
+  return location.fresh && valueKmh !== null ? 'current' : 'unknown';
+}
+
 type RiskNote = 'roadRisk.failed' | 'dashboard.location.stale' | 'roadRisk.noWeather' | 'roadRisk.noIncidents';
 
 type HomeRisk =
