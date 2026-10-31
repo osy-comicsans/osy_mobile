@@ -53,6 +53,8 @@ test('the app config lists every language with permission text', () => {
     const locale = require(path.join(__dirname, '..', expo.locales[language]));
     assert.ok(locale.ios.NSLocationWhenInUseUsageDescription);
     assert.ok(locale.ios.NSMotionUsageDescription);
+    assert.ok(locale.ios.NSMicrophoneUsageDescription);
+    assert.ok(locale.ios.NSSpeechRecognitionUsageDescription);
     assert.ok(locale.android.app_name);
   }
 });
