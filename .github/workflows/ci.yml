@@ -74,6 +74,9 @@ jobs:
       - name: Accident report tests
         run: pnpm test:accident-report
 
+      - name: Road risk tests
+        run: pnpm test:road-risk
+
   build:
     name: Build ${{ matrix.platform }}
     needs: checks
