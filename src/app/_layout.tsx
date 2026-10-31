@@ -88,7 +88,7 @@ export default function RootLayout() {
                               <TripMonitor />
                               <LocaleProvider direction={isRtl(getLanguage()) ? 'rtl' : 'ltr'}>
                                 <Stack screenOptions={{ headerShown: false }}>
-                                  <Stack.Protected guard={canAccessApp} redirectTo="/login">
+                                  <Stack.Protected guard={canAccessApp} redirectTo="/welcome">
                                     <Stack.Screen name="(tabs)" />
                                     <Stack.Screen name="report-accident" options={{ presentation: 'modal' }} />
                                   </Stack.Protected>

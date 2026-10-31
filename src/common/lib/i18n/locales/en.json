@@ -158,7 +158,6 @@
     "email": "Email",
     "mobileNumber": "Mobile number",
     "password": "Password",
-    "confirmPassword": "Confirm password",
     "signIn": "Sign in",
     "createAccount": "Create account",
     "haveAccount": "Already have an account?",
@@ -167,27 +166,44 @@
       "nameShort": "Must be at least 2 characters.",
       "nameLong": "Must be 50 characters or fewer.",
       "emailInvalid": "Enter a valid email address.",
-      "mobileInvalid": "Enter a valid mobile number, such as +213555123456.",
+      "mobileInvalid": "Enter all 9 digits, such as 555 12 34 56.",
       "passwordShort": "Must be at least 8 characters.",
       "passwordLong": "Must be 72 characters or fewer.",
       "passwordLowercase": "Must include a lowercase letter.",
       "passwordUppercase": "Must include an uppercase letter.",
       "passwordNumber": "Must include a number.",
-      "passwordMismatch": "Passwords do not match.",
       "passwordRequired": "Enter your password.",
       "emailTaken": "This email is already registered.",
       "mobileTaken": "This mobile number is already registered.",
-      "invalidCredentials": "The email or password is wrong."
+      "invalidCredentials": "The email or password is wrong.",
+      "invalidCredentialsHint": "Check both and try again."
     },
     "mobileHint": "Include your country code, such as +213.",
-    "passwordHint": "At least 8 characters, with upper and lower case letters and a number.",
     "noAccount": "New to OSY?",
     "back": "Go back",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "stepOne": "Step 1 of 3",
     "stepTwo": "Step 2 of 3",
-    "stepThree": "Step 3 of 3"
+    "stepThree": "Step 3 of 3",
+    "welcomeTitle": "Safer journeys. Smarter detection.",
+    "welcomeDescription": "Road warnings, crash detection and help when you need it.",
+    "emergencyTitle": "Emergency check-in",
+    "emergencyHint": "No account needed",
+    "emergencyLink": "Emergency check-in, no account needed",
+    "continue": "Continue",
+    "secureTitle": "Secure your account",
+    "secureDescription": "You’ll sign in with your email and this password.",
+    "progress": {
+      "account": "Your account",
+      "documents": "Documents",
+      "review": "Review"
+    },
+    "passwordRules": {
+      "length": "8 or more characters",
+      "letterCase": "Upper and lower case letters",
+      "number": "A number"
+    }
   },
   "documents": {
     "title": "Your documents",
@@ -214,7 +230,8 @@
       "missing": "To add",
       "pending": "Under review",
       "verified": "Verified",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "next": "Next"
     },
     "errors": {
       "fileType": "Use a JPG, PNG, or PDF file.",
@@ -248,13 +265,24 @@
     "front": "Front",
     "back": "Back",
     "scanHint": "Take a photo of the document now",
-    "photoHint": "Use a photo you already have",
-    "fileHint": "Use a JPG, PNG, or PDF, up to 10 MB",
+    "photoHint": "From your gallery",
+    "fileHint": "JPG, PNG or PDF, up to 10 MB",
     "reading": "Reading your document…",
     "detailsTitle": "Document details",
     "checkField": "Check this one. It may not have been read correctly.",
     "nameMismatch": "The name on this licence does not match your account.",
-    "ocrFailed": "We could not read this document automatically. Please enter the details yourself."
+    "ocrFailed": "We could not read this document automatically. Please enter the details yourself.",
+    "add": {
+      "driver_license": "Add driver’s licence",
+      "vehicle_registration": "Add car registration"
+    },
+    "tips": {
+      "flat": "Lay it flat, with all four corners in view",
+      "light": "Use good light and avoid glare"
+    },
+    "otherSources": "Or use one you already have",
+    "privacy": "Text is read on your phone. Nothing is sent until you confirm the details.",
+    "photos": "Photos"
   },
   "errors": {
     "api": {

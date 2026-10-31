@@ -1,4 +1,4 @@
-import { useEffect, useState, type ComponentRef, type ReactNode, type Ref } from 'react';
+import { useState, type ComponentRef, type ReactNode, type Ref } from 'react';
 import {
   Platform,
   StyleSheet,
@@ -9,10 +9,10 @@ import {
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { Colors, Palette, Radius, Space, Typography } from '@/common/lib/theme';
 import { useTheme } from '@/common/hooks/use-theme';
+import { Icon } from './icon';
 
 export type InputHandle = ComponentRef<typeof TextInput>;
 
@@ -21,28 +21,37 @@ export type InputProps = TextInputProps & {
   label?: string;
   hint?: string;
   error?: string;
-  leadingIcon?: ReactNode;
+  // Asks the user to check a value they did not type, such as one read from a document.
+  warning?: string;
+  valid?: boolean;
+  leading?: ReactNode;
   trailing?: ReactNode;
   containerStyle?: StyleProp<ViewStyle>;
 };
 
-const LABEL_RESTING_TOP = 14;
-const LABEL_FLOATING_TOP = -9;
-const LABEL_RESTING_SIZE = 14;
-const LABEL_FLOATING_SIZE = 12;
-const LABEL_DURATION = 150;
+function Message({ text, tone }: { text: string; tone: 'error' | 'warning' }) {
+  const error = tone === 'error';
+  return (
+    <View accessibilityLiveRegion="polite" style={styles.message}>
+      <View style={styles.messageIcon}>
+        <Icon name={error ? 'error' : 'warning'} size={16} color={error ? Colors.errorText : Colors.warning} />
+      </View>
+      <Text style={[styles.messageText, { color: error ? Colors.errorText : Palette.neutral[600] }]}>{text}</Text>
+    </View>
+  );
+}
 
 export function Input({
   ref,
   label,
   hint,
   error,
-  leadingIcon,
+  warning,
+  valid,
+  leading,
   trailing,
   containerStyle,
   style,
-  value,
-  placeholder,
   editable = true,
   onFocus,
   onBlur,
@@ -51,38 +60,26 @@ export function Input({
   const [focused, setFocused] = useState(false);
   const theme = useTheme();
   const disabled = editable === false;
-  const floating = focused || !!value;
-  const progress = useSharedValue(floating ? 1 : 0);
-
-  useEffect(() => {
-    progress.value = withTiming(floating ? 1 : 0, { duration: LABEL_DURATION });
-  }, [floating, progress]);
-
-  // DESIGN.md §8.2: the label rests inside the field, then notches into the top border.
-  const labelMotion = useAnimatedStyle(() => ({
-    top: LABEL_RESTING_TOP + (LABEL_FLOATING_TOP - LABEL_RESTING_TOP) * progress.value,
-    fontSize: LABEL_RESTING_SIZE + (LABEL_FLOATING_SIZE - LABEL_RESTING_SIZE) * progress.value,
-  }));
-
-  const labelColor = error ? Colors.errorText : focused ? Colors.accent : Colors.textTertiary;
+  const flagged = !!error || !!warning;
 
   return (
     <View style={[styles.wrapper, containerStyle]}>
+      {label ? (
+        <Text style={[styles.label, { color: disabled ? theme.textTertiary : theme.textPrimary }]}>{label}</Text>
+      ) : null}
       <View
         style={[
           styles.field,
-          { backgroundColor: theme.surface, borderColor: theme.border },
-          !!value && styles.filled,
-          disabled && styles.disabled,
-          focused && styles.focused,
+          { backgroundColor: focused || flagged ? theme.surface : theme.background, borderColor: theme.borderField },
+          focused && !flagged && styles.focused,
+          !!warning && styles.warning,
           !!error && styles.error,
+          disabled && { borderColor: theme.border },
         ]}>
-        {leadingIcon && <View style={styles.leading}>{leadingIcon}</View>}
+        {leading}
         <TextInput
           ref={ref}
           accessibilityLabel={label}
-          value={value}
-          placeholder={floating ? placeholder : undefined}
           placeholderTextColor={theme.textTertiary}
           selectionColor={Colors.accent}
           editable={editable}
@@ -95,73 +92,62 @@ export function Input({
             setFocused(false);
             onBlur?.(event);
           }}
-          style={[styles.input, { color: theme.textPrimary }, disabled && styles.inputDisabled, rest.keyboardType === 'phone-pad' && styles.phone, style]}
+          style={[
+            styles.input,
+            { color: disabled ? theme.textTertiary : theme.textPrimary },
+            (!!trailing || valid) && styles.inputBeforeTrailing,
+            rest.keyboardType === 'phone-pad' && styles.phone,
+            style,
+          ]}
         />
+        {valid && !flagged && (
+          <View style={styles.valid}><Icon name="check" size={20} color={Colors.successText} /></View>
+        )}
         {trailing && <View style={styles.trailing}>{trailing}</View>}
-        {label ? (
-          <Animated.Text
-            pointerEvents="none"
-            numberOfLines={1}
-            style={[
-              styles.label,
-              leadingIcon && !floating ? styles.labelAfterIcon : undefined,
-              floating && styles.labelFloating,
-              floating && { backgroundColor: theme.surface },
-              { color: labelColor },
-              labelMotion,
-            ]}>
-            {label}
-          </Animated.Text>
-        ) : null}
       </View>
       {error ? (
-        <Text accessibilityLiveRegion="polite" style={styles.errorText}>{error}</Text>
+        <Message tone="error" text={error} />
+      ) : warning ? (
+        <Message tone="warning" text={warning} />
       ) : hint ? (
-        <Text style={styles.hint}>{hint}</Text>
+        <Text style={[styles.hint, { color: theme.textSecondary }]}>{hint}</Text>
       ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: { gap: Space[1] + 2 },
+  wrapper: { gap: Space[2] },
+  label: { ...Typography.bodyStrong, color: Colors.textPrimary },
   field: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 48,
+    height: 52,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
-    boxShadow: '0 1px 2px rgba(23,31,37,0.04)',
+    borderColor: Colors.borderField,
+    backgroundColor: Colors.background,
   },
-  filled: { borderColor: Colors.borderStrong },
-  focused: { borderColor: Colors.accent, boxShadow: '0 0 0 3px rgba(99,22,219,0.12)' },
-  error: { borderColor: Colors.error },
-  disabled: { backgroundColor: Palette.neutral[50], opacity: 0.7 },
-  leading: { paddingStart: Space[4] },
-  trailing: { paddingEnd: Space[2] },
+  focused: { borderWidth: 1.5, borderColor: Colors.accent, boxShadow: `0 0 0 4px ${Colors.focusRing}` },
+  warning: { borderWidth: 1.5, borderColor: Colors.warning },
+  error: { borderWidth: 1.5, borderColor: Colors.errorText },
   input: {
-    ...Typography.body,
+    ...Typography.bodyLarge,
     flex: 1,
-    minHeight: 46,
-    paddingHorizontal: Space[3],
-    paddingVertical: 12,
+    alignSelf: 'stretch',
+    paddingHorizontal: Space[4],
+    paddingVertical: 0,
     color: Colors.textPrimary,
     // Web browsers add their own focus outline, which the ring above replaces.
     ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : null),
   },
-  inputDisabled: { color: Colors.textTertiary },
+  inputBeforeTrailing: { paddingEnd: Space[3] },
   // Phone numbers stay left to right in Arabic. Android already does this for phone fields.
   phone: { writingDirection: 'ltr' },
-  label: {
-    ...Typography.body,
-    position: 'absolute',
-    start: Space[3],
-    maxWidth: '85%',
-  },
-  labelAfterIcon: { start: 44 },
-  labelFloating: { backgroundColor: Colors.surface, paddingHorizontal: Space[1], lineHeight: 16 },
+  valid: { paddingEnd: Space[4] },
+  trailing: { paddingEnd: Space[1] },
+  message: { flexDirection: 'row', alignItems: 'flex-start', gap: Space[2] },
+  messageIcon: { paddingTop: 1 },
+  messageText: { ...Typography.label, flex: 1 },
   hint: { ...Typography.label, color: Colors.textSecondary },
-  errorText: { ...Typography.label, color: Colors.errorText },
 });

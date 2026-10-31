@@ -1,66 +1,59 @@
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { ThemedText } from '@/common/components/themed-text';
-import { Icon } from '@/common/components/ui/icon';
-import { StatusPill, type StatusPillStatus } from '@/common/components/ui/status-pill';
-import { Colors, Palette, Radius, Space } from '@/common/lib/theme';
+import { Icon, type IconName } from '@/common/components/ui/icon';
+import { useTheme } from '@/common/hooks/use-theme';
+import { Colors, Palette, Radius, Space, Typography } from '@/common/lib/theme';
 
 import { DOCUMENT_ORDER, type DocumentRecord, type DocumentType } from '../types/auth.schemas';
 
-const statusPills: Record<DocumentRecord['status'], StatusPillStatus> = {
-  missing: 'waiting',
-  pending: 'pending',
-  verified: 'approved',
-  rejected: 'rejected',
-};
+const icons: Record<DocumentType, IconName> = { driver_license: 'idCard', vehicle_registration: 'car' };
 
-type StepState = 'done' | 'active' | 'rejected' | 'upcoming';
+// Each status has its own word, so it is never shown by colour alone.
+const pills = {
+  next: { label: 'documents.status.next', background: Colors.accent, color: Colors.onAccent, dot: null },
+  missing: { label: 'documents.status.missing', background: Colors.backgroundElement, color: Palette.neutral[600], dot: null },
+  pending: { label: 'documents.status.pending', background: Colors.warningSoft, color: Palette.neutral[600], dot: Colors.warning },
+  verified: { label: 'documents.status.verified', background: Colors.successSoft, color: Colors.textPrimary, dot: Colors.success },
+  rejected: { label: 'documents.status.rejected', background: Colors.errorSoft, color: Colors.textPrimary, dot: Colors.error },
+} as const;
 
-function Node({ state }: { state: StepState }) {
-  if (state === 'done') {
-    return <View style={[styles.node, styles.nodeDone]}><Icon name="check" size={14} color={Colors.onAccent} /></View>;
-  }
-  if (state === 'rejected') {
-    return <View style={[styles.node, styles.nodeRejected]}><Icon name="close" size={14} color={Colors.onAccent} /></View>;
-  }
-  if (state === 'active') return <View style={[styles.node, styles.nodeActive]} />;
-  return <View style={styles.upcomingDot} />;
+function StatusPill({ status }: { status: keyof typeof pills }) {
+  const { t } = useTranslation();
+  const { label, background, color, dot } = pills[status];
+  return (
+    <View style={[styles.pill, { backgroundColor: background }]}>
+      {dot && <View style={[styles.dot, { backgroundColor: dot }]} />}
+      <Text style={[styles.pillText, { color }]}>{t(label)}</Text>
+    </View>
+  );
 }
 
-// DESIGN.md §15: the workflow tracker, with one step per document.
 export function DocumentTracker({ documents, current }: { documents: DocumentRecord[]; current: DocumentType | null }) {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   return (
-    <View>
+    <View style={[styles.list, { borderColor: theme.border }]}>
       {DOCUMENT_ORDER.map((type, index) => {
         const record = documents.find((document) => document.type === type);
         const status = record?.status ?? 'missing';
-        const done = status === 'pending' || status === 'verified';
-        const state: StepState = done ? 'done' : status === 'rejected' ? 'rejected' : type === current ? 'active' : 'upcoming';
-        const last = index === DOCUMENT_ORDER.length - 1;
-
         return (
-          <View key={type} style={styles.step}>
-            <View style={styles.rail}>
-              <Node state={state} />
-              {!last && <View style={[styles.connector, done && styles.connectorDone]} />}
-            </View>
-            <View style={[styles.content, !last && styles.contentSpaced]}>
-              <View style={styles.titleRow}>
-                <ThemedText
-                  type="headingS"
-                  themeColor={state === 'upcoming' ? 'textTertiary' : 'textPrimary'}
-                  style={styles.title}>
-                  {t(`documents.types.${type}`)}
-                </ThemedText>
-                <StatusPill status={statusPills[status]} label={t(`documents.status.${status}`)} showGlyph={false} />
+          <View key={type}>
+            {index > 0 && <View style={[styles.divider, { backgroundColor: theme.border }]} />}
+            <View style={styles.row}>
+              <View style={[styles.tile, { backgroundColor: theme.backgroundElement }]}>
+                <Icon name={icons[type]} size={22} color={theme.accent} />
               </View>
-              <ThemedText type="label" themeColor="textSecondary">{t('documents.bothSides')}</ThemedText>
-              {record?.rejectionReason && (
-                <ThemedText type="label" themeColor="errorText">{record.rejectionReason}</ThemedText>
-              )}
+              <View style={styles.text}>
+                <ThemedText type="headingS">{t(`documents.types.${type}`)}</ThemedText>
+                <ThemedText type="body" themeColor="textSecondary">{t('documents.bothSides')}</ThemedText>
+                {record?.rejectionReason && (
+                  <ThemedText type="label" themeColor="errorText">{record.rejectionReason}</ThemedText>
+                )}
+              </View>
+              <StatusPill status={status === 'missing' && type === current ? 'next' : status} />
             </View>
           </View>
         );
@@ -69,33 +62,26 @@ export function DocumentTracker({ documents, current }: { documents: DocumentRec
   );
 }
 
-const NODE_SIZE = 24;
-const RAIL_WIDTH = 32;
-
 const styles = StyleSheet.create({
-  step: { flexDirection: 'row' },
-  rail: { width: RAIL_WIDTH, alignItems: 'center' },
-  node: {
-    width: NODE_SIZE,
-    height: NODE_SIZE,
-    borderRadius: Radius.full,
+  list: { borderWidth: 1, borderRadius: Radius.lg, overflow: 'hidden' },
+  divider: { height: 1 },
+  row: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: Space[3],
+    paddingHorizontal: Space[4],
+    paddingVertical: Space[3],
   },
-  nodeDone: { backgroundColor: Colors.accent },
-  nodeRejected: { backgroundColor: Colors.error },
-  nodeActive: { borderWidth: 2, borderColor: Colors.accent, backgroundColor: Colors.surface },
-  upcomingDot: {
-    width: 10,
-    height: 10,
-    marginVertical: 7,
+  tile: { width: 44, height: 44, borderRadius: Radius.md, alignItems: 'center', justifyContent: 'center' },
+  text: { flex: 1 },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Space[2],
+    paddingHorizontal: Space[3],
+    paddingVertical: Space[1],
     borderRadius: Radius.full,
-    backgroundColor: Palette.neutral[300],
   },
-  connector: { flex: 1, width: 2, backgroundColor: Palette.neutral[200] },
-  connectorDone: { backgroundColor: Colors.accent },
-  content: { flex: 1, gap: Space[1], paddingStart: Space[2] },
-  contentSpaced: { paddingBottom: Space[6] },
-  titleRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: Space[2] },
-  title: { flex: 1, minWidth: 120 },
+  dot: { width: 6, height: 6, borderRadius: 3 },
+  pillText: Typography.labelStrong,
 });

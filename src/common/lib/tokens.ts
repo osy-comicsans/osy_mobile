@@ -48,6 +48,8 @@ export const Colors = {
 
   border: '#E3D9F0',
   borderStrong: '#C8BBD8',
+  // Form field edge: neutral-400 keeps 3:1 against white, which borderStrong does not.
+  borderField: '#9A8EAA',
 
   accent: '#6316DB',
   accentHover: '#5010B8',
@@ -145,10 +147,13 @@ export const Typography = {
   headingL: { fontFamily: FontFamily.bold, fontSize: 24, lineHeight: 32 },
   headingM: { fontFamily: FontFamily.semiBold, fontSize: 20, lineHeight: 28 },
   headingS: { fontFamily: FontFamily.semiBold, fontSize: 16, lineHeight: 24 },
+  bodyLarge: { fontFamily: FontFamily.regular, fontSize: 16, lineHeight: 24 },
   body: { fontFamily: FontFamily.regular, fontSize: 14, lineHeight: 22 },
   bodyMedium: { fontFamily: FontFamily.medium, fontSize: 14, lineHeight: 22 },
+  bodyStrong: { fontFamily: FontFamily.semiBold, fontSize: 14, lineHeight: 22 },
   label: { fontFamily: FontFamily.regular, fontSize: 13, lineHeight: 18 },
   labelMedium: { fontFamily: FontFamily.medium, fontSize: 13, lineHeight: 18 },
+  labelStrong: { fontFamily: FontFamily.semiBold, fontSize: 13, lineHeight: 18 },
   overline: {
     fontFamily: FontFamily.semiBold,
     fontSize: 11,

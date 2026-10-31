@@ -1,4 +1,6 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -8,119 +10,115 @@ import { ThemedText } from '@/common/components/themed-text';
 import { AnimatedLogo } from '@/common/components/ui/animated-logo';
 import { Icon } from '@/common/components/ui/icon';
 import { useOnline } from '@/common/hooks/use-online';
-import { Colors, MaxContentWidth, Palette, Radius, Shadow, Space } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
+import { Colors, MaxContentWidth, Palette, Radius, Space, Typography } from '@/common/lib/theme';
 
 import { FormNotice } from './FormNotice';
-import { useTheme } from '@/common/hooks/use-theme';
-
-// DESIGN.md §2: the primary brand gradient, for heroes and banners only. The hero
-// also has a solid accent fill, so its white text stays readable if this is not drawn.
-const brandGradient = 'linear-gradient(135deg, #8B4BEA 0%, #6316DB 100%)';
-const heroGradient = Platform.OS === 'web'
-  ? ({ backgroundImage: brandGradient } as object)
-  : { experimental_backgroundImage: brandGradient };
+import { SignupProgress, type SignupStep } from './SignupProgress';
 
 type AuthScreenProps = PropsWithChildren<{
   title: string;
   description?: string;
-  overline?: string;
+  logo?: boolean;
+  progress?: SignupStep;
   showBack?: boolean;
   onBack?: () => void;
+  // Pinned to the bottom of the sheet, below any free space.
   footer?: ReactNode;
 }>;
 
-export function AuthScreen({ title, description, overline, showBack, onBack, footer, children }: AuthScreenProps) {
+export function AuthScreen({ title, description, logo, progress, showBack, onBack, footer, children }: AuthScreenProps) {
   const theme = useTheme();
   const { t } = useTranslation();
   const online = useOnline();
   const { top, bottom } = useSafeAreaInsets();
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[styles.root, { backgroundColor: theme.background }]}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.root}>
+      <StatusBar style="light" />
       <ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.scroll, { paddingBottom: bottom + Space[6] }]}>
-        <View style={[styles.hero, heroGradient, { paddingTop: top + Space[4] }]}>
-          <View style={styles.heroBar}>
-            {showBack ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t('auth.back')}
-                hitSlop={8}
-                onPress={onBack ?? (() => router.back())}
-                style={({ pressed }) => [styles.back, pressed && styles.backPressed]}>
-                <Icon name="back" size={18} color={Colors.onAccent} />
-              </Pressable>
-            ) : <AnimatedLogo width={132} emblemColor={Colors.onAccent} lettersColor={Colors.onAccent} />}
-          </View>
-          <View style={styles.heroText}>
-            {overline && <ThemedText type="overline" style={styles.overline}>{overline}</ThemedText>}
-            <ThemedText type="title" accessibilityRole="header" style={styles.title}>{title}</ThemedText>
-            {description && <ThemedText type="body" style={styles.description}>{description}</ThemedText>}
+        contentContainerStyle={styles.scroll}>
+        <View style={[styles.header, { paddingTop: top + Space[4] }]}>
+          {!progress && (
+            <Image source={require('@/assets/brand/osy-road-motif.png')} contentFit="contain" transition={0}
+              accessible={false} style={styles.road} />
+          )}
+          <View style={styles.headerContent}>
+            {(showBack || logo || progress) && (
+              <View style={styles.topRow}>
+                {showBack && (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={t('auth.back')}
+                    onPress={onBack ?? (() => router.back())}
+                    style={({ pressed }) => [styles.back, pressed && styles.backPressed]}>
+                    <Icon name="back" size={20} color={Colors.onAccent} />
+                  </Pressable>
+                )}
+                {logo && <AnimatedLogo still width={84} emblemColor={Colors.onAccent} lettersColor={Colors.onAccent} />}
+                {progress && <SignupProgress {...progress} />}
+              </View>
+            )}
+            <View style={styles.headerText}>
+              <ThemedText accessibilityRole="header" style={[Typography.displayS, styles.title]}>{title}</ThemedText>
+              {description && <ThemedText style={[Typography.bodyLarge, styles.description]}>{description}</ThemedText>}
+            </View>
           </View>
         </View>
 
-        <View style={[styles.sheet, { backgroundColor: theme.surface }]}>
-          {!online && <FormNotice tone="warning" message={t('auth.offline')} />}
-          {children}
+        <View style={[styles.sheet, { backgroundColor: theme.surface, paddingBottom: bottom + Space[8] }]}>
+          <View style={styles.sheetContent}>
+            {!online && <FormNotice tone="warning" message={t('auth.offline')} />}
+            {children}
+            {footer && (
+              <>
+                <View style={styles.spacer} />
+                <View style={styles.footer}>{footer}</View>
+              </>
+            )}
+          </View>
         </View>
-        {footer && <View style={styles.footer}>{footer}</View>}
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-const SHEET_OVERLAP = 32;
-
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: Colors.background },
+  root: { flex: 1, backgroundColor: Colors.accent },
   scroll: { flexGrow: 1 },
-  hero: {
-    backgroundColor: Colors.accent,
+  header: {
     paddingHorizontal: Space[6],
-    paddingBottom: SHEET_OVERLAP + Space[8],
-    borderBottomStartRadius: Radius.xxl,
-    borderBottomEndRadius: Radius.xxl,
-    gap: Space[6],
+    paddingBottom: 28,
+    overflow: 'hidden',
+    alignItems: 'center',
   },
-  heroBar: { minHeight: 36, flexDirection: 'row', alignItems: 'center' },
+  // Kept to the top corner, clear of the title below it.
+  road: { position: 'absolute', end: -44, top: 8, width: 230, height: 143 },
+  headerContent: { width: '100%', maxWidth: MaxContentWidth, gap: Space[6] },
+  topRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: Space[4] },
   back: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     borderRadius: Radius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: Palette.purple[600],
   },
-  backPressed: { backgroundColor: 'rgba(255,255,255,0.3)' },
-  heroText: { gap: Space[2], maxWidth: MaxContentWidth },
-  overline: { color: Palette.purple[200] },
+  backPressed: { backgroundColor: Palette.purple[700] },
+  headerText: { gap: 6 },
   title: { color: Colors.onAccent },
   description: { color: Palette.purple[100] },
   sheet: {
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    marginTop: -SHEET_OVERLAP,
-    paddingHorizontal: Space[4],
-    gap: Space[5],
-  },
-  footer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: Space[1],
-    paddingTop: Space[4],
+    paddingTop: Space[6],
     paddingHorizontal: Space[6],
+    borderTopStartRadius: Radius.xxl,
+    borderTopEndRadius: Radius.xxl,
   },
+  sheetContent: { flexGrow: 1, width: '100%', maxWidth: MaxContentWidth, gap: Space[5] },
+  spacer: { flexGrow: 1 },
+  footer: { gap: Space[5] },
 });
-
-export const sheetCard = {
-  backgroundColor: Colors.surface,
-  borderRadius: Radius.xxl,
-  padding: Space[6],
-  gap: Space[5],
-  boxShadow: Shadow.soft,
-} as const;

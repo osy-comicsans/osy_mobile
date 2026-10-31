@@ -1,0 +1,14 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Flag DZ" clip-path="url(#clip0_0_93)">
+<path id="Vector" d="M12 0H0V16H12V0Z" fill="#006233"/>
+<path id="Vector_2" d="M24 -1.19209e-07H12V16H24V-1.19209e-07Z" fill="white"/>
+<path id="Vector_3" d="M12 12.16C14.2975 12.16 16.16 10.2975 16.16 8C16.16 5.7025 14.2975 3.84 12 3.84C9.7025 3.84 7.84 5.7025 7.84 8C7.84 10.2975 9.7025 12.16 12 12.16Z" fill="#D21034"/>
+<path id="Vector_4" d="M13.12 11.36C14.9757 11.36 16.48 9.85568 16.48 8C16.48 6.14432 14.9757 4.64 13.12 4.64C11.2643 4.64 9.76 6.14432 9.76 8C9.76 9.85568 11.2643 11.36 13.12 11.36Z" fill="white"/>
+<path id="Vector_5" d="M14.88 8L13.28 8.52L14.28 7.16V8.84L13.28 7.48L14.88 8Z" fill="#D21034"/>
+</g>
+<defs>
+<clipPath id="clip0_0_93">
+<rect width="24" height="16" fill="white"/>
+</clipPath>
+</defs>
+</svg>
