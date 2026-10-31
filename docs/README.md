@@ -10,3 +10,4 @@ The project overview is in the [README](../README.md), the API in [API_CONTRACT.
 - [Emergency escalation](escalation.md): what happens when a driver needs help, and what the backend must do.
 - [Crash model](crash-model.md): how the AI model runs beside the crash rules, and what is left to confirm.
 - [Accident reports](accident-reports.md): how a report reaches the backend from offline, and what is left to the backend.
+- [Road risk](road-risk.md): how road risk scores work, and their limits.
