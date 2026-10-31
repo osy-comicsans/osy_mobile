@@ -458,6 +458,7 @@
       "pedestrian": "Piéton renversé",
       "rollover": "Tonneau",
       "fire": "Véhicule en feu",
+      "crash": "Accident détecté",
       "other": "Autre"
     },
     "severity": {

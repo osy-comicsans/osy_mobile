@@ -80,7 +80,7 @@ Field keys are defined in #28. A document marked `rejected` must include a `reje
 
 Incident: `id`, `source` (`user_report`, `crash_detected`), `location`, `occurredAt`, `type`, `severity` (`minor`, `serious`, `critical`), `injuriesVisible`, `note`.
 
-For a `user_report`, `type` is `collision`, `pedestrian`, `rollover`, `fire`, or `other`. A queued report can arrive long after `occurredAt`.
+For a `user_report`, `type` is `collision`, `pedestrian`, `rollover`, `fire`, or `other`. A `crash_detected` incident uses `crash`. A request for help without a detected crash is a `user_report` of type `other`. A queued report can arrive long after `occurredAt`.
 
 The backend must merge duplicate reports of one accident and protect against abuse, for example with per-user rate limits. A merged report still returns `201`, and a `429` is retried by the app. Any other `4xx` is treated as final, and the app stops retrying.
 

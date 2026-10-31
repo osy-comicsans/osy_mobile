@@ -458,6 +458,7 @@
       "pedestrian": "Pedestrian hit",
       "rollover": "Rollover",
       "fire": "Vehicle fire",
+      "crash": "Detected crash",
       "other": "Other"
     },
     "severity": {
