@@ -23,14 +23,25 @@ export class ProfileRepository {
     });
     return (await this.read(parsed.profile.id))!;
   }
-  async acknowledge(userId: string, revision: number, photoUrl?: string) {
+  async acknowledge(userId: string, revision: number) {
+    await this.database.write((db) => db.runAsync('UPDATE profile_cache SET dirty = 0 WHERE user_id = ? AND revision = ?', userId, revision).then(() => undefined));
+  }
+  // Clears an uploaded or missing photo but leaves the rest of the edit pending.
+  async settlePhoto(userId: string, name: string, photoUrl: string | null) {
     await this.database.write(async (db) => {
-      const row = await db.getFirstAsync<{ payload: string }>('SELECT payload FROM profile_cache WHERE user_id = ? AND revision = ?', userId, revision);
+      const row = await db.getFirstAsync<{ payload: string }>('SELECT payload FROM profile_cache WHERE user_id = ?', userId);
       if (!row) return;
       const bundle = profileBundleSchema.parse(JSON.parse(row.payload));
-      if (photoUrl) { bundle.profile.photoUrl = photoUrl; bundle.pendingPhoto = null; }
-      await db.runAsync('UPDATE profile_cache SET dirty = 0, payload = ? WHERE user_id = ? AND revision = ?', JSON.stringify(bundle), userId, revision);
+      if (bundle.pendingPhoto !== name) return;
+      const settled = { ...bundle, pendingPhoto: null, profile: photoUrl ? { ...bundle.profile, photoUrl } : bundle.profile };
+      await db.runAsync('UPDATE profile_cache SET payload = ? WHERE user_id = ?', JSON.stringify(settled), userId);
     });
+  }
+  // Replaces unsent edits with the server copy, unless a newer edit was saved meanwhile.
+  async discard(revision: number, bundle: ProfileBundle) {
+    const parsed = profileBundleSchema.parse(bundle);
+    await this.database.write((db) => db.runAsync('UPDATE profile_cache SET payload = ?, dirty = 0, revision = revision + 1, updated_at = ? WHERE user_id = ? AND revision = ?',
+      JSON.stringify(parsed), Date.now(), parsed.profile.id, revision).then(() => undefined));
   }
   async remove(userId: string) {
     await this.database.write((db) => db.runAsync('DELETE FROM profile_cache WHERE user_id = ?', userId).then(() => undefined));

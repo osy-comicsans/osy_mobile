@@ -36,6 +36,11 @@ function kindForStatus(status: number): ApiErrorKind {
   return status >= 500 ? 'server' : 'request';
 }
 
+// These will fail the same way on every attempt, so retrying cannot help.
+export const isPermanentError = (error: unknown): error is ApiError => (
+  error instanceof ApiError && ['conflict', 'validation', 'request'].includes(error.kind)
+);
+
 export function toApiError(error: unknown): ApiError {
   if (error instanceof ApiError) return error;
   if (isCancel(error)) return new ApiError('canceled', 'The request was canceled.');

@@ -1,19 +1,56 @@
 import { createStore } from 'zustand/vanilla';
+import { isPermanentError, type ApiErrorKind } from '../../api/apiError';
 import type { ProfileRepository } from '../repositories/profileRepository';
 import type { createProfileApi } from '../../../../features/profile/api/profileApi';
 import { profileBundleSchema, type ProfileBundle } from '../../../../features/profile/types/profile.schemas';
 
 type ProfileApi = ReturnType<typeof createProfileApi>;
-export interface ProfileState { revision: number; userId: string | null; loading: boolean; syncing: boolean; error: boolean; erasureAcknowledged: boolean }
-export function createProfileSyncManager(repository: Pick<ProfileRepository, 'read' | 'write' | 'acknowledge' | 'remove'>, api: ProfileApi,
-  photos?: { uriOf(name: string): string | null; remove(name: string): void }, isCurrentOwner: (id: string) => boolean = () => true) {
-  const store = createStore<ProfileState>(() => ({ revision: 0, userId: null, loading: false, syncing: false, error: false, erasureAcknowledged: false }));
+// A change the server refused. It stays on the phone until the user edits, retries or discards it.
+export interface ProfileRejection { revision: number; kind: ApiErrorKind; fields: string[] }
+export interface ProfileState { revision: number; userId: string | null; loading: boolean; syncing: boolean; error: boolean; erasureAcknowledged: boolean; rejection: ProfileRejection | null }
+export function createProfileSyncManager(repository: Pick<ProfileRepository, 'read' | 'write' | 'acknowledge' | 'settlePhoto' | 'discard' | 'remove'>, api: ProfileApi,
+  photos?: { uriOf(name: string): string | null; remove(name: string): void; clearOwner(owner: string): Promise<void> }, isCurrentOwner: (id: string) => boolean = () => true) {
+  const store = createStore<ProfileState>(() => ({ revision: 0, userId: null, loading: false, syncing: false, error: false, erasureAcknowledged: false, rejection: null }));
   let owner: string | null = null;
   let generation = 0;
   let online = false;
   let busy = false;
   let acknowledgedDeletion: boolean | null = null;
   const valid = (id: number, userId: string) => generation === id && owner === userId && isCurrentOwner(userId);
+
+  // Resolves false once the account changed, so nothing more is sent for it.
+  async function push({ profile, contacts, pendingPhoto }: ProfileBundle, id: number, userId: string) {
+    if (pendingPhoto) {
+      // A photo file that no longer exists cannot be sent, so the rest of the change goes without it.
+      const uri = photos?.uriOf(pendingPhoto);
+      const photoUrl = uri ? (await api.uploadPhoto(uri, pendingPhoto)).photoUrl : null;
+      if (!valid(id, userId)) return false;
+      // Kept at once, so a later failure does not upload the photo again.
+      await repository.settlePhoto(userId, pendingPhoto, photoUrl);
+      if (photoUrl && !photoUrl.startsWith('file:')) photos?.remove(pendingPhoto);
+      if (valid(id, userId)) store.setState((state) => ({ revision: state.revision + 1 }));
+    }
+    const saved = await api.updateProfile(profile);
+    if (JSON.stringify(saved.medical) !== JSON.stringify(profile.medical) || saved.vehicle !== profile.vehicle) {
+      throw new Error('Backend did not acknowledge the profile fields.');
+    }
+    if (!valid(id, userId)) return false;
+    await api.replaceEmergencyContacts(contacts);
+    return valid(id, userId);
+  }
+
+  async function download(userId: string): Promise<ProfileBundle> {
+    const [profile, contacts, stats, reports] = await Promise.allSettled([api.getProfile(), api.getEmergencyContacts(), api.getDrivingStats(), api.getReports()]);
+    if (profile.status !== 'fulfilled' || contacts.status !== 'fulfilled' || profile.value.id !== userId) throw new Error('Profile unavailable.');
+    const previous = await repository.read(userId);
+    return {
+      profile: profile.value, contacts: contacts.value.contacts,
+      stats: stats.status === 'fulfilled' ? stats.value : previous?.bundle.stats ?? null,
+      reports: reports.status === 'fulfilled' ? reports.value.reports : previous?.bundle.reports ?? [],
+      pendingPhoto: null,
+      historyAvailable: reports.status === 'fulfilled' || (previous?.bundle.historyAvailable ?? false),
+    };
+  }
 
   async function refresh() {
     if (!owner || !online || busy) return;
@@ -24,43 +61,23 @@ export function createProfileSyncManager(repository: Pick<ProfileRepository, 're
       const cached = await repository.read(userId);
       if (!valid(id, userId)) return;
       if (cached?.dirty) {
+        // Sending a refused change again would fail the same way.
+        if (cached.revision === store.getState().rejection?.revision) return;
         sentRevision = cached.revision;
-        let photoUrl: string | undefined;
-        if (cached.bundle.pendingPhoto) {
-          const uri = photos?.uriOf(cached.bundle.pendingPhoto);
-          if (!uri) throw new Error('Saved photo unavailable.');
-          photoUrl = (await api.uploadPhoto(uri, cached.bundle.pendingPhoto)).photoUrl;
-          if (!valid(id, userId)) return;
+        try {
+          if (!await push(cached.bundle, id, userId)) return;
+        } catch (error) {
+          if (!isPermanentError(error)) throw error;
+          if (valid(id, userId)) store.setState({ error: false, rejection: { revision: sentRevision, kind: error.kind, fields: Object.keys(error.fields) } });
+          return;
         }
-        const saved = await api.updateProfile(cached.bundle.profile);
-        if (JSON.stringify(saved.medical) !== JSON.stringify(cached.bundle.profile.medical) || saved.vehicle !== cached.bundle.profile.vehicle) {
-          throw new Error('Backend did not acknowledge the profile fields.');
-        }
-        if (!valid(id, userId)) return;
-        await api.replaceEmergencyContacts(cached.bundle.contacts);
-        if (!valid(id, userId)) return;
-        await repository.acknowledge(userId, sentRevision, photoUrl);
-        if (cached.bundle.pendingPhoto && photoUrl && !photoUrl.startsWith('file:')) {
-          const latest = await repository.read(userId);
-          if (latest?.bundle.pendingPhoto !== cached.bundle.pendingPhoto) photos?.remove(cached.bundle.pendingPhoto);
-        }
+        await repository.acknowledge(userId, sentRevision);
       }
-      const results = await Promise.allSettled([api.getProfile(), api.getEmergencyContacts(), api.getDrivingStats(), api.getReports()]);
-      if (!valid(id, userId)) return;
-      const [profile, contacts, stats, reports] = results;
-      if (profile.status !== 'fulfilled' || contacts.status !== 'fulfilled' || profile.value.id !== userId) throw new Error('Profile unavailable.');
-      const previous = await repository.read(userId);
-      const bundle: ProfileBundle = {
-        profile: profile.value, contacts: contacts.value.contacts,
-        stats: stats.status === 'fulfilled' ? stats.value : previous?.bundle.stats ?? null,
-        reports: reports.status === 'fulfilled' ? reports.value.reports : previous?.bundle.reports ?? [],
-        pendingPhoto: null,
-        historyAvailable: reports.status === 'fulfilled' || (previous?.bundle.historyAvailable ?? false),
-      };
+      const bundle = await download(userId);
       if (!valid(id, userId)) return;
       const cache = await repository.write(bundle, false);
       pendingRevision = cache.dirty ? cache.revision : -1;
-      if (valid(id, userId)) store.setState((state) => ({ revision: state.revision + 1, error: false }));
+      if (valid(id, userId)) store.setState((state) => ({ revision: state.revision + 1, error: false, rejection: null }));
       succeeded = true;
     } catch { if (valid(id, userId)) store.setState({ error: true }); }
     finally {
@@ -70,24 +87,26 @@ export function createProfileSyncManager(repository: Pick<ProfileRepository, 're
       }
     }
   }
+
+  async function releasePhoto(userId: string, name: string) {
+    try {
+      const cache = await repository.read(userId);
+      if (cache?.bundle.pendingPhoto !== name && !cache?.bundle.profile.photoUrl?.endsWith(name)) photos?.remove(name);
+    } catch { /* Keep the file when storage cannot confirm that it is unreferenced. */ }
+  }
+
   return {
-    store, refresh,
+    store, refresh, releasePhoto,
     async read(expectedOwner: string | null = owner) {
       if (!expectedOwner || expectedOwner !== owner || !isCurrentOwner(expectedOwner)) return null;
       const id = generation;
       const cache = await repository.read(expectedOwner);
       return valid(id, expectedOwner) ? cache : null;
     },
-    async releasePhoto(userId: string, name: string) {
-      try {
-        const cache = await repository.read(userId);
-        if (cache?.bundle.pendingPhoto !== name && !cache?.bundle.profile.photoUrl?.endsWith(name)) photos?.remove(name);
-      } catch { /* Keep the file when storage cannot confirm that it is unreferenced. */ }
-    },
     async connect(userId: string | null) {
       const id = ++generation; owner = userId; busy = false;
       acknowledgedDeletion = null;
-      store.setState((state) => ({ revision: state.revision + 1, userId, loading: Boolean(userId), error: false, syncing: false, erasureAcknowledged: false }));
+      store.setState((state) => ({ revision: state.revision + 1, userId, loading: Boolean(userId), error: false, syncing: false, erasureAcknowledged: false, rejection: null }));
       if (!userId) return;
       try {
         await repository.read(userId);
@@ -101,6 +120,31 @@ export function createProfileSyncManager(repository: Pick<ProfileRepository, 're
       const id = generation; const userId = owner;
       await repository.write(profileBundleSchema.parse(bundle), true);
       if (valid(id, userId)) { store.setState((state) => ({ revision: state.revision + 1, error: false })); void refresh(); }
+    },
+    // Sends a refused change again, for when the server may accept it now.
+    retry() { store.setState({ rejection: null }); return refresh(); },
+    // Drops unsent edits for the account's saved copy, which only the server has.
+    async discard() {
+      if (!owner || !online || busy || !isCurrentOwner(owner)) throw new Error('Connect before discarding.');
+      const id = generation; const userId = owner; busy = true;
+      store.setState({ syncing: true });
+      try {
+        const cached = await repository.read(userId);
+        const bundle = await download(userId);
+        if (!cached || !valid(id, userId)) throw new Error('Account changed.');
+        await repository.discard(cached.revision, bundle);
+        if (cached.bundle.pendingPhoto) await releasePhoto(userId, cached.bundle.pendingPhoto);
+        if (valid(id, userId)) store.setState((state) => ({ revision: state.revision + 1, error: false, rejection: null }));
+      } finally { if (valid(id, userId)) { busy = false; store.setState({ syncing: false }); } }
+    },
+    // Sends unsynced edits without the extra reads, for when the backend copy is about to be used.
+    async syncPending() {
+      const cache = owner ? await repository.read(owner).catch(() => null) : null;
+      if (cache?.dirty) await refresh();
+    },
+    // Signing out leaves no profile, medical details, contacts or photos on the phone.
+    async forget(userId: string) {
+      await Promise.all([repository.remove(userId), photos?.clearOwner(userId)]);
     },
     async erase(account: boolean) {
       if (!owner || !online || busy || !isCurrentOwner(owner)) throw new Error('Connect before deleting.');

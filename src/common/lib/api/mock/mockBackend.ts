@@ -180,6 +180,9 @@ export function createMockBackend(storage: MockStorage, latency = LATENCY_MS, op
     if (key === 'GET /me') return { status: 200, data: profile(user) };
     if (key === 'PUT /me') {
       const { firstName, lastName, mobileNumber, vehicle, medical } = body;
+      if (users.some((other) => other.id !== user.id && other.mobileNumber === mobileNumber)) {
+        return fail(409, 'mobile_taken', 'This mobile number is already registered.', { mobileNumber: 'This mobile number is already registered.' });
+      }
       Object.assign(user, { firstName, lastName, mobileNumber, vehicle, medical }); save(users);
       return { status: 200, data: profile(user) };
     }

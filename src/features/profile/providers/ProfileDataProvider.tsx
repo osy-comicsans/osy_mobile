@@ -27,6 +27,11 @@ export function ProfileDataProvider({ children }: PropsWithChildren) {
         const cache = { bundle, dirty, revision: (previous?.revision ?? 0) + 1 }; memory.set(bundle.profile.id, cache); return cache;
       },
       acknowledge: async (id: string, revision: number) => { const cache = memory.get(id); if (cache?.revision === revision) cache.dirty = false; },
+      // The web preview cannot choose a photo, so none is ever pending.
+      settlePhoto: async () => {},
+      discard: async (revision: number, bundle: ProfileBundle) => {
+        if (memory.get(bundle.profile.id)?.revision === revision) memory.set(bundle.profile.id, { bundle, dirty: false, revision: revision + 1 });
+      },
       remove: async (id: string) => { memory.delete(id); },
     };
     return createProfileService(repository, profileApi, profilePhotos,
