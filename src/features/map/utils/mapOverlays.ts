@@ -4,7 +4,7 @@ export type OverlayGeometry =
   | { type: 'Point'; coordinates: Position }
   | { type: 'LineString'; coordinates: Position[] };
 
-export type OverlayId = 'risk-roads' | 'hazards' | 'incidents' | 'route';
+export type OverlayId = 'current-road' | 'risk-roads' | 'hazards' | 'incidents' | 'route';
 
 export interface OverlayFeature {
   id: string;
@@ -15,7 +15,7 @@ export interface OverlayFeature {
 export type MapOverlays = Record<OverlayId, OverlayFeature[]>;
 
 // Risk highlighting (#16) and incident markers (#14) add their features here.
-export const EMPTY_OVERLAYS: MapOverlays = { 'risk-roads': [], hazards: [], incidents: [], route: [] };
+export const EMPTY_OVERLAYS: MapOverlays = { 'current-road': [], 'risk-roads': [], hazards: [], incidents: [], route: [] };
 
 interface Place {
   latitude: number;

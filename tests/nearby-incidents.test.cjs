@@ -227,10 +227,21 @@ test('the mock backend serves a valid incident near the driver', async () => {
     return request;
   });
   const { incidents } = await createSafetyApi(client).getNearbyIncidents({ latitude: 36.75, longitude: 3.05, radiusKm: 5 });
-  assert.equal(incidents.length, 1);
+  assert.equal(incidents.length, 4);
   const [mock] = incidents;
   assert.ok(mock.location.latitude > 36.75);
   assert.equal(mock.roadName, 'RN 5');
   const again = await createSafetyApi(client).getNearbyIncidents({ latitude: 36.7501, longitude: 3.0501, radiusKm: 5 });
   assert.equal(again.incidents[0].id, mock.id);
+});
+
+test('an incident may name the driver and car, and never needs to', () => {
+  const { incidentSchema } = require('../src/features/safety/types/safety.schemas.ts');
+  const base = {
+    id: '00000000-0000-4000-8000-000000000001', source: 'user_report', location: { latitude: 36.7, longitude: 3 },
+    occurredAt: '2026-10-30T10:00:00Z', type: 'collision', severity: 'serious', injuriesVisible: true, roadName: 'RN 5', distanceMeters: 100,
+  };
+  assert.equal(incidentSchema.parse(base).involved, undefined);
+  const involved = { firstName: 'Yacine', vehicle: 'Renault Symbol' };
+  assert.deepEqual(incidentSchema.parse({ ...base, involved }).involved, involved);
 });

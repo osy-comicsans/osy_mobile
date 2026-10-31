@@ -340,6 +340,16 @@ test('the mock backend answers nearby incidents', async () => {
   const storage = { value: null, getItem() { return this.value; }, setItem(_key, value) { this.value = value; } };
   const client = create({ adapter: createMockBackend(storage, 0), headers: { Authorization: 'Bearer mock-access.mock-demo' } });
   const { incidents } = await createSafetyApi(client).getNearbyIncidents({ latitude: 36.75, longitude: 3.05, radiusKm: 3 });
-  // Each area has one test accident, for nearby alerts.
-  assert.equal(incidents.length, 1);
+  // Each area has sample accidents, for nearby alerts.
+  assert.equal(incidents.length, 4);
+});
+
+test('the current road lights every part with its name', () => {
+  const { currentRoadFeatures } = require('../src/features/road-risk/utils/riskOverlay.ts');
+  const part = (id, name) => ({ id, name, coordinates: [{ latitude: 36.7, longitude: 3 }, { latitude: 36.8, longitude: 3.1 }] });
+  const a = part('a', 'RN 5'); const b = part('b', 'RN 5'); const c = part('c', 'RN 11'); const unnamed = part('d', null);
+  assert.deepEqual(currentRoadFeatures([a, b, c], a).map(({ id }) => id), ['current-a', 'current-b']);
+  assert.deepEqual(currentRoadFeatures([a, unnamed], unnamed).map(({ id }) => id), ['current-d']);
+  assert.deepEqual(currentRoadFeatures([a], null), []);
+  assert.deepEqual(currentRoadFeatures([a], a)[0].geometry.coordinates[0], [3, 36.7]);
 });

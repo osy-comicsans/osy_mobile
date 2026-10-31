@@ -11,6 +11,7 @@ import { useAlertService } from '@/features/alerts/hooks/useAlerts';
 import { useCurrentLocation } from '@/features/location/hooks/useLocation';
 import { useSettings } from '@/features/settings/hooks/useSettings';
 
+import { IncidentDetails } from '../components/IncidentDetails';
 import { useDismissModal } from '../hooks/useDismissModal';
 import { useNearbyIncident } from '../hooks/useNearbyIncidents';
 import { nearbyIncidents } from '../nearbyServices';
@@ -41,7 +42,7 @@ export function AlertDetailScreen() {
     <PlaceholderScreen
       title={alert ? t(`alerts.${alert.type}.title`) : t('safety.alertTitle')}
       description={alert ? alert.detail ?? t(`alerts.${alert.type}.body`) : t('safety.alertDescription')}>
-      {incident && <ThemedText type="bodyMedium">{t(`nearby.severity.${incident.severity}`)}</ThemedText>}
+      {incident && <IncidentDetails incident={incident} />}
       {roadName && <ThemedText type="bodyMedium">{roadName}</ThemedText>}
       {distance && (
         <ThemedText type="body" themeColor="textSecondary">

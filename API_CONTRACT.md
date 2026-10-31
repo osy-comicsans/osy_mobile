@@ -78,7 +78,7 @@ Field keys are defined in #28. A document marked `rejected` must include a `reje
 | `POST` | `/emergency/escalate/{id}/location` | `latitude`, `longitude` | `204` |
 | `POST` | `/emergency/escalate/{id}/cancel` | None | `200` escalation status |
 
-Incident: `id`, `source` (`user_report`, `crash_detected`), `location`, `occurredAt`, `type`, `severity` (`minor`, `serious`, `critical`), `injuriesVisible`, `note`.
+Incident: `id`, `source` (`user_report`, `crash_detected`), `location`, `occurredAt`, `type`, `severity` (`minor`, `serious`, `critical`), `injuriesVisible`, `note`. Nearby incidents may add `involved: { firstName, vehicle }`, both nullable. Send it only when that driver has consented to sharing it with nearby drivers. Never include a plate, phone number, last name or medical details.
 
 For a `user_report`, `type` is `collision`, `pedestrian`, `rollover`, `fire`, or `other`. A `crash_detected` incident uses `crash`. A request for help without a detected crash is a `user_report` of type `other`. A queued report can arrive long after `occurredAt`.
 

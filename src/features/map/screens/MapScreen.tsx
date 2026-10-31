@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Card } from '@/common/components/ui/card';
 import { Icon } from '@/common/components/ui/icon';
 import { useTheme } from '@/common/hooks/use-theme';
 import { BottomTabInset, Colors, Radius, Shadow, Space } from '@/common/lib/theme';
@@ -15,10 +16,14 @@ import type { Bounds } from '@/features/road-risk/types/roadRisk.types';
 import { riskAreasInView, type RiskArea } from '@/features/road-risk/utils/roadSegments';
 import { osrmApi } from '@/features/roads/api/osrmClient';
 import { ReportAccidentButton } from '@/features/safety/components/ReportAccidentButton';
+import { useRoadRisk } from '@/features/road-risk/hooks/useRoadRisk';
+import { currentRoadFeatures } from '@/features/road-risk/utils/riskOverlay';
+import { IncidentDetails } from '@/features/safety/components/IncidentDetails';
 import { useNearbyIncident, useNearbyIncidents } from '@/features/safety/hooks/useNearbyIncidents';
 
 import type { MapCanvas as MapCanvasType, MapCanvasHandle } from '../components/MapCanvas';
 import { RiskLegend } from '../components/RiskLegend';
+import { FOLLOW_ZOOM, ROUTE_ZOOM } from '../utils/mapStyle';
 import { RiskRoadCard } from '../components/RiskRoadCard';
 import { RoadInfoCard } from '../components/RoadInfoCard';
 import { RouteCard } from '../components/RouteCard';
@@ -57,13 +62,17 @@ export function MapScreen() {
   });
   const incidentLayer = useMemo(() => incidentFeatures(incidents), [incidents]);
   const routeLayer = useMemo(() => routeFeatures(route.data?.coordinates ?? []), [route.data]);
+  const { segments, currentSegment } = useRoadRisk();
+  const currentRoad = useMemo(() => currentRoadFeatures(segments, currentSegment), [segments, currentSegment]);
   const overlays = useMemo<MapOverlays>(() => ({
     ...(showRisk ? { ...EMPTY_OVERLAYS, 'risk-roads': risk.features, hazards: risk.hazardFeatures } : EMPTY_OVERLAYS),
+    'current-road': currentRoad,
     incidents: incidentLayer,
     route: routeLayer,
-  }), [showRisk, risk.features, risk.hazardFeatures, incidentLayer, routeLayer]);
+  }), [showRisk, risk.features, risk.hazardFeatures, currentRoad, incidentLayer, routeLayer]);
 
   useEffect(() => () => clearTimeout(settle.current), []);
+
 
   const onViewChange = useCallback((bounds: Bounds) => {
     clearTimeout(settle.current);
@@ -96,6 +105,9 @@ export function MapScreen() {
     <View style={[styles.root, { backgroundColor: theme.background }]}>
       <MapCanvas
         ref={canvas}
+        dangerLabel={t('roadRisk.dangerLabel')}
+        // Roads and their risk only draw close in. A route pulls back to show the accident too.
+        zoom={fix ? (incidentId ? ROUTE_ZOOM : FOLLOW_ZOOM) : undefined}
         following={following}
         overlays={overlays}
         onFollowingChange={setFollowing}
@@ -104,6 +116,7 @@ export function MapScreen() {
       />
       <View pointerEvents="box-none" style={[styles.top, { top: top + Space[3] }]}>
         <RoadInfoCard />
+        {target && <Card style={styles.incident}><IncidentDetails incident={target} /></Card>}
         {incidentId && (
           <RouteCard
             route={route.data ?? null}
@@ -138,6 +151,7 @@ export function MapScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.background },
+  incident: { padding: Space[4], boxShadow: Shadow.md },
   top: { position: 'absolute', start: Space[4], end: Space[4], gap: Space[2] },
   report: { position: 'absolute', start: Space[4], bottom: BottomTabInset + Space[6], alignItems: 'flex-start', gap: Space[2] },
   recenter: {

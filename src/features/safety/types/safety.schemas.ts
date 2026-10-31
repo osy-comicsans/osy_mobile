@@ -17,7 +17,15 @@ export const incidentRequestSchema = z.object({
   note: z.string().max(500).nullable(),
 });
 
+// Only what a nearby driver needs to find the car. Never a plate, phone number or
+// medical detail, and only when the driver agreed to share it.
+export const incidentInvolvedSchema = z.object({
+  firstName: z.string().trim().min(1).max(50).nullable(),
+  vehicle: z.string().trim().min(1).max(150).nullable(),
+});
+
 export const incidentSchema = incidentRequestSchema.omit({ note: true }).extend({
+  involved: incidentInvolvedSchema.nullable().optional(),
   roadName: z.string().nullable(),
   distanceMeters: z.number().nullable(),
 });

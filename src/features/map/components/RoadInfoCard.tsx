@@ -2,9 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/common/components/themed-text';
+import { Icon } from '@/common/components/ui/icon';
 import { useTheme } from '@/common/hooks/use-theme';
 import { Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 import { useCurrentSpeed } from '@/features/location/hooks/useLocation';
+import { useRoadRisk } from '@/features/road-risk/hooks/useRoadRisk';
 import { RoadHazardList } from '@/features/roads/components/RoadHazardList';
 import { useCurrentRoad } from '@/features/roads/hooks/useRoad';
 import { useRoadRules } from '@/features/roads/hooks/useRoadRules';
@@ -13,6 +15,7 @@ import { useSpeedDisplay } from '@/features/settings/hooks/useSpeedDisplay';
 export function RoadInfoCard() {
   const { t } = useTranslation();
   const { road, stale } = useCurrentRoad();
+  const { current } = useRoadRisk();
   const speed = useCurrentSpeed();
   const { speedLimit, hazards } = useRoadRules();
   const display = useSpeedDisplay(speed);
@@ -51,12 +54,18 @@ export function RoadInfoCard() {
         <ThemedText type="label" themeColor="textSecondary">{display.unit}</ThemedText>
       </View>
       </View>
+      {current?.level === 'high' ? <View style={styles.danger}>
+        <Icon name="warning" size={14} color={Colors.onAccent} />
+        <ThemedText type="label" style={styles.dangerText}>{t('roadRisk.dangerous')}</ThemedText>
+      </View> : null}
       <RoadHazardList hazards={hazards} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  danger: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: Space[1], paddingHorizontal: Space[3], paddingVertical: Space[1], borderRadius: Radius.full, backgroundColor: Colors.error },
+  dangerText: { color: Colors.onAccent },
   card: {
     gap: Space[2],
     padding: Space[4],
