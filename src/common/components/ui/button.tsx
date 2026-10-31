@@ -12,6 +12,7 @@ import {
 import { Colors, Palette, Radius, Shadow, Typography } from '@/common/lib/theme';
 import { useFontFallback } from '@/common/providers/FontReadinessProvider';
 import { LoadingIndicator } from './loading';
+import { useTheme } from '@/common/hooks/use-theme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'subtle' | 'text' | 'destructive' | 'logout';
 export type ButtonSize = 'large' | 'medium' | 'small';
@@ -35,7 +36,7 @@ const sizes = {
   small: { height: 32, paddingHorizontal: 16, type: Typography.buttonSmall },
 } as const;
 
-function palette(variant: ButtonVariant, tone: ButtonTone) {
+function palette(variant: ButtonVariant, tone: ButtonTone, Colors: Record<keyof typeof import('@/common/lib/tokens').Colors, string>) {
   const dark = tone === 'dark';
   switch (variant) {
     case 'primary':
@@ -88,7 +89,8 @@ export function Button({
   const fontFallback = useFontFallback();
   const accessibleLabel = rest.accessibilityLabel ?? label ?? (typeof children === 'string' ? children : t('loading.action'));
   const dims = sizes[size];
-  const colors = palette(variant, tone);
+  const theme = useTheme();
+  const colors = palette(variant, tone, theme);
   const isDisabled = disabled || loading;
   const pressedBg =
     variant === 'primary'

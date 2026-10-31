@@ -1,7 +1,7 @@
 import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
@@ -9,14 +9,20 @@ import { Card } from '@/common/components/ui/card';
 import { ContentSkeleton } from '@/common/components/ui/loading';
 import { formatDateTime, formatNumber } from '@/common/lib/i18n/format';
 import { getLanguage } from '@/common/lib/i18n/i18n';
-import { Colors, Radius, Space } from '@/common/lib/theme';
+import { Radius, Space } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 
 import { useWeather } from '../hooks/useWeather';
+import { useSettings } from '@/features/settings/hooks/useSettings';
+import { speedValue } from '@/features/settings/utils/units';
 
 export function WeatherWidget({ compact = false, glass = false }: { compact?: boolean; glass?: boolean }) {
+  const Colors = useTheme();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const [expanded, setExpanded] = useState(false);
   const showDetails = !compact || expanded;
   const weather = useWeather();
+  const { settings } = useSettings();
   const { t } = useTranslation();
   const language = getLanguage();
   const value = weather.snapshot;
@@ -25,6 +31,10 @@ export function WeatherWidget({ compact = false, glass = false }: { compact?: bo
   const time = (date: string | null | undefined) => date
     ? formatDateTime(language, new Date(date), { hour: '2-digit', minute: '2-digit', timeZone: value?.sun.timezone })
     : t('weather.unknown');
+  const wind = (ms: number | null) => t('preferences.radiusValue', {
+    value: ms === null ? t('weather.unknown') : number(speedValue(ms * 3.6, settings.units), 1),
+    unit: t(settings.units === 'mph' ? 'preferences.mph' : 'units.kmh'),
+  });
   const status = !weather.configured ? 'unconfigured' : weather.offline ? 'offline'
     : weather.awaitingLocation ? 'locationRequired' : 'unavailable';
 
@@ -57,9 +67,9 @@ export function WeatherWidget({ compact = false, glass = false }: { compact?: bo
               minutes: number(value.current.precipitationIntervalSeconds / 60),
             })} />
             <Metric label={t('weather.visibility')} value={t('weather.metres', { value: number(value.current.visibilityM) })} />
-            <Metric label={t('weather.wind')} value={t('weather.windValue', { value: number(value.current.windSpeedMs, 1) })} />
+            <Metric label={t('weather.wind')} value={wind(value.current.windSpeedMs)} />
             {showDetails ? <>
-              <Metric label={t('weather.gusts')} value={t('weather.windValue', { value: number(value.current.windGustMs, 1) })} />
+              <Metric label={t('weather.gusts')} value={wind(value.current.windGustMs)} />
               <Metric label={t('weather.sunrise')} value={time(value.sun.sunriseAt)} />
               <Metric label={t('weather.sunset')} value={time(value.sun.sunsetAt)} />
             </> : null}
@@ -99,18 +109,18 @@ export function WeatherWidget({ compact = false, glass = false }: { compact?: bo
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
-  return <View style={styles.metric}>
+  return <View style={metricStyle}>
     <ThemedText type="small" themeColor="textSecondary">{label}</ThemedText>
     <ThemedText type="bodyMedium">{value}</ThemedText>
   </View>;
 }
 
-const styles = StyleSheet.create({
+const metricStyle = { flexBasis: '43%' as const, flexGrow: 1, gap: Space[1] };
+const makeStyles = (Colors: ReturnType<typeof useTheme>) => StyleSheet.create({
   card: { alignSelf: 'stretch', gap: Space[4] },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: Space[2] },
   current: { gap: Space[1] },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Space[4] },
-  metric: { flexBasis: '43%', flexGrow: 1, gap: Space[1] },
   icing: { backgroundColor: Colors.accentSoft, padding: Space[3], borderRadius: Radius.md, gap: Space[1] },
   forecast: { flexDirection: 'row', flexWrap: 'wrap', gap: Space[2] },
   hour: { flexGrow: 1, minWidth: 70, gap: Space[1], padding: Space[2], borderRadius: Radius.sm, backgroundColor: Colors.backgroundElement },

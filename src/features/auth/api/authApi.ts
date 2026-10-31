@@ -13,7 +13,7 @@ export function createAuthApi(publicClient: AxiosInstance, session: AuthSession)
     const { user, accessToken, refreshToken } = await parseResponse(
       publicClient.post(path, body), authResponseSchema,
     );
-    await session.save({ accessToken, refreshToken });
+    await session.save({ accessToken, refreshToken }, user.id);
     return user;
   };
 

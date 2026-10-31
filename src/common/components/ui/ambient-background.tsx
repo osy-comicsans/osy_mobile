@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 
 /*
  * DESIGN.md §2.1 — static ambient canvas.
@@ -20,6 +21,9 @@ const whiteLift =
  * Kept deliberately subtle so cards, text, and borders stay dominant.
  */
 export function AmbientBackground() {
+  const theme = useTheme();
+  if (theme.background !== Colors.background) return <View pointerEvents="none" accessibilityElementsHidden
+    importantForAccessibility="no-hide-descendants" style={[styles.layer, { backgroundColor: theme.background }]} />;
   return (
     <View
       pointerEvents="none"

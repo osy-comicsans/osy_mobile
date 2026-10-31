@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { ReduceMotion, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +7,9 @@ import { ThemedText } from '@/common/components/themed-text';
 import { useReducedMotion } from '@/common/hooks/use-reduced-motion';
 import { formatNumber } from '@/common/lib/i18n/format';
 import { getLanguage } from '@/common/lib/i18n/i18n';
-import { Colors, Radius, Space, Typography } from '@/common/lib/theme';
+import { Radius, Space, Typography } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
+import { useSpeedDisplay } from '@/features/settings/hooks/useSpeedDisplay';
 
 // Display range only; this is independent of the current road's legal limit.
 export const SPEEDOMETER_MAX_KMH = 240;
@@ -19,13 +21,17 @@ const TICKS = Array.from({ length: TICK_COUNT + 1 }, (_, index) => ({
 }));
 
 export function Speedometer({ speedKmh }: { speedKmh: number | null }) {
+  const Colors = useTheme();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const language = getLanguage();
+  const display = useSpeedDisplay(speedKmh);
+  const maximum = display.units === 'mph' ? 160 : SPEEDOMETER_MAX_KMH;
   const reducedMotion = useReducedMotion();
   const [diameter, setDiameter] = useState(240);
   const radius = diameter / 2;
   const known = speedKmh !== null && Number.isFinite(speedKmh) && speedKmh >= 0;
-  const fraction = known ? Math.min(speedKmh / SPEEDOMETER_MAX_KMH, 1) : 0;
+  const fraction = known ? Math.min((display.value ?? 0) / maximum, 1) : 0;
   const progress = useSharedValue(fraction);
   useEffect(() => {
     progress.value = withTiming(fraction, {
@@ -35,14 +41,14 @@ export function Speedometer({ speedKmh }: { speedKmh: number | null }) {
   }, [fraction, known, progress, reducedMotion]);
   const arcMotion = useAnimatedStyle(() => ({ transform: [{ rotate: `${-180 + progress.value * 180}deg` }] }));
   const needleMotion = useAnimatedStyle(() => ({ transform: [{ rotate: `${-90 + progress.value * 180}deg` }] }));
-  const speed = known ? formatNumber(language, Math.round(speedKmh)) : '—';
+  const speed = known ? display.formatted : '—';
   const circle = { width: diameter, height: diameter, borderRadius: radius };
   const tickRadius = radius - TRACK_WIDTH - Space[3];
   const labelRadius = Math.max(0, radius - TRACK_WIDTH - Space[10]);
 
   return (
     <View style={styles.root} accessible
-      accessibilityLabel={known ? t('units.speedSpoken', { value: speed }) : t('units.speedUnknown')}
+      accessibilityLabel={known ? display.spoken : t('units.speedUnknown')}
       onLayout={({ nativeEvent }) => {
         const width = Math.round(nativeEvent.layout.width);
         if (width > 0) setDiameter(width);
@@ -74,7 +80,7 @@ export function Speedometer({ speedKmh }: { speedKmh: number | null }) {
               {major ? <ThemedText type="small" maxFontSizeMultiplier={1.2} style={[styles.scale, {
                 top: radius,
                 transform: [{ translateX: Math.cos(angle) * labelRadius - 20 }, { translateY: -Math.sin(angle) * labelRadius }],
-              }]}>{formatNumber(language, position * SPEEDOMETER_MAX_KMH)}</ThemedText> : null}
+              }]}>{formatNumber(language, position * maximum)}</ThemedText> : null}
             </View>
           );
         })}
@@ -85,13 +91,13 @@ export function Speedometer({ speedKmh }: { speedKmh: number | null }) {
       </View>
       <View style={styles.reading} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
         <ThemedText style={Typography.displayXL} numberOfLines={1} adjustsFontSizeToFit>{speed}</ThemedText>
-        <ThemedText type="bodyMedium" themeColor="textSecondary">{t('dashboard.speed.unit')}</ThemedText>
+        <ThemedText type="bodyMedium" themeColor="textSecondary">{display.unit}</ThemedText>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (Colors: ReturnType<typeof useTheme>) => StyleSheet.create({
   root: { width: '100%', maxWidth: 320, alignSelf: 'center', gap: Space[1] },
   dial: { overflow: 'hidden', direction: 'ltr' },
   clip: { position: 'absolute', top: 0, start: 0, end: 0, overflow: 'hidden' },

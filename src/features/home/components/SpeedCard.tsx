@@ -1,21 +1,24 @@
 import { StyleSheet, View } from 'react-native';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { Card } from '@/common/components/ui/card';
 import { ContentSkeleton } from '@/common/components/ui/loading';
-import { formatNumber } from '@/common/lib/i18n/format';
-import { getLanguage } from '@/common/lib/i18n/i18n';
-import { Colors, Radius, Space } from '@/common/lib/theme';
+import { Radius, Space } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 import { useRoadRules } from '@/features/roads/hooks/useRoadRules';
 import { useHomeLocation } from '../hooks/useHomeLocation';
 import { Speedometer } from './Speedometer';
+import { useSpeedDisplay } from '@/features/settings/hooks/useSpeedDisplay';
 
 export function SpeedCard() {
+  const Colors = useTheme();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const location = useHomeLocation();
   const { speedLimit } = useRoadRules();
-  const language = getLanguage();
+  const limitDisplay = useSpeedDisplay(speedLimit.valueKmh);
   return (
     <Card glass style={styles.card}>
       <View style={styles.header}>
@@ -29,7 +32,7 @@ export function SpeedCard() {
       <View style={styles.limit}>
         <ThemedText type="label" themeColor="textSecondary">{t('dashboard.speed.limit')}</ThemedText>
         <ThemedText type="bodyMedium">{speedLimit.valueKmh === null ? t('dashboard.speed.limitUnknown')
-          : t('units.speed', { value: formatNumber(language, speedLimit.valueKmh) })}</ThemedText>
+          : `${limitDisplay.formatted} ${limitDisplay.unit}`}</ThemedText>
         {speedLimit.source !== 'unknown' ? <ThemedText type="small" themeColor="textSecondary">{t(`dashboard.speed.${speedLimit.source}`)}</ThemedText> : null}
       </View>
       {!location.fresh ? <ThemedText type="label" themeColor="textSecondary">{t(`dashboard.location.${location.status}`)}</ThemedText> : null}
@@ -37,7 +40,7 @@ export function SpeedCard() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (Colors: ReturnType<typeof useTheme>) => StyleSheet.create({
   card: { gap: Space[4] },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: Space[2] },
   badge: { borderRadius: Radius.full, backgroundColor: Colors.accentSoft, paddingHorizontal: Space[3], paddingVertical: Space[1] },

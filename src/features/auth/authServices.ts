@@ -7,7 +7,7 @@ import { createAccountService } from './utils/accountService';
 
 export const authApi = createAuthApi(publicApi, authSession);
 export const documentsApi = createDocumentsApi(api);
-export const profileApi = createProfileApi(api);
+export const profileApi = createProfileApi(api, () => authSession.status.getState().userId);
 export const accountService = createAccountService({
   session: authSession,
   listDocuments: documentsApi.list,

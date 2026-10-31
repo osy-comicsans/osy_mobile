@@ -4,6 +4,7 @@ const folder = () => new Directory(Paths.document, 'report-photos');
 
 // iOS can move the app's folder on an update, so only the file name is queued.
 export const reportPhotos = {
+  clearAll() { const directory = folder(); if (directory.exists) directory.delete(); },
   keep(uri: string, name: string) {
     const directory = folder();
     directory.create({ idempotent: true });

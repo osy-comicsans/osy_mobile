@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors, Palette, Radius, Space, Typography } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 
 interface ChoicePillsProps<T extends string> {
   label: string;
@@ -11,6 +12,7 @@ interface ChoicePillsProps<T extends string> {
 
 // DESIGN.md §14.2 filter pills, with room for a thumb.
 export function ChoicePills<T extends string>({ label, options, selected, onSelect }: ChoicePillsProps<T>) {
+  const theme = useTheme();
   return (
     <View accessibilityRole="radiogroup" accessibilityLabel={label} style={styles.row}>
       {options.map((option) => {
@@ -21,8 +23,8 @@ export function ChoicePills<T extends string>({ label, options, selected, onSele
             accessibilityRole="radio"
             accessibilityState={{ selected: active }}
             onPress={() => onSelect(option.value)}
-            style={({ pressed }) => [styles.pill, active && styles.active, pressed && !active && styles.pressed]}>
-            <Text style={[Typography.buttonSmall, { color: active ? Colors.onAccent : Colors.textSecondary }]}>
+            style={({ pressed }) => [styles.pill, { backgroundColor: active ? theme.accent : pressed ? theme.backgroundElement : theme.accentSoft }]}>
+            <Text style={[Typography.buttonSmall, { color: active ? theme.onAccent : theme.textSecondary }]}>
               {option.label}
             </Text>
           </Pressable>

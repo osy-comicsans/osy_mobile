@@ -10,13 +10,13 @@ import { Card } from '@/common/components/ui/card';
 import { formatNumber } from '@/common/lib/i18n/format';
 import { getLanguage } from '@/common/lib/i18n/i18n';
 import { Colors, Space } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 
 import { CountdownRing } from '../components/CountdownRing';
 import { EscalationPanel } from '../components/EscalationPanel';
 import { VoiceIndicator } from '../components/VoiceIndicator';
 import { useCheckInService, useCheckInState } from '../hooks/useCheckIn';
 import { useVoiceCheckIn } from '../hooks/useVoiceCheckIn';
-import { CHECK_IN_ROUNDS_SECONDS } from '../utils/checkInService';
 
 const SHARED_ITEMS = ['location', 'road', 'speed'] as const;
 const CONFIRMED_DURATION = 1500;
@@ -39,6 +39,7 @@ function useSecondsLeft(endsAt: number | null) {
 }
 
 export function CheckInScreen() {
+  const theme = useTheme();
   const { t } = useTranslation();
   const service = useCheckInService();
   const { status, round, endsAt } = useCheckInState();
@@ -67,7 +68,7 @@ export function CheckInScreen() {
   const title = confirmed ? 'checkIn.confirmedTitle' : escalated ? 'checkIn.escalatedTitle' : 'checkIn.title';
 
   return (
-    <SafeAreaView style={styles.root}>
+    <SafeAreaView style={[styles.root, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <ThemedText
           type="title"
@@ -82,7 +83,7 @@ export function CheckInScreen() {
         ) : (
           <CountdownRing
             key={round}
-            total={CHECK_IN_ROUNDS_SECONDS[round]}
+            total={service.roundDuration()}
             remaining={secondsLeft}
             confirmed={confirmed}>
             <View

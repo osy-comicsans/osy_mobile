@@ -12,6 +12,7 @@ import { Pressable, View, StyleSheet } from 'react-native';
 import { ThemedText } from './themed-text';
 
 import { Colors, MaxContentWidth, Radius, Shadow, Spacing } from '@/common/lib/theme';
+import { useTheme } from '@/common/hooks/use-theme';
 
 export default function AppTabs() {
   const { t } = useTranslation();
@@ -37,16 +38,17 @@ export default function AppTabs() {
 }
 
 export function TabButton({ children, isFocused, ref, ...props }: TabTriggerSlotProps) {
+  const theme = useTheme();
   return (
     <Pressable
       {...props}
       // expo-router types this ref as RefAttributes<View>, which no longer matches Pressable's instance ref under RN 0.88's strict types.
       ref={ref as React.ComponentProps<typeof Pressable>['ref']}
       style={({ pressed }) => pressed && styles.pressed}>
-      <View style={[styles.tabButtonView, isFocused ? styles.tabActive : styles.tabInactive]}>
+      <View style={[styles.tabButtonView, { backgroundColor: isFocused ? theme.accent : theme.accentSoft }]}>
         <ThemedText
           type="bodyMedium"
-          style={isFocused ? styles.tabActiveLabel : styles.tabInactiveLabel}>
+          style={{ color: isFocused ? theme.onAccent : theme.textSecondary }}>
           {children}
         </ThemedText>
       </View>
@@ -55,10 +57,11 @@ export function TabButton({ children, isFocused, ref, ...props }: TabTriggerSlot
 }
 
 export function CustomTabList(props: TabListProps) {
+  const theme = useTheme();
   return (
     <View {...props} style={styles.tabListContainer}>
-      <View style={styles.innerContainer}>
-        <ThemedText type="headingS" style={styles.brandText}>
+      <View style={[styles.innerContainer, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+        <ThemedText type="headingS" style={[styles.brandText, { color: theme.textPrimary }]}>
           OSY
         </ThemedText>
 

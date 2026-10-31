@@ -117,7 +117,7 @@ export function ReportAccidentScreen() {
   return (
     <View style={styles.root}>
       <AmbientBackground />
-      <SafeAreaView style={styles.root} edges={['bottom']}>
+      <SafeAreaView style={[styles.root, { backgroundColor: 'transparent' }]} edges={['bottom']}>
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"

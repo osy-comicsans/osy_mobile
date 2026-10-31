@@ -9,6 +9,7 @@ import { extractFeatures } from '../model/crashFeatures';
 import { createCrashModelMonitor, type CrashClassifier } from '../model/crashModelMonitor';
 import { buildModelWindow, IMPACT_OFFSET_SECONDS, type SpeedSample } from '../model/modelWindow';
 import { createCrashDetector, replayTrace } from './crash.utils';
+import { sensitivityPolicy, type DetectionSensitivity } from './sensitivity';
 
 const SAME_CRASH_MS = 60_000;
 const CHECK_WINDOW_MS = 16_500;
@@ -20,11 +21,13 @@ export function createCrashDetectionService(
   location: StoreApi<LocationState>,
   now: () => number = Date.now,
   classify?: CrashClassifier,
+  getSensitivity?: () => DetectionSensitivity,
 ) {
   const store = createStore<CrashDetectionState>(() => ({ status: 'idle', lastCrash: null, lastNearMiss: null }));
   const listeners = new Set<(event: CrashEvent) => void>();
   const nearMissListeners = new Set<(event: NearMissEvent) => void>();
-  const detector = createCrashDetector();
+  const policy = () => sensitivityPolicy(getSensitivity?.() ?? 'standard');
+  const detector = createCrashDetector(policy);
   let session = 0;
   let sensors: Removable | null = null;
   let driving = false;
@@ -32,6 +35,7 @@ export function createCrashDetectionService(
   let unsubscribe: (() => void) | null = null;
 
   const emit = (event: CrashEvent) => {
+    if (getSensitivity && event.source !== 'model' && event.confidence < policy().confidence) return;
     store.setState({ lastCrash: event });
     listeners.forEach((listener) => listener(event));
   };
@@ -39,6 +43,7 @@ export function createCrashDetectionService(
   // The model runs beside the rules, so it can add a detection but never hide one.
   const model = classify ? createCrashModelMonitor({
     classify,
+    getThreshold: () => policy().modelThreshold,
     onCrash(event) {
       const last = store.getState().lastCrash;
       if (last && event.detectedAt - last.detectedAt < SAME_CRASH_MS) return;
@@ -62,10 +67,12 @@ export function createCrashDetectionService(
         return;
       }
       const subscription = await driver.subscribe((sample) => {
+        if (id !== session) return;
         const event = detector.addAcceleration(sample);
         if (event) emit(event);
         model?.addAcceleration(sample);
       }, (sample) => {
+        if (id !== session) return;
         detector.addRotation(sample);
         model?.addRotation(sample);
       });

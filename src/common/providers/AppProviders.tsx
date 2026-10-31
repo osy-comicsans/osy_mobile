@@ -10,6 +10,9 @@ import { subscribeToForeground } from '@/common/lib/native/appLifecycle';
 import { subscribeToConnectivity } from '@/common/lib/network/connectivity';
 import { createSafetyApi } from '@/features/safety/api/safetyApi';
 import { reportPhotos } from '@/features/safety/native/reportPhotos';
+import { profilePhotos } from '@/common/lib/native/profilePhoto';
+import { settingsService } from '@/features/settings/settingsService';
+import { defaultSettings } from '@/features/settings/types/settings.types';
 
 export const OfflineContext = createContext<OfflineRuntime | null>(null);
 
@@ -17,14 +20,20 @@ export function AppProviders({ children }: PropsWithChildren) {
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   }));
-  const [runtime] = useState(createOfflineRuntime);
+  const [runtime] = useState(() => createOfflineRuntime({
+    async finishPrivacyReset(owner) {
+      reportPhotos.clearAll();
+      await profilePhotos.clearOwner(owner);
+      await settingsService.update(defaultSettings);
+    },
+  }));
 
   useEffect(() => {
-    if (!runtime.status.getState().supported) return;
-
-    // Register real backend adapters here when their endpoints exist.
-    runtime.registerSyncAdapter(ACCIDENT_REPORT_ENTITY, createAccidentReportSyncAdapter(createSafetyApi(api), reportPhotos));
-    runtime.start(() => queryClient.invalidateQueries({ queryKey: ['local'] }));
+    if (runtime.status.getState().supported) {
+      // Web keeps profile previews in memory; native platforms use SQLite.
+      runtime.registerSyncAdapter(ACCIDENT_REPORT_ENTITY, createAccidentReportSyncAdapter(createSafetyApi(api), reportPhotos));
+      runtime.start(() => queryClient.invalidateQueries({ queryKey: ['local'] }));
+    }
     const unsubscribeNetwork = subscribeToConnectivity((online) => {
       onlineManager.setOnline(online);
       runtime.setOnline(online);

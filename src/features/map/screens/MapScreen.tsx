@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/common/components/ui/icon';
+import { useTheme } from '@/common/hooks/use-theme';
 import { BottomTabInset, Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 import { useCurrentLocation } from '@/features/location/hooks/useLocation';
 import { PlaceholderScreen } from '@/common/screens/PlaceholderScreen';
@@ -31,6 +32,7 @@ const sameAreas = (a: RiskArea[] | null, b: RiskArea[] | null) => (
 );
 
 export function MapScreen() {
+  const theme = useTheme();
   const { t } = useTranslation();
   const { top } = useSafeAreaInsets();
   const fix = useCurrentLocation();
@@ -91,7 +93,7 @@ export function MapScreen() {
   };
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { backgroundColor: theme.background }]}>
       <MapCanvas
         ref={canvas}
         following={following}
@@ -126,7 +128,7 @@ export function MapScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('map.recenter')}
           onPress={recenter}
-          style={({ pressed }) => [styles.recenter, pressed && styles.pressed]}>
+          style={({ pressed }) => [styles.recenter, { backgroundColor: pressed ? theme.accentSoft : theme.surface }]}>
           <Icon name="location" size={22} color={Colors.accent} />
         </Pressable>
       )}
@@ -150,5 +152,4 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     boxShadow: Shadow.md,
   },
-  pressed: { backgroundColor: Colors.accentSoft },
 });

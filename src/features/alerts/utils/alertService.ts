@@ -1,6 +1,7 @@
 import { createStore } from 'zustand/vanilla';
 
 import type { Language } from '@/common/lib/i18n/languages';
+import type { AppSettings } from '@/features/settings/types/settings.types';
 
 import type {
   AlertChannel, AlertDriver, AlertPermission, AlertPreferences, AlertText, AppAlert, PushToken,
@@ -22,9 +23,11 @@ interface AlertServiceOptions {
   sendPushToken: (token: PushToken & { language: Language }) => Promise<void>;
   onCheckInAnswer?: (action: string) => void;
   now?: () => number;
+  getSettings?: () => AppSettings;
+  speak?: (alert: AppAlert) => void;
 }
 
-export function createAlertService({ driver, navigate, sendPushToken, onCheckInAnswer, now = Date.now }: AlertServiceOptions) {
+export function createAlertService({ driver, navigate, sendPushToken, onCheckInAnswer, getSettings, speak, now = Date.now }: AlertServiceOptions) {
   const store = createStore<AlertState>(() => ({
     banner: null,
     permission: 'undetermined',
@@ -37,6 +40,11 @@ export function createAlertService({ driver, navigate, sendPushToken, onCheckInA
   const raised = new Set<string>();
   let bannerTimer: ReturnType<typeof setTimeout> | undefined;
   let sentLanguage: Language | null = null;
+  const enabled = (alert: AppAlert) => {
+    const settings = getSettings?.();
+    return settings === undefined || (settings.notifications[alert.type] && (alert.type !== 'accident_nearby'
+      || (alert.distanceMeters !== undefined && alert.distanceMeters <= settings.nearbyRadiusKm * 1000)));
+  };
 
   const dismissBanner = () => {
     clearTimeout(bannerTimer);
@@ -51,12 +59,13 @@ export function createAlertService({ driver, navigate, sendPushToken, onCheckInA
 
   const receive = (data: unknown) => {
     const alert = parseAlert(data);
-    if (!alert || !gate.allows(alert, now())) return;
+    if (!alert || (!enabled(alert) && alert.type !== 'crash_detected') || !gate.allows(alert, now())) return;
     gate.record(alert, now());
     alerts.set(alert.id, alert);
 
     const rule = ALERT_RULES[alert.type];
-    if (usesHaptics(alert.type, store.getState().preferences)) {
+    if (enabled(alert) && (getSettings?.().voice ?? true)) speak?.(alert);
+    if (enabled(alert) && usesHaptics(alert.type, store.getState().preferences)) {
       void driver.playHaptic(rule.severity).catch(() => undefined);
     }
     if (rule.fullScreen) navigate(alert);
@@ -74,7 +83,7 @@ export function createAlertService({ driver, navigate, sendPushToken, onCheckInA
 
   const shouldPlaySound = (data: unknown) => {
     const alert = parseAlert(data);
-    if (alert === null) return false;
+    if (alert === null || !enabled(alert)) return false;
     return (gate.allows(alert, now()) || raised.delete(alert.id))
       && usesSound(alert.type, store.getState().preferences);
   };
@@ -87,6 +96,7 @@ export function createAlertService({ driver, navigate, sendPushToken, onCheckInA
   return {
     store,
     dismissBanner,
+    refreshPermission: () => applyPermission(driver.getPermission).catch(() => undefined),
     open,
     getAlert: (id: string) => alerts.get(id) ?? null,
 
@@ -134,9 +144,9 @@ export function createAlertService({ driver, navigate, sendPushToken, onCheckInA
     // Reacts at once, so a phone without notification permission still responds.
     // The notification adds the sound, and a lock-screen entry when backgrounded.
     raise(alert: AppAlert, text: AlertText) {
-      raised.add(alert.id);
+      if (enabled(alert)) raised.add(alert.id);
       receive(toAlertData(alert));
-      void driver.present(alert, text, 0).catch(() => undefined);
+      if (enabled(alert)) void driver.present(alert, text, 0).catch(() => undefined);
     },
   };
 }

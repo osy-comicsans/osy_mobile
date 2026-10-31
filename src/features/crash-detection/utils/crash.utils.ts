@@ -83,7 +83,7 @@ function keepRecent(samples: MotionSample[], sample: MotionSample) {
 
 // An impact while driving, followed by the vehicle stopping, is a crash. A
 // phone that falls freely just before the impact was dropped instead.
-export function createCrashDetector() {
+export function createCrashDetector(getPolicy = () => ({ impactG: IMPACT_G, confidence: CHECK_IN_CONFIDENCE })) {
   const acceleration: MotionSample[] = [];
   const rotation: MotionSample[] = [];
   let lastFix: LocationFix | null = null;
@@ -154,7 +154,7 @@ export function createCrashDetector() {
     keepRecent(acceleration, sample);
     const g = magnitude(sample);
     if (!candidate) {
-      if (g >= IMPACT_G && sample.t >= quietUntil) open(sample, g);
+      if (g >= getPolicy().impactG && sample.t >= quietUntil) open(sample, g);
       return null;
     }
     if (candidate.carriedOn) {

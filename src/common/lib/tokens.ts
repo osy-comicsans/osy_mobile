@@ -72,6 +72,13 @@ export const Colors = {
 
 export type ThemeColor = keyof typeof Colors;
 
+export const DarkColors: Record<ThemeColor, string> = {
+  ...Colors, text: '#F5F5F5', textPrimary: '#F5F5F5', textSecondary: '#C8BBD8', textTertiary: '#9A8EAA',
+  background: '#10171C', surface: '#171F25', backgroundElement: '#292832', backgroundSelected: '#2C0A68',
+  border: '#45404C', borderStrong: '#655B70', accent: '#B78AFF', accentSoft: '#2C0A68',
+  onAccent: '#171F25', accentActive: '#D8C2FF', accentHover: '#D8C2FF',
+};
+
 export const Priority = {
   low: Colors.success,
   medium: Colors.warning,
@@ -99,6 +106,9 @@ export const Shadow = {
 
 /** Frosted variants of the fixed OSY white/lavender/charcoal palette. */
 export const Glass = {
+  darkSurface: 'rgba(23,31,37,0.86)',
+  darkAccent: 'rgba(44,10,104,0.88)',
+  darkTint: 'rgba(23,31,37,0.32)',
   surface: 'rgba(255,255,255,0.86)',
   accent: 'rgba(236,224,255,0.88)',
   edge: 'rgba(255,255,255,0.92)',

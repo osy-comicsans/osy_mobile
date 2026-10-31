@@ -9,6 +9,7 @@ import { Colors, Radius, Shadow, Space } from '@/common/lib/theme';
 
 import { useAlertService, useAlertState } from '../hooks/useAlerts';
 import { ALERT_RULES } from '../utils/alertRules';
+import { useTheme } from '@/common/hooks/use-theme';
 
 const severityStyles = {
   critical: { backgroundColor: Colors.errorSoft, borderColor: Colors.error },
@@ -17,6 +18,7 @@ const severityStyles = {
 } as const;
 
 export function AlertBanner() {
+  const theme = useTheme();
   const { t } = useTranslation();
   const service = useAlertService();
   const { banner } = useAlertState();
@@ -31,7 +33,7 @@ export function AlertBanner() {
       <View
         accessibilityRole="alert"
         accessibilityLiveRegion="assertive"
-        style={[styles.banner, severityStyles[ALERT_RULES[banner.type].severity]]}>
+        style={[styles.banner, severityStyles[ALERT_RULES[banner.type].severity], theme.background !== Colors.background && { backgroundColor: theme.surface }]}>
         <Pressable
           accessibilityRole="button"
           accessibilityHint={t('alerts.view')}

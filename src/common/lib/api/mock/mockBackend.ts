@@ -30,6 +30,11 @@ interface MockUser {
   mobileNumber: string;
   documents: Record<DocumentType, MockDocument>;
   contacts?: unknown[];
+  photoUrl?: string | null;
+  vehicle?: string | null;
+  medical?: { bloodType: string; allergies: string; conditions: string };
+  preferences?: unknown;
+  reports?: { id: string; occurredAt: string; type: string; severity: string; status: string }[];
 }
 
 interface MockStorage {
@@ -93,14 +98,23 @@ function formField(form: unknown, name: string): string {
   return typeof value === 'string' ? value : '';
 }
 
-export function createMockBackend(storage: MockStorage, latency = LATENCY_MS): AxiosAdapter {
+export function createMockBackend(storage: MockStorage, latency = LATENCY_MS, options = { persistSensitive: true }): AxiosAdapter {
+  let ephemeral: MockUser[] | undefined;
   const load = (): MockUser[] => {
+    if (!options.persistSensitive && ephemeral) return ephemeral;
     const saved = storage.getItem(STORAGE_KEY);
-    return saved ? (JSON.parse(saved) as MockUser[]) : seedUsers;
+    return saved ? (JSON.parse(saved) as MockUser[]) : JSON.parse(JSON.stringify(seedUsers)) as MockUser[];
   };
-  const save = (users: MockUser[]) => storage.setItem(STORAGE_KEY, JSON.stringify(users));
+  const save = (users: MockUser[]) => {
+    if (options.persistSensitive) storage.setItem(STORAGE_KEY, JSON.stringify(users));
+    else {
+      ephemeral = users;
+      const nonSensitive = users.map(({ medical: _medical, contacts: _contacts, reports: _reports, photoUrl: _photo, ...user }) => user);
+      storage.setItem(STORAGE_KEY, JSON.stringify(nonSensitive));
+    }
+  };
 
-  const profile = ({ documents, contacts: _contacts, ...user }: MockUser) => ({ ...user, onboardingStatus: onboardingStatus(documents) });
+  const profile = ({ documents, contacts: _contacts, reports: _reports, preferences: _preferences, ...user }: MockUser) => ({ ...user, onboardingStatus: onboardingStatus(documents) });
 
   function onboardingStatus(documents: MockUser['documents']) {
     return Object.values(documents).every(({ status }) => status === 'pending' || status === 'verified')
@@ -160,8 +174,30 @@ export function createMockBackend(storage: MockStorage, latency = LATENCY_MS): A
 
     const user = signedInUser(users, request);
     if (!user) return fail(401, 'unauthorized', 'Sign in again.');
+    const expectedOwner = request.headers.get('X-OSY-Owner');
+    if (expectedOwner && expectedOwner !== user.id) return fail(403, 'account_changed', 'Account changed.');
 
     if (key === 'GET /me') return { status: 200, data: profile(user) };
+    if (key === 'PUT /me') {
+      const { firstName, lastName, mobileNumber, vehicle, medical } = body;
+      Object.assign(user, { firstName, lastName, mobileNumber, vehicle, medical }); save(users);
+      return { status: 200, data: profile(user) };
+    }
+    if (key === 'PUT /me/photo') {
+      const parts = (body as { getParts?: () => { fieldName: string; uri?: string }[] }).getParts?.();
+      const uri = parts?.find((part) => part.fieldName === 'photo')?.uri;
+      if (!uri) return fail(422, 'invalid_photo', 'Choose a photo on a device.');
+      user.photoUrl = uri; save(users); return { status: 200, data: { photoUrl: uri } };
+    }
+    if (key === 'GET /me/driving-stats') return { status: 200, data: { trips: 0, distanceMeters: 0, warnings: 0 } };
+    if (key === 'GET /me/reports') return { status: 200, data: { reports: user.reports ?? [] } };
+    if (key === 'PUT /me/preferences') { user.preferences = body; save(users); return { status: 204 }; }
+    if (key === 'DELETE /me/data') {
+      user.contacts = []; user.medical = { bloodType: '', allergies: '', conditions: '' }; user.reports = [];
+      user.photoUrl = null; user.vehicle = null; user.preferences = undefined;
+      save(users); return { status: 204 };
+    }
+    if (key === 'DELETE /me') { save(users.filter(({ id }) => id !== user.id)); return { status: 204 }; }
     if (key === 'GET /me/documents') return { status: 200, data: documentsResponse(user) };
     if (key === 'POST /me/push-tokens') return { status: 204 };
 
@@ -175,6 +211,11 @@ export function createMockBackend(storage: MockStorage, latency = LATENCY_MS): A
     // Nothing is sent to anyone. The real backend notifies contacts by SMS or push.
     if (key === 'POST /incidents') {
       const { note: _note, ...incident } = body;
+      if (body.source === 'user_report') {
+        user.reports = [{ id: body.id, occurredAt: body.occurredAt, type: body.type, severity: body.severity, status: 'received' },
+          ...(user.reports ?? []).filter(({ id }) => id !== body.id)].slice(0, 100);
+        save(users);
+      }
       return { status: 201, data: { ...incident, roadName: null, distanceMeters: null } };
     }
     if (request.method?.toUpperCase() === 'POST' && /^\/incidents\/[^/]+\/photo$/.test(request.url ?? '')) {
