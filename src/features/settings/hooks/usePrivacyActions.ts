@@ -4,6 +4,7 @@ import { authSession } from '@/common/lib/api/axios';
 import { useOfflineRuntime, useOfflineStatus } from '@/common/hooks/use-offline';
 import { authApi } from '@/features/auth/authServices';
 import { useProfileService } from '@/features/profile/providers/ProfileDataProvider';
+import { clearVehicle } from '@/features/auth/native/documentVault';
 import { reportPhotos } from '@/features/safety/native/reportPhotos';
 import { settingsService } from '../settingsService';
 import { defaultSettings } from '../types/settings.types';
@@ -28,6 +29,7 @@ export function usePrivacyActions() {
       erased = true;
       if (supported) { await runtime.profiles.purgePersonalData(userId); reportPhotos.clearAll(); }
       await profilePhotos.clearOwner(userId);
+      await clearVehicle(userId);
       await settingsService.update(defaultSettings);
       queryClient.clear();
       await privacyReset.complete(); cleaned = true;
