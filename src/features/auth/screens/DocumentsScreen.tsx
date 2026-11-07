@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
+import { Card } from '@/common/components/ui/card';
 import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
 import { Checkbox } from '@/common/components/ui/checkbox';
 import { Icon } from '@/common/components/ui/icon';
 import { useTheme } from '@/common/hooks/use-theme';
-import { Colors, Palette, Radius, Space } from '@/common/lib/theme';
+import { Colors, Palette, Space } from '@/common/lib/theme';
 
 import { accountService } from '../authServices';
 import { AuthScreen } from '../components/AuthScreen';
@@ -48,6 +49,7 @@ export function DocumentsScreen() {
       title={t('documents.title')}
       description={t('documents.description')}
       progress={{ step: 1, fill: sent / DOCUMENT_ORDER.length }}
+      bare
       footer={(
         <Button
           label={t(current ? `documents.add.${current}` : 'documents.continue')}
@@ -58,28 +60,29 @@ export function DocumentsScreen() {
         />
       )}>
       {loadFailed ? (
-        <>
+        <Card style={styles.failed}>
           <FormNotice message={t('documents.loadFailed')} />
           <Button label={t('common.tryAgain')} variant="tonal" size="large" loading={retrying} onPress={() => void retry()} />
-        </>
+        </Card>
       ) : (
-        <DocumentTracker documents={documents} current={current} />
+        <Card padded={false}><DocumentTracker documents={documents} current={current} /></Card>
       )}
 
-      <View style={[styles.consent, { backgroundColor: theme.background }]}>
+      <Card tone="accentSoft" style={styles.consent}>
         <View style={styles.consentTitle}>
           <Icon name="shield" size={20} color={theme.accent} />
           <ThemedText type="headingS" style={styles.consentHeading}>{t('documents.consentTitle')}</ThemedText>
         </View>
         <ThemedText type="body" style={styles.consentBody}>{t('documents.consentBody')}</ThemedText>
         <Checkbox checked={consented} onPress={() => setConsented(!consented)} label={t('documents.consentAccept')} />
-      </View>
+      </Card>
     </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  consent: { gap: Space[3], padding: Space[4], borderRadius: Radius.lg },
+  consent: { gap: Space[3] },
+  failed: { gap: Space[4] },
   consentTitle: { flexDirection: 'row', alignItems: 'center', gap: Space[2] },
   consentHeading: { flex: 1 },
   consentBody: { color: Palette.neutral[600] },

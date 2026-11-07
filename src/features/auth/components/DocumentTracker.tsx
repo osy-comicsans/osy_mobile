@@ -35,7 +35,7 @@ export function DocumentTracker({ documents, current }: { documents: DocumentRec
   const theme = useTheme();
 
   return (
-    <View style={[styles.list, { borderColor: theme.border }]}>
+    <View style={styles.list}>
       {DOCUMENT_ORDER.map((type, index) => {
         const record = documents.find((document) => document.type === type);
         const status = record?.status ?? 'missing';
@@ -63,7 +63,7 @@ export function DocumentTracker({ documents, current }: { documents: DocumentRec
 }
 
 const styles = StyleSheet.create({
-  list: { borderWidth: 1, borderRadius: Radius.lg, overflow: 'hidden' },
+  list: { overflow: 'hidden' },
   divider: { height: 1 },
   row: {
     flexDirection: 'row',

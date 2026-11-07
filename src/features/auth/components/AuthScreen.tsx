@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/common/components/themed-text';
 import { AnimatedLogo } from '@/common/components/ui/animated-logo';
+import { Card } from '@/common/components/ui/card';
 import { Icon } from '@/common/components/ui/icon';
 import { useOnline } from '@/common/hooks/use-online';
 import { useTheme } from '@/common/hooks/use-theme';
@@ -23,24 +24,27 @@ type AuthScreenProps = PropsWithChildren<{
   progress?: SignupStep;
   showBack?: boolean;
   onBack?: () => void;
-  // Pinned to the bottom of the sheet, below any free space.
+  // Pinned to the bottom, below any free space.
   footer?: ReactNode;
+  // Sections bring their own cards, so the content is not wrapped in one.
+  bare?: boolean;
 }>;
 
-export function AuthScreen({ title, description, logo, progress, showBack, onBack, footer, children }: AuthScreenProps) {
+export function AuthScreen({ title, description, logo, progress, showBack, onBack, footer, bare, children }: AuthScreenProps) {
   const theme = useTheme();
   const { t } = useTranslation();
   const online = useOnline();
   const { top, bottom } = useSafeAreaInsets();
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.root}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[styles.root, { backgroundColor: theme.background }]}>
       <StatusBar style="light" />
       <ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scroll}>
         <View style={[styles.header, { paddingTop: top + Space[4] }]}>
+          {/* The step bar fills the top row, so the road would sit on its labels. */}
           {!progress && (
             <Image source={require('@/assets/brand/osy-road-motif.png')} contentFit="contain" transition={0}
               accessible={false} style={styles.road} />
@@ -68,10 +72,10 @@ export function AuthScreen({ title, description, logo, progress, showBack, onBac
           </View>
         </View>
 
-        <View style={[styles.sheet, { backgroundColor: theme.surface, paddingBottom: bottom + Space[8] }]}>
-          <View style={styles.sheetContent}>
+        <View style={[styles.body, { paddingBottom: bottom + Space[6] }]}>
+          <View style={styles.bodyContent}>
             {!online && <FormNotice tone="warning" message={t('auth.offline')} />}
-            {children}
+            {bare ? children : <Card style={styles.card}>{children}</Card>}
             {footer && (
               <>
                 <View style={styles.spacer} />
@@ -86,11 +90,15 @@ export function AuthScreen({ title, description, logo, progress, showBack, onBac
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: Colors.accent },
+  root: { flex: 1 },
   scroll: { flexGrow: 1 },
+  // The same purple hero as the rest of the app, rounded at the bottom.
   header: {
-    paddingHorizontal: Space[6],
-    paddingBottom: 28,
+    backgroundColor: Colors.accent,
+    paddingHorizontal: Space[5],
+    paddingBottom: Space[8],
+    borderBottomStartRadius: Radius.xxl,
+    borderBottomEndRadius: Radius.xxl,
     overflow: 'hidden',
     alignItems: 'center',
   },
@@ -110,15 +118,9 @@ const styles = StyleSheet.create({
   headerText: { gap: 6 },
   title: { color: Colors.onAccent },
   description: { color: Palette.purple[100] },
-  sheet: {
-    flexGrow: 1,
-    alignItems: 'center',
-    paddingTop: Space[6],
-    paddingHorizontal: Space[6],
-    borderTopStartRadius: Radius.xxl,
-    borderTopEndRadius: Radius.xxl,
-  },
-  sheetContent: { flexGrow: 1, width: '100%', maxWidth: MaxContentWidth, gap: Space[5] },
+  body: { flexGrow: 1, alignItems: 'center', paddingTop: Space[5], paddingHorizontal: Space[4] },
+  bodyContent: { flexGrow: 1, width: '100%', maxWidth: MaxContentWidth, gap: Space[4] },
+  card: { gap: Space[5] },
   spacer: { flexGrow: 1 },
   footer: { gap: Space[5] },
 });

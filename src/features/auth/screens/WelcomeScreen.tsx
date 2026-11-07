@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/common/components/themed-text';
 import { AnimatedLogo } from '@/common/components/ui/animated-logo';
 import { Button } from '@/common/components/ui/button';
+import { Card } from '@/common/components/ui/card';
 import { useTheme } from '@/common/hooks/use-theme';
 import { Colors, MaxContentWidth, Palette, Radius, Space, Typography } from '@/common/lib/theme';
 
@@ -36,11 +37,13 @@ export function WelcomeScreen() {
         </View>
       </View>
 
-      <View style={[styles.sheet, { backgroundColor: theme.surface, paddingBottom: bottom + Space[8] }]}>
-        <View style={styles.sheetContent}>
-          <LanguageSwitch />
-          <Button label={t('auth.createAccount')} size="large" onPress={() => router.push('/register')} />
-          <Button label={t('auth.signIn')} variant="tonal" size="large" onPress={() => router.push('/login')} />
+      <View style={[styles.body, { backgroundColor: theme.background, paddingBottom: bottom + Space[6] }]}>
+        <View style={styles.bodyContent}>
+          <Card style={styles.actions}>
+            <LanguageSwitch />
+            <Button label={t('auth.createAccount')} size="large" onPress={() => router.push('/register')} />
+            <Button label={t('auth.signIn')} variant="tonal" size="large" onPress={() => router.push('/login')} />
+          </Card>
           <EmergencyAccess variant="card" />
         </View>
       </View>
@@ -49,9 +52,19 @@ export function WelcomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: Colors.accent },
+  root: { flex: 1, backgroundColor: Colors.background },
   scroll: { flexGrow: 1 },
-  hero: { flexGrow: 1, alignItems: 'center', paddingHorizontal: 28, paddingBottom: 28, overflow: 'hidden' },
+  // The app's purple hero, given more room here as the front door.
+  hero: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingHorizontal: 28,
+    paddingBottom: Space[8],
+    overflow: 'hidden',
+    backgroundColor: Colors.accent,
+    borderBottomStartRadius: Radius.xxl,
+    borderBottomEndRadius: Radius.xxl,
+  },
   road: { position: 'absolute', start: -30, top: 40, width: 470, height: 291 },
   heroContent: {
     flexGrow: 1,
@@ -63,12 +76,7 @@ const styles = StyleSheet.create({
   headline: { gap: Space[2] },
   title: { color: Colors.onAccent },
   description: { color: Palette.purple[100] },
-  sheet: {
-    alignItems: 'center',
-    paddingTop: Space[6],
-    paddingHorizontal: Space[6],
-    borderTopStartRadius: Radius.xxl,
-    borderTopEndRadius: Radius.xxl,
-  },
-  sheetContent: { width: '100%', maxWidth: MaxContentWidth, gap: Space[3] },
+  body: { alignItems: 'center', paddingTop: Space[4], paddingHorizontal: Space[4] },
+  bodyContent: { width: '100%', maxWidth: MaxContentWidth, gap: Space[3] },
+  actions: { gap: Space[3] },
 });

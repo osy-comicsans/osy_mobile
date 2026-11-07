@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useStore } from 'zustand';
 
+import { Card } from '@/common/components/ui/card';
 import { ThemedText } from '@/common/components/themed-text';
 import { Button } from '@/common/components/ui/button';
 import { Icon } from '@/common/components/ui/icon';
@@ -117,6 +118,7 @@ export function DocumentReviewScreen() {
       title={t(`documents.types.${type}`)}
       description={t('documents.reviewDescription')}
       progress={{ step: 2, fill: 0.5 }}
+      bare
       showBack
       onBack={() => retake()}
       footer={(
@@ -130,7 +132,7 @@ export function DocumentReviewScreen() {
           />
         </>
       )}>
-      <View style={styles.section}>
+      <Card style={styles.section}>
         <View style={styles.heading}>
           <ThemedText type="headingS" accessibilityRole="header">{t('documents.photos')}</ThemedText>
           <Pressable
@@ -165,9 +167,9 @@ export function DocumentReviewScreen() {
             );
           })}
         </View>
-      </View>
+      </Card>
 
-      <View style={styles.details}>
+      <Card style={styles.details}>
         <ThemedText type="headingS" accessibilityRole="header">{t('documents.detailsTitle')}</ThemedText>
         {ocrFailed && (
           <FormNotice
@@ -194,13 +196,13 @@ export function DocumentReviewScreen() {
             ))}
           </View>
         ))}
-      </View>
+      </Card>
     </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  section: { gap: Space[2] },
+  section: { gap: Space[3] },
   heading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   retake: { flexDirection: 'row', alignItems: 'center', gap: Space[2], minHeight: 44 },
   retakeFaded: { opacity: 0.5 },
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
   pageColumn: { flex: 1, gap: Space[2] },
   page: { height: 104, borderRadius: Radius.md, borderWidth: 1 },
   pdf: { alignItems: 'center', justifyContent: 'center', gap: Space[1], padding: Space[2] },
-  details: { gap: Space[4], marginTop: Space[1] },
+  details: { gap: Space[4] },
   fieldRow: { flexDirection: 'row', gap: Space[3] },
   field: { flex: 1 },
 });
